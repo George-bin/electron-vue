@@ -35,17 +35,17 @@ export default {
     login () {
       let data = {
         username: this.username,
-        password: ''
+        password: this.password
       }
       this.$store.commit('showLoading');
       return new Promise((resolve, reject) => {
-        request.login('/login', 'post', data, function (res) {
+        request.login('/login', 'post', data, (res) => {
           this.$store.commit('hideLoading');
           localStorage.setItem('username', this.username);
           // 全局函数-showTips
           this.showTips(res);
           resolve(res);
-        }.bind(this));
+        });
       })
     },
     async asyncLogin () {

@@ -48,37 +48,10 @@
           </li>
         </ul>
         <!-- 事件列表 -->
-        <div class="event-list">
-          <ul>
-            <li
-              v-for="item in eventList"
-              :key="item._id">
-              <strong
-                @click="editEvent(item)"
-                class="item-content">{{item.eventName}}
-              </strong>
-              <template v-if="item.state === 0 || item.state === 3">
-                <span
-                  class="edit-button"
-                  v-if="item.state === 0"
-                  @click="addNowEndEventList(item)">今日完成</span>
-                <span
-                  class="edit-button"
-                  v-else-if="item.state === 3"
-                  @click="outInRecycleBin(item)">暂缓完成</span>
-                <span class="edit-button" @click="endEvent(item)">完成</span>
-                <span class="edit-button" @click="addRecycleBin(item)">回收</span>
-              </template>
-              <template v-else-if="item.state === 1">
-                <span class="edit-button" @click="addToNoEndEvent(item)">尚未完成</span>
-              </template>
-              <template v-else>
-                <span class="edit-button" @click="clearEvent(item)">销毁</span>
-                <span class="edit-button" @click="outInRecycleBin(item)">恢复</span>
-              </template>
-            </li>
-          </ul>
-        </div>
+        <eventlist-template
+          :eventList="this.eventList"
+          @updateData="updateData">
+        </eventlist-template>
       </div>
     </section>
   </div>
@@ -86,8 +59,7 @@
 
 <script>
   import request from '@/utils/script/request.js';
-  import TipsTemplate from '@/comm/tips-template';
-  import LoadingTemplate from '@/comm/loading-template';
+  import eventlistTemplate from '@/comm/eventlist-template';
   export default {
     name: 'landing-page',
     data () {
@@ -97,7 +69,6 @@
         eventData: '', // 添加事件名字
         eventList: [], // 当前显示事件列表
         allEventList: [], // 总的事件列表
-        editEventId: '', // 编辑事件的id
         endEventNum: 0, // 完成事件的数量
         noEndEventNum: 0, // 未完成事件的数量
         nowNoEndEventNum: 0, // 今日待完成事项
@@ -136,7 +107,7 @@
       // 添加待办事项
       addEvent () {
         let data = {
-          state: 0, // 事件状态 0：未完成 1：已完成
+          state: 0, // 事件状态 0：未完成 1：已完成 2：进入回收站 3：需要今日完成
           eventName: this.eventName, // 事件名称
           eventData: this.eventData, // 事件名称
           username: this.username, // 用户
@@ -158,63 +129,6 @@
         }.bind(this));
       },
 
-      // 将事项添加至回收站
-      addRecycleBin (event) {
-        let data = {
-          _id: event._id
-        }
-        this.$store.commit('showLoading');
-        request.addrecyclebin(`/addRecycleBin/${event._id}`, 'put', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          // 全局函数-showTips
-          this.showTips(res)
-          if (res.data.errcode === 0) {
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
-      },
-
-      // 移出回收站
-      outInRecycleBin (event) {
-        let data = {
-          _id: event._id
-        }
-        this.$store.commit('showLoading');
-        request.outinrecyclebin(`/outInRecycleBin/${event._id}`, 'put', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          // 全局函数-showTips
-          this.showTips(res)
-          if (res.data.errcode === 0) {
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
-      },
-
-      // 添加至今日需完成列表
-      addNowEndEventList (event) {
-        let data = {
-          _id: event._id
-        }
-        this.$store.commit('showLoading');
-        request.addnowendeventlist(`/addNowEndEventList/${event._id}`, 'put', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          // 全局函数-showTips
-          this.showTips(res)
-          if (res.data.errcode === 0) {
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
-      },
-
       // 获取事项列表
       getEventList () {
         this.$store.commit('showLoading');
@@ -222,9 +136,7 @@
           this.$store.commit('hideLoading');
           if (res.data.errcode === 0) {
             this.activeClass = 'no-end';
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
+            this.updateData(res.data.eventList, 'no-end');
             return;
           } else {
             // 全局函数-showTips
@@ -234,64 +146,11 @@
         })
       },
 
-      // 编辑事件
-      editEvent (data) {
-        this.$router.push({ path: '/editorevent', query: {event: data} });
-      },
-
-      // 添加到完成事件
-      endEvent (item) {
-        let data = {
-          _id: item._id
-        };
-        this.$store.commit('showLoading');
-        request.endevent(`/endevent/${data._id}`, 'put', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          // 全局函数-showTips
-          this.showTips(res)
-          if (res.data.errcode === 0) {
-            this.editEventId = '';
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
-      },
-
-      // 将完成事件移至未完成事件
-      addToNoEndEvent (event) {
-        let data = {
-          _id: event._id
-        }
-        this.$store.commit('showLoading');
-        request.tonoendevent(`/toNoEndEvent/${event._id}`, 'put', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          // 全局函数-showTips
-          this.showTips(res)
-          if (res.data.errcode === 0) {
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
-      },
-
-      // 计算事件完成情况
-      calculationEndNum (events) {
-        let endEventsList = events.filter(item => {
-          return item.state === 1;
-        });
-        let recycleBinEventList = events.filter(item => {
-          return item.state === 2;
-        });
-        let nowEndEventList = events.filter(item => {
-          return item.state === 3;
-        });
-        this.endEventNum = endEventsList.length;
-        this.noEndEventNum = events.length - endEventsList.length - recycleBinEventList.length;
-        this.nowNoEndEventNum = nowEndEventList.length;
+      // 触发父组件数据更新
+      updateData (allEventList, type) {
+        this.allEventList = allEventList;
+        this.eventList = this.filterEvent(type);
+        this.calculationEndNum(allEventList)
       },
 
       // 过滤代办事项
@@ -319,23 +178,20 @@
         }
       },
 
-      // 销毁事件
-      clearEvent (event) {
-        let data = {
-          _id: event._id
-        }
-        this.$store.commit('showLoading');
-        request.clearevent('/clearEvent', 'post', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          // 全局函数-showTips
-          this.showTips(res)
-          if (res.data.errcode === 0) {
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('recycle-bin');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
+      // 计算事件完成情况
+      calculationEndNum (events) {
+        let endEventsList = events.filter(item => {
+          return item.state === 1;
+        });
+        let recycleBinEventList = events.filter(item => {
+          return item.state === 2;
+        });
+        let nowEndEventList = events.filter(item => {
+          return item.state === 3;
+        });
+        this.endEventNum = endEventsList.length;
+        this.noEndEventNum = events.length - endEventsList.length - recycleBinEventList.length;
+        this.nowNoEndEventNum = nowEndEventList.length;
       },
 
       // 获取已完成事项的数据
@@ -362,13 +218,13 @@
         this.eventList = this.filterEvent('recycle-bin');
       }
     },
+
     activated () {
       this.initData();
     },
     mounted () {},
     components: {
-      TipsTemplate,
-      LoadingTemplate
+      eventlistTemplate
     },
   }
 </script>
