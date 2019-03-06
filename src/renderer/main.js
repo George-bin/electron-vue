@@ -11,8 +11,13 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 
+// 引入element-ui
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+Vue.use(ElementUI)
+
 // 引入全局函数
-import './utils/script/global-function';
+import './utils/script/global-function'
 
 Vue.use(VueQuillEditor)
 

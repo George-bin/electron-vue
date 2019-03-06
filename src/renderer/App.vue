@@ -44,4 +44,10 @@
   * {
     font-family: '微软雅黑';
   }
+  body, html {
+    height: 100%;
+  }
+  #app {
+    height: 100%
+  }
 </style>

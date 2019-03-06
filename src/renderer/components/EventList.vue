@@ -8,8 +8,7 @@
         <strong>{{username}}</strong><span @click="logon">注销</span>
       </div>
     </header>
-    <!-- body -->
-    <section class="add-event">
+    <div class="add-event-box">
       <!-- 新增事件框 -->
       <div class="input-box">
         <input
@@ -18,35 +17,37 @@
           v-model="eventName"
           @keyup.enter="addEvent" />
       </div>
-      <!-- 刷新按钮 -->
-      <!-- <div class="refresh">
-        <span @click="getEventList">刷新</span>
-      </div> -->
+    </div>
+    <!-- 事件列表 -->
+    <section class="event-list-box">
       <!-- 事件区域 -->
-      <div class="event-box" :style="{height: eventListHeight}">
+      <div class="event-box">
         <!-- 左侧导航 -->
-        <ul class="event-num">
-          <li
-            @click="getNowEndEventList"
-            :style="{color: activeClass === 'now-end' ? 'orange' :'white'}">
-            今日待完成：{{nowNoEndEventNum}}
-          </li>
-          <li
-            @click="getEndEventList"
-            :style="{color: activeClass === 'end' ? 'orange' :'white'}">
-            已完成事项：{{endEventNum}}
-          </li>
-          <li
-            @click="getNoEndEventList"
-            :style="{color: activeClass === 'no-end' ? 'orange' :'white'}">
-            未完成事项：{{noEndEventNum}}
-          </li>
-          <li
-            @click="goRecycleBin"
-            :style="{color: activeClass === 'recycle-bin' ? 'orange' :'white'}">
-            回收站
-          </li>
-        </ul>
+        <aside class="event-num">
+          <ul>
+            <li
+              @click="getNowEndEventList"
+              :style="{color: activeClass === 'now-end' ? 'orange' :'white'}">
+              今日待完成：{{nowNoEndEventNum}}
+            </li>
+            <li
+              @click="getEndEventList"
+              :style="{color: activeClass === 'end' ? 'orange' :'white'}">
+              已完成事项：{{endEventNum}}
+            </li>
+            <li
+              @click="getNoEndEventList"
+              :style="{color: activeClass === 'no-end' ? 'orange' :'white'}">
+              未完成事项：{{noEndEventNum}}
+            </li>
+            <li
+              @click="goRecycleBin"
+              :style="{color: activeClass === 'recycle-bin' ? 'orange' :'white'}">
+              回收站
+            </li>
+          </ul>
+        </aside>
+        
         <!-- 事件列表 -->
         <eventlist-template
           :eventList="this.eventList"
@@ -72,7 +73,6 @@
         endEventNum: 0, // 完成事件的数量
         noEndEventNum: 0, // 未完成事件的数量
         nowNoEndEventNum: 0, // 今日待完成事项
-        eventListHeight: 0, // 事件列表的高度
         activeClass: 'no-end' // 当前选中分类
       }
     },
@@ -98,8 +98,6 @@
 
       // 初始化页面信息
       initData () {
-        let h = document.documentElement.clientHeight;
-        this.eventListHeight = h - 240 + 'px';
         this.username = localStorage.getItem('username');
         this.getEventList();
       },
@@ -231,8 +229,11 @@
 
 <style lang="scss">
   #wrapper {
+    height: 100%;
     h1 {
-      margin-top: 20px;
+      // margin-top: 20px;
+      height: 100px;
+      line-height: 100px;
       text-align: center;
       font-size: 30px;
       font-weight: normal;
@@ -249,13 +250,13 @@
         cursor: pointer;
       }
     }
-    .add-event {
-      margin-top: 40px;
+    .add-event-box {
+      margin-top: 20px;
       .input-box {
         text-align: center;
         input {
           width: 400px;;
-          height: 40px;
+          height: 38px;
           padding: 0 20px;
           border: 1px solid #dddddd;
           border-radius: 10px;
@@ -265,16 +266,14 @@
           border: 1px solid #009fd0;
         }
       }
-      .refresh {
-        padding: 0 70px;
-        margin-top: 50px;
-        text-align: right;
-        cursor: pointer;
-      }
+    }
+    .event-list-box {
+      height: calc(100% - 260px);
+      margin-top: 60px;
       .event-box {
         display: flex;
+        height: 100%;
         padding: 0 70px;
-        margin-top: 60px;
         .event-num {
           padding: 10px 20px;
           text-align: left;
@@ -284,70 +283,6 @@
           li {
             cursor: pointer;
           }
-        }
-        .event-list {
-          flex: 1;
-          height: 100%;
-          margin-left: 20px;
-          background: #f9f9f9;
-          overflow: auto;
-          span {
-            float: right;
-          }
-          li {
-            position: relative;
-            display: flex;
-            height: 40px;
-            padding: 0 20px;
-            line-height: 40px;
-            color: #333333;
-            .item-content {
-              flex: 1;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              cursor: pointer;
-            }
-            .edit-button {
-              margin-left: 10px;
-              cursor: pointer;
-            }
-            .edit-input {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100%;
-              background: #f7f7f7;
-              input {
-                width: calc(100% - 110px);
-                height: 38px;
-                padding: 0 20px;
-                border: 1px solid #dddddd;
-                border-radius: 10px;
-                outline: none; // 去除输入框焦点高亮显示
-              }
-              input:focus {
-                border: 1px solid #009fd0;
-              }
-              button {
-                border: none;
-                font-size: 14px;
-                font-family: '微软雅黑';
-                color: #333333;
-                background: none;
-                outline: none; // 去掉点击时样式
-                cursor: pointer;
-              }
-            }
-          }
-          li:hover {
-            color: white;
-            background: #777777;
-          }
-        }
-        // 隐藏滚动条
-        .event-list::-webkit-scrollbar {
-          display: none;
         }
       }
     }

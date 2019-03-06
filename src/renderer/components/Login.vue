@@ -1,25 +1,26 @@
 <template>
   <div class="login-components">
-    <h1>ADMIN-LOGIN</h1>
     <div class="input-box">
-      <p class="username">
-        <label for="username">用户：</label>
-        <input v-model="username" id="username" type="text" />
-      </p>
-      <p class="password">
-        <label for="password">密码：</label>
-        <input v-model="password" @keyup.enter="asyncLogin" id="password" type="password" />
-      </p>
+      <div class="title">
+        <h1>ADMIN-LOGIN</h1>
+      </div>
+      <div class="content">
+        <p class="username">
+          <label for="username">用户：</label>
+          <input v-model="username" id="username" type="text" />
+        </p>
+        <p class="password">
+          <label for="password">密码：</label>
+          <input v-model="password" @keyup.enter="asyncLogin" id="password" type="password" />
+        </p>
+        <el-button type="primary" icon="el-icon-search">搜索</el-button>
+      </div>
     </div>
-
-    <!-- 数据请求客户提示 -->
-    <tips-template :type="resState" :message="resMessage" :hidden="stateTemplateShow"></tips-template>
   </div>
 </template>
 
 <script>
 import request from '@/utils/script/request.js';
-import TipsTemplate from '@/comm/tips-template';
 export default {
   data () {
     return {
@@ -27,7 +28,8 @@ export default {
       password: '', // 密码
       resState: 'normal', // 操作状态：success error normal
       resMessage: '', // 操作状态服务器返回信息
-      stateTemplateShow: false // 控制状态组件显示
+      stateTemplateShow: false, // 控制状态组件显示
+      radios: ''
     }
   },
   methods: {
@@ -61,22 +63,30 @@ export default {
     filterSpace(type) {}
   },
   watch: {},
-  components: {
-    TipsTemplate
-  }
+  components: {}
 }
 </script>
 
 <style>
+.login-components {
+  height: 100%;
+}
+
 .login-components h1 {
-  margin-top: 100px;
   font-size: 30px;
   text-align: center;
 }
 
 .login-components .input-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
   width: 300px;
-  margin: 50px auto 0;
+}
+
+.login-components .input-box .content {
+  margin-top: 70px;
 }
 
 .login-components .input-box .username, .login-components .input-box .password {
