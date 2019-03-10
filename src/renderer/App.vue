@@ -47,6 +47,9 @@
   body, html {
     height: 100%;
   }
+  body::-webkit-scrollbar {
+    display: none;
+  }
   #app {
     height: 100%
   }

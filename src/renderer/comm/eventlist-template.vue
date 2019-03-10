@@ -48,6 +48,23 @@ export default {
     return {}
   },
   methods: {
+    // 获取事项列表
+    getEventList () {
+      this.$store.commit('showLoading');
+      request.geteventlist('/geteventlist', 'get', '', (res) => {
+        this.$store.commit('hideLoading');
+        if (res.data.errcode === 0) {
+          this.activeClass = 'no-end';
+          this.updateData(res.data.eventList, 'no-end');
+          return;
+        } else {
+          // 全局函数-showTips
+          this.showTips(res);
+          this.$router.push('/login');
+        }
+      })
+    },
+
     // 编辑事件
     editEvent (data) {
       this.$router.push({ path: '/editorevent', query: {event: data} });
@@ -161,9 +178,8 @@ export default {
 <style lang="scss">
 .event-list-box {
   .event-list {
-    flex: 1;
-    height: 100%;
-    margin-left: 20px;
+    height: calc(100vh - 240px);
+    margin-top: 40px;
     background: #f9f9f9;
     overflow: auto;
     span {

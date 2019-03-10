@@ -13,7 +13,6 @@
           <label for="password">密码：</label>
           <input v-model="password" @keyup.enter="asyncLogin" id="password" type="password" />
         </p>
-        <el-button type="primary" icon="el-icon-search">搜索</el-button>
       </div>
     </div>
   </div>

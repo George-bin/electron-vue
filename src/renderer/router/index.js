@@ -17,7 +17,14 @@ export default new Router({
     {
       path: '/eventlist',
       name: 'eventlist',
-      component: require('@/components/EventList').default
+      component: require('@/components/eventList').default,
+      children: [
+        {
+          path: '',
+          name: 'addEvent',
+          component: require('@/components/eventList/children/AddEvent').default
+        }
+      ]
     },
     {
       path: '/login',

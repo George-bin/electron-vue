@@ -1,60 +1,77 @@
 <template>
   <div id="wrapper">
-    <!-- 标题 -->
-    <header>
-      <h1>ADMIN-TOOLS</h1>
-      <!-- 用户信息 -->
-      <div class="username-box">
-        <strong>{{username}}</strong><span @click="logon">注销</span>
-      </div>
-    </header>
-    <div class="add-event-box">
-      <!-- 新增事件框 -->
-      <div class="input-box">
-        <input
-          type="text"
-          placeholder="请输入内容按回车键!"
-          v-model="eventName"
-          @keyup.enter="addEvent" />
-      </div>
-    </div>
-    <!-- 事件列表 -->
-    <section class="event-list-box">
-      <!-- 事件区域 -->
-      <div class="event-box">
-        <!-- 左侧导航 -->
-        <aside class="event-num">
-          <ul>
-            <li
-              @click="getNowEndEventList"
-              :style="{color: activeClass === 'now-end' ? 'orange' :'white'}">
+    <el-container
+      class="event-list-box">
+      <!-- 左侧导航 -->
+      <el-aside
+        class="event-num">
+        <el-menu
+          background-color="#545454"
+          text-color="white"
+          style="width: 100%">
+          <el-submenu index="1">
+            <template>
+              <span slot="title">事项管理</span>
+            </template>
+            <el-menu-item
+              index="001"
+              route="/eventlist"
+            >
+              新增事项
+            </el-menu-item>
+            <!-- <el-menu-item
+              index="1-1"
+              route="/now"
+            >
               今日待完成：{{nowNoEndEventNum}}
-            </li>
-            <li
-              @click="getEndEventList"
-              :style="{color: activeClass === 'end' ? 'orange' :'white'}">
+            </el-menu-item>
+            <el-menu-item
+              index="1-2"
+              route="/end"
+            >
               已完成事项：{{endEventNum}}
-            </li>
-            <li
-              @click="getNoEndEventList"
-              :style="{color: activeClass === 'no-end' ? 'orange' :'white'}">
+            </el-menu-item>
+            <el-menu-item
+              index="1-3"
+              route="/no"
+            >
               未完成事项：{{noEndEventNum}}
-            </li>
-            <li
-              @click="goRecycleBin"
-              :style="{color: activeClass === 'recycle-bin' ? 'orange' :'white'}">
-              回收站
-            </li>
-          </ul>
-        </aside>
-        
-        <!-- 事件列表 -->
+            </el-menu-item> -->
+          </el-submenu>
+        </el-menu>
+      </el-aside>
+
+      <!-- 右侧显示 -->
+      <el-main>
+        <el-header
+          class="title-box"
+        >
+          <strong>{{username}}</strong><span @click="logon">注销</span>
+          <!-- <h1>ADMIN-TOOLS</h1> -->
+          <!-- <div class="username-box"> -->
+          <!-- <div class="username-box">
+            <strong>{{username}}</strong><span @click="logon">注销</span>
+          </div> -->
+        </el-header>
+
+        <!-- 新增事件框 -->
+        <div class="add-event-box">
+          <div class="input-box">
+            <input
+              type="text"
+              placeholder="请输入内容按回车键!"
+              v-model="eventName"
+              @keyup.enter="addEvent" />
+          </div>
+        </div>
+
+        <!-- 事项列表 -->
         <eventlist-template
           :eventList="this.eventList"
           @updateData="updateData">
         </eventlist-template>
-      </div>
-    </section>
+      </el-main>
+    </el-container>
   </div>
 </template>
 
@@ -230,26 +247,13 @@
 <style lang="scss">
   #wrapper {
     height: 100%;
-    h1 {
-      // margin-top: 20px;
-      height: 100px;
-      line-height: 100px;
-      text-align: center;
-      font-size: 30px;
-      font-weight: normal;
-    }
-    .username-box {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      strong {
-        margin-right: 10px;
-        color: orange;
-      }
-      span {
-        cursor: pointer;
-      }
-    }
+    // h1 {
+    //   height: 100px;
+    //   line-height: 100px;
+    //   text-align: center;
+    //   font-size: 30px;
+    //   font-weight: normal;
+    // }
     .add-event-box {
       margin-top: 20px;
       .input-box {
@@ -268,19 +272,39 @@
       }
     }
     .event-list-box {
-      height: calc(100% - 260px);
-      margin-top: 60px;
-      .event-box {
-        display: flex;
-        height: 100%;
-        padding: 0 70px;
-        .event-num {
-          padding: 10px 20px;
+      height: 100%;
+      // height: calc(100% - 260px);
+      // margin-top: 60px;
+      .event-num {
+        width: 150px !important;
+        text-align: left;
+        line-height: 30px;
+        background: #383838;
+        color: white;
+        overflow: hidden;
+        li {
+          cursor: pointer;
           text-align: left;
-          line-height: 30px;
-          background: #383838;
-          color: white;
-          li {
+        }
+        .el-submenu .el-menu-item {
+          min-width: 150px;
+          padding: 0 !important;
+          text-align: center;
+        }
+      }
+
+      .el-main {
+        padding: 0;
+        .el-header {
+          height: 56px !important;
+          line-height: 56px;
+          border-bottom: 1px solid #f3f3f3;
+          text-align: right;
+          strong {
+            margin-right: 10px;
+            color: orange;
+          }
+          span {
             cursor: pointer;
           }
         }
