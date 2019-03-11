@@ -13,8 +13,8 @@
 </template>
 
 <script>
-  import TipsTemplate from '@/comm/tips-template';
-  import LoadingTemplate from '@/comm/loading-template';
+  import TipsTemplate from '@/components/tips-template';
+  import LoadingTemplate from '@/components/loading-template';
   import {mapState} from 'vuex';
   export default {
     name: 'admin-tools',

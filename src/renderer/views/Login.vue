@@ -1,5 +1,8 @@
 <template>
   <div class="login-components">
+    <div class="register-btn">
+      <span @click="goRegister">注册</span>
+    </div>
     <div class="input-box">
       <div class="title">
         <h1>ADMIN-LOGIN</h1>
@@ -56,6 +59,11 @@ export default {
         this.username = '';
         this.password = '';
       }
+    },
+
+    // 前往注册
+    goRegister() {
+      this.$router.push({ path: '/register' })
     }
   },
   computed: {
@@ -66,52 +74,56 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .login-components {
   height: 100%;
-}
+  .register-btn {
+    padding-right: 40px;
+    margin-top: 20px;
+    text-align: right;
+    span {
+      cursor: pointer;
+    }
+    span:hover {
+      color: orange;
+    }
+  }
+  .input-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    width: 300px;
+    h1 {
+      font-size: 30px;
+      text-align: center;
+    }
+    .content {
+      margin-top: 70px;
+      .username, .password {
+        display: flex;
+        line-height: 36px;
+      }
+      .password {
+        margin-top: 20px;
+      }
+      label {
+        text-align: right;
+      }
+      input {
+        flex: 1;
+        height: 34px;
+        line-height: 34px;
+        padding: 0 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 5px;
+        outline: none;
+      }
+      input:focus {
+        border: 1px solid #009fd0;
+      }
 
-.login-components h1 {
-  font-size: 30px;
-  text-align: center;
-}
-
-.login-components .input-box {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-100%);
-  width: 300px;
-}
-
-.login-components .input-box .content {
-  margin-top: 70px;
-}
-
-.login-components .input-box .username, .login-components .input-box .password {
-  display: flex;
-  line-height: 36px;
-}
-
-.login-components .input-box .password {
-  margin-top: 20px;
-}
-
-.login-components .input-box label {
-  text-align: right;
-}
-
-.login-components .input-box input {
-  flex: 1;
-  height: 34px;
-  line-height: 34px;
-  padding: 0 10px;
-  border: 1px solid #d1d1d1;
-  border-radius: 5px;
-  outline: none;
-}
-
-.login-components .input-box input:focus {
-  border: 1px solid #009fd0;
+    }
+  }
 }
 </style>

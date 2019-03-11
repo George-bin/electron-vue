@@ -37,7 +37,12 @@ export default  {
 
   // 用户登录
   login (url, method, options, callback) {
-    this.ajax(url, method, options, callback);
+    this.ajax(url, method, options, callback)
+  },
+
+  // 用户注册
+  register(url, method, options, callback){
+    this.ajax(url, method, options, callback)
   },
 
   // 用户注销

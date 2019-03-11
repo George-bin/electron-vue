@@ -17,12 +17,12 @@ export default new Router({
     {
       path: '/eventlist',
       name: 'eventlist',
-      component: require('@/components/eventList').default,
+      component: require('@/views/eventList').default,
       children: [
         {
           path: '',
           name: 'addEvent',
-          component: require('@/components/eventList/children/AddEvent').default
+          component: require('@/views/eventList/children/AddEvent').default
         }
       ]
     },
@@ -30,12 +30,17 @@ export default new Router({
       path: '/login',
       name: 'login',
       // component: require('@/components/EventList').default
-      component: require('@/components/Login').default
+      component: require('@/views/Login').default
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: require('@/views/register/Register').default
     },
     {
       path: '/editorevent',
       name: 'editor-event',
-      component: require('@/components/EventDetail').default
+      component: require('@/views/EventDetail').default
     }
   ]
 })
