@@ -4,72 +4,67 @@
       class="event-list-box">
       <!-- 左侧导航 -->
       <el-aside
-        class="event-num">
+        class="event-num"
+        :style="{ 'width': isCollapse ? '64px' : '200px' }"
+      >
         <el-menu
+          :collapse="isCollapse"
+          :router="true"
           background-color="#545454"
           text-color="white"
-          style="width: 100%">
+          active-text-color="orange"
+        >
           <el-submenu index="1">
-            <template>
+            <template slot="title">
+              <i class="el-icon-menu"></i>
               <span slot="title">事项管理</span>
             </template>
             <el-menu-item
-              index="001"
-              route="/eventlist"
+              index="/event/addEvent"
             >
+              <i class="iconfont icon-xinzeng"></i>
               新增事项
             </el-menu-item>
-            <!-- <el-menu-item
-              index="1-1"
-              route="/now"
-            >
-              今日待完成：{{nowNoEndEventNum}}
-            </el-menu-item>
-            <el-menu-item
-              index="1-2"
-              route="/end"
-            >
-              已完成事项：{{endEventNum}}
-            </el-menu-item>
-            <el-menu-item
-              index="1-3"
-              route="/no"
-            >
-              未完成事项：{{noEndEventNum}}
-            </el-menu-item> -->
+            <!--<el-menu-item-->
+              <!--index="1-1"-->
+              <!--route="/now"-->
+            <!--&gt;-->
+              <!--今日待完成：{{nowNoEndEventNum}}-->
+            <!--</el-menu-item>-->
+            <!--<el-menu-item-->
+              <!--index="1-2"-->
+              <!--route="/end"-->
+            <!--&gt;-->
+              <!--已完成事项：{{endEventNum}}-->
+            <!--</el-menu-item>-->
+            <!--<el-menu-item-->
+              <!--index="1-3"-->
+              <!--route="/no"-->
+            <!--&gt;-->
+              <!--未完成事项：{{noEndEventNum}}-->
+            <!--</el-menu-item>-->
           </el-submenu>
         </el-menu>
       </el-aside>
 
       <!-- 右侧显示 -->
       <el-main>
-        <el-header
-          class="title-box"
-        >
+        <el-header class="title-box">
+          <!--转换-->
+          <i
+            :class="['iconfont', 'icon-caidan', isCollapse ? 'shrink-menu' : 'an-menu']"
+            @click="startRotate"
+          >
+          </i>
           <strong>{{username}}</strong><span @click="logon">注销</span>
-          <!-- <h1>ADMIN-TOOLS</h1> -->
-          <!-- <div class="username-box"> -->
-          <!-- <div class="username-box">
-            <strong>{{username}}</strong><span @click="logon">注销</span>
-          </div> -->
         </el-header>
-
-        <!-- 新增事件框 -->
-        <div class="add-event-box">
-          <div class="input-box">
-            <input
-              type="text"
-              placeholder="请输入内容按回车键!"
-              v-model="eventName"
-              @keyup.enter="addEvent" />
-          </div>
-        </div>
+        <router-view></router-view>
 
         <!-- 事项列表 -->
-        <eventlist-template
-          :eventList="this.eventList"
-          @updateData="updateData">
-        </eventlist-template>
+        <!--<eventlist-template-->
+          <!--:eventList="this.eventList"-->
+          <!--@updateData="updateData">-->
+        <!--</eventlist-template>-->
       </el-main>
     </el-container>
   </div>
@@ -83,20 +78,24 @@
     data () {
       return {
         username: '', // 用户名
-        eventName: '', // 添加事件名字
         eventData: '', // 添加事件名字
         eventList: [], // 当前显示事件列表
         allEventList: [], // 总的事件列表
         endEventNum: 0, // 完成事件的数量
         noEndEventNum: 0, // 未完成事件的数量
         nowNoEndEventNum: 0, // 今日待完成事项
-        activeClass: 'no-end' // 当前选中分类
+        activeClass: 'no-end', // 当前选中分类
+        isCollapse: false
       }
     },
     created () {
       this.initData();
     },
     methods: {
+      // 展示/收缩菜单
+      startRotate() {
+        this.isCollapse = !this.isCollapse
+      },
       // 注销
       logon () {
         let data = {
@@ -106,8 +105,10 @@
         request.logon('/logon', 'post', data, (res) => {
           this.$store.commit('hideLoading');
           if (res.data.errcode === 0) {
-            // 全局函数-showTips
-            this.showTips(res);
+            this.$message({
+              type: 'success',
+              message: '注销成功!'
+            })
             this.$router.push('/login');
           }
         })
@@ -117,31 +118,6 @@
       initData () {
         this.username = localStorage.getItem('username');
         this.getEventList();
-      },
-
-      // 添加待办事项
-      addEvent () {
-        let data = {
-          state: 0, // 事件状态 0：未完成 1：已完成 2：进入回收站 3：需要今日完成
-          eventName: this.eventName, // 事件名称
-          eventData: this.eventData, // 事件名称
-          username: this.username, // 用户
-          date: Date.now() // 事件创建时间
-        }
-        this.$store.commit('showLoading');
-        request.addevent('/addevent', 'post', data, function cb(res) {
-          this.$store.commit('hideLoading');
-          this.eventName = '';
-          // 全局函数-showTips
-          this.showTips(res);
-          if (res.data.errcode === 0) {
-            this.activeClass = 'no-end';
-            this.allEventList = res.data.eventList;
-            this.eventList = this.filterEvent('no-end');
-            this.calculationEndNum(res.data.eventList);
-            return;
-          }
-        }.bind(this));
       },
 
       // 获取事项列表
@@ -273,33 +249,46 @@
     }
     .event-list-box {
       height: 100%;
-      // height: calc(100% - 260px);
-      // margin-top: 60px;
       .event-num {
-        width: 150px !important;
+        /*width: auto !important;*/
         text-align: left;
         line-height: 30px;
         background: #383838;
         color: white;
         overflow: hidden;
-        li {
-          cursor: pointer;
-          text-align: left;
+        .el-menu {
+          width: 100%;
+          /*height: 100%;*/
         }
-        .el-submenu .el-menu-item {
-          min-width: 150px;
-          padding: 0 !important;
-          text-align: center;
-        }
+        /*.el-submenu .el-menu-item {*/
+          /*min-width: 150px;*/
+          /*padding: 0 !important;*/
+          /*text-align: center;*/
+        /*}*/
       }
 
       .el-main {
         padding: 0;
         .el-header {
+          position: relative;
           height: 56px !important;
           line-height: 56px;
           border-bottom: 1px solid #f3f3f3;
           text-align: right;
+          .shrink-menu {
+            transform: rotate(90deg);
+            transition: transform 0.5s;
+          }
+          .an-menu {
+            transform: rotate(0deg);
+            transition: transform 0.5s;
+          }
+          .icon-caidan {
+            position: absolute;
+            left: 10px;
+            font-size: 20px;
+            cursor: pointer;
+          }
           strong {
             margin-right: 10px;
             color: orange;

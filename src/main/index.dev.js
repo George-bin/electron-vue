@@ -8,6 +8,7 @@
 /* eslint-disable */
 
 // Install `electron-debug` with `devtron`
+// 打开调试工具
 require('electron-debug')({ showDevTools: true })
 
 // Install `vue-devtools`

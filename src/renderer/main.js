@@ -19,7 +19,13 @@ Vue.use(ElementUI)
 // 引入全局函数
 import './utils/script/global-function'
 
+// 引入css文件
+import '../../static/css/index.css'
+
 Vue.use(VueQuillEditor)
+
+// 以web形式渲染，打包需注释
+// process.env.IS_WEB = 'web'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios

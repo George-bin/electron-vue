@@ -7,35 +7,34 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'eventlist',
-      redirect: '/eventlist'
+      name: 'event',
+      redirect: '/login'
       // component: require('@/components/EventList').default
       // component: require('@/components/Editor').default
       // component: require('@/components/Login').default
       // component: require('@/components/EditorEvent').default
     },
     {
-      path: '/eventlist',
-      name: 'eventlist',
-      component: require('@/views/eventList').default,
+      path: '/event',
+      name: 'event',
+      component: require('@/views/event').default,
       children: [
         {
-          path: '',
+          path: 'addEvent',
           name: 'addEvent',
-          component: require('@/views/eventList/children/AddEvent').default
+          component: require('@/views/event/children/AddEvent').default
         }
       ]
     },
     {
       path: '/login',
       name: 'login',
-      // component: require('@/components/EventList').default
-      component: require('@/views/Login').default
+      component: () => import('@/views/login/Login')
     },
     {
       path: '/register',
       name: 'register',
-      component: require('@/views/register/Register').default
+      component: () => import('@/views/register/index')
     },
     {
       path: '/editorevent',

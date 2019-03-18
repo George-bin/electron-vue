@@ -5,10 +5,10 @@
     </keep-alive>
 
     <!-- 数据请求客户提示 -->
-    <tips-template :type="resState" :message="resMessage" :hidden="stateTemplateShow"></tips-template>
+    <!--<tips-template :type="resState" :message="resMessage" :hidden="stateTemplateShow"></tips-template>-->
 
     <!-- Loading组件 -->
-    <loading-template :loadingShow="loadingShow"></loading-template>
+    <!--<loading-template :loadingShow="loadingShow"></loading-template>-->
   </div>
 </template>
 
@@ -39,7 +39,6 @@
 </script>
 
 <style>
-  @import './utils/css/init.css';
   /* CSS */
   * {
     font-family: '微软雅黑';
