@@ -7,7 +7,7 @@
       <h2>{{title}}</h2>
     </header>
     <div class="editor-button">
-      <span @click="showEditor" :style="{color: isShowEditor ? 'orange': '#333333'}">编辑</span> | 
+      <span @click="showEditor" :style="{color: isShowEditor ? 'orange': '#333333'}">编辑</span> |
       <span @click="cancelEditor">取消</span>
     </div>
     <!-- 事件编辑区域 -->
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import request from '@/utils/script/request.js';
+import request from '@/utils/request.js';
 export default {
   data () {
     return {

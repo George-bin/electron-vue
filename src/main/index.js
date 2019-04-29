@@ -32,7 +32,7 @@ function createWindow () {
     webPreferences: { webSecurity: false } // 允许跨域访问
   })
   // vue.js devtools
-  BrowserWindow.addDevToolsExtension('C:\\Users\\think\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\nhdogjmejiglipccpnnnanhbledajbpd\\4.1.5_0');
+  // BrowserWindow.addDevToolsExtension('C:\\Users\\think\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\nhdogjmejiglipccpnnnanhbledajbpd\\4.1.5_0');
 
   // 加载页面（URL）
   mainWindow.loadURL(winURL)

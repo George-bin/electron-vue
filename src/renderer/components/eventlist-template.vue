@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import request from '@/utils/script/request.js';
+import request from '@/utils/request.js';
 export default {
   props: {
     eventList: {

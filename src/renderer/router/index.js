@@ -34,7 +34,7 @@ export default new Router({
     {
       path: '/register',
       name: 'register',
-      component: () => import('@/views/register/index')
+      component: () => import('@/views/register/register')
     },
     {
       path: '/editorevent',

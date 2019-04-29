@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import request from '@/utils/script/request.js';
+  import request from '@/utils/request.js';
   import eventlistTemplate from '@/components/eventlist-template';
   export default {
     name: 'landing-page',

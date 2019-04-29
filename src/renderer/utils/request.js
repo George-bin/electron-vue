@@ -2,40 +2,71 @@ import axios from 'axios'
 
 // 创建axios实例
 const service = axios.create({
-    // baseURL: "http://www.gengshaobin.top:3000/admin-tools/api", // api 的 base_url,相当于http://localhost:3000
-    baseURL: "http://localhost:3000/admin-tools/api", // api 的 base_url,相当于http://localhost:3000
-    timeout: 5000 // 请求超时时间
+  // api的base_url
+  baseURL: 'http://localhost:3000/admin-tools/api',
+  // 请求超时时间
+  timeout: 60000,
+  // 允许携带cookie
+  withCredentials: true
 })
 
-function ajax({ url, method, data }) {
-    return new Promise((resolve, reject) => {
-      if (method === 'get') {
-        service({
-          url: url
-        })
-          .then(response => {
-            resolve(response.data)
-          })
-          .catch(err => {
-            reject(err)
-          })
-        return
-      }
-      service({
-        url: url,
-        method: method,
-        data
-      })
-        .then(response => {
-          resolve(response.data);
-        })
-        .catch(err => {
-          reject(err);
-        })
-    })
-}
+// request拦截器
+service.interceptors.request.use(config => {
+  return config
+}, error => {
+  // Do something with request error
+  console.log(error) // for debug
+  Promise.reject(error)
+})
 
-export default ajax
+// respone拦截器
+service.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    return Promise.reject(error)
+  })
+
+export default service
+
+
+// 创建axios实例
+// const service = axios.create({
+//   // baseURL: "http://www.gengshaobin.top:3000/admin-tools/api", // api 的 base_url,相当于http://localhost:3000
+//   baseURL: "http://localhost:3000/admin-tools/api", // api 的 base_url,相当于http://localhost:3000
+//   timeout: 5000 // 请求超时时间
+// })
+//
+// function ajax({ url, method, data }) {
+//   return new Promise((resolve, reject) => {
+//     if (method === 'get') {
+//       service({
+//         url: url
+//       })
+//         .then(response => {
+//           resolve(response.data)
+//         })
+//         .catch(err => {
+//           reject(err)
+//         })
+//       return
+//     }
+//     service({
+//       url: url,
+//       method: method,
+//       data
+//     })
+//       .then(response => {
+//         resolve(response.data);
+//       })
+//       .catch(err => {
+//         reject(err);
+//       })
+//   })
+// }
+//
+// export default ajax
 
 // export default  {
   // 数据请求

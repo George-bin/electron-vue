@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import request from '@/utils/script/request'
 import { validatorSpace } from '@/utils/script/validatorData'
+import { mapActions } from 'vuex'
 
 export default {
   data () {
@@ -51,22 +51,32 @@ export default {
     }
   },
   methods: {
-    // 注册
+    ...mapActions([
+      'Register'
+    ]),
+    // 用户注册
     register() {
-      const data = { ...this.user }
-      request.register('/register', 'post', data, (res) => {
-        if (res.data.errcode === 0) {
+      this.Register(this.form)
+        .then(data => {
           this.$message({
             type: 'success',
             message: res.data.message
           })
-          return
-        }
-        this.$message({
-          type: 'error',
-          message: res.data.message
         })
-      })
+        .catch(err => {
+          console.log(err)
+          if (err.errcode) {
+            this.$message({
+              type: 'error',
+              message: err.message
+            })
+            return
+          }
+          this.$message({
+            type: 'error',
+            message: '网络错误!'
+          })
+        })
     },
     // 取消注册
     cancelRegister() {

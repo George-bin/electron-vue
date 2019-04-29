@@ -36,7 +36,6 @@
 </template>
 
 <script>
-import request from '@/utils/script/request'
 import { mapActions } from 'vuex'
 import { validatorSpace } from '@/utils/script/validatorData'
 
@@ -57,9 +56,7 @@ export default {
     ...mapActions(['Login']),
     // 用户登录
     login () {
-      const form = this.form
-      // this.$store.commit('showLoading')
-      this.Login(form)
+      this.Login(this.form)
         .then(data => {
           if (data.errcode === 0) {
             this.$message({
@@ -71,23 +68,6 @@ export default {
         .catch(err => {
           console.log(err)
         })
-      // return new Promise((resolve, reject) => {
-      //   request.login('/login', 'post', data, (res) => {
-      //     this.$store.commit('hideLoading');
-      //     localStorage.setItem('username', this.form.username);
-      //     this.$message({
-      //       type: 'success',
-      //       message: res.data.message
-      //     })
-      //     resolve(res);
-      //   });
-      // })
-    },
-    async asyncLogin () {
-      let res = await this.login();
-      if (res.data.errcode === 0) {
-        this.$router.push({path: '/event', query: { username: this.form.username }})
-      }
     },
 
     // 前往注册
