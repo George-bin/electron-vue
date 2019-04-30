@@ -17,3 +17,12 @@ export function registerRequest (data) {
     data: data
   })
 }
+
+// 注销登录
+export function logonRequest (data) {
+  return request({
+    url: '/logon',
+    method: 'post',
+    data: data
+  })
+}

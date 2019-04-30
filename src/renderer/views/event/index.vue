@@ -56,7 +56,8 @@
             @click="startRotate"
           >
           </i>
-          <strong>{{username}}</strong><span @click="logon">注销</span>
+          <!--<strong>{{username}}</strong><span @click="logon">注销</span>-->
+          <strong>geng</strong><span @click="logon">注销</span>
         </el-header>
         <router-view></router-view>
 
@@ -73,6 +74,7 @@
 <script>
   import request from '@/utils/request.js';
   import eventlistTemplate from '@/components/eventlist-template';
+  import { mapActions } from 'vuex'
   export default {
     name: 'landing-page',
     data () {
@@ -92,6 +94,9 @@
       this.initData();
     },
     methods: {
+      ...mapActions([
+        'Logon'
+      ]),
       // 展示/收缩菜单
       startRotate() {
         this.isCollapse = !this.isCollapse
@@ -99,19 +104,19 @@
       // 注销
       logon () {
         let data = {
-          username: this.username
+          username: 'geng',
+          password: '123456'
         }
-        this.$store.commit('showLoading');
-        request.logon('/logon', 'post', data, (res) => {
-          this.$store.commit('hideLoading');
-          if (res.data.errcode === 0) {
-            this.$message({
-              type: 'success',
-              message: '注销成功!'
-            })
-            this.$router.push('/login');
-          }
-        })
+        this.Logon(data)
+          .then(data => {
+            if (data.errcode === 0) {
+              this.$message({
+                type: 'success',
+                message: '注销成功!'
+              })
+              this.$router.push('/login');
+            }
+          })
       },
 
       // 初始化页面信息

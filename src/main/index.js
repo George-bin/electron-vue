@@ -29,6 +29,10 @@ function createWindow () {
     height: 600,
     useContentSize: true,
     width: 1000,
+    minWidth: 1000,
+    minHeight: 600,
+    maxWidth: 1000,
+    maxHeight: 600,
     webPreferences: { webSecurity: false } // 允许跨域访问
   })
   // vue.js devtools

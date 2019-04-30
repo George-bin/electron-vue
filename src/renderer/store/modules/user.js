@@ -1,6 +1,7 @@
 import {
   loginRequest,
-  registerRequest
+  registerRequest,
+  logonRequest
 } from "../../api/user";
 
 const user = {
@@ -36,6 +37,18 @@ const user = {
               return
             }
             reject(response.data)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
+    // 注销登录
+    Logon ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        logonRequest(data)
+          .then(response => {
+            resolve(response.data)
           })
           .catch(err => {
             reject(err)
