@@ -15,14 +15,15 @@ export default new Router({
       // component: require('@/components/EditorEvent').default
     },
     {
-      path: '/event',
+      path: '/home',
       name: 'event',
-      component: require('@/views/event').default,
+      component: require('@/views/home/home').default,
+      redirect: '/home/addEvent',
       children: [
         {
           path: 'addEvent',
           name: 'addEvent',
-          component: require('@/views/event/children/AddEvent').default
+          component: require('@/views/home/children/AddEvent').default
         }
       ]
     },
@@ -38,7 +39,7 @@ export default new Router({
     },
     {
       path: '/editorevent',
-      name: 'editor-event',
+      name: 'editor-home',
       component: require('@/views/EventDetail').default
     }
   ]

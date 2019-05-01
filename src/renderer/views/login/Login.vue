@@ -11,7 +11,7 @@
         ref="loginForm"
         :model="form"
         :rules="rules"
-        class="form-box"
+        class="login-form"
       >
         <el-form-item prop="username">
           <el-input
@@ -72,7 +72,7 @@ export default {
                   type: 'success',
                   message: data.message
                 })
-                this.$router.push('/event')
+                this.$router.push('/home')
               } else {
                 this.$message({
                   type: 'warning',
@@ -110,7 +110,7 @@ export default {
   height: 100%;
   .register-btn {
     padding-right: 40px;
-    margin-top: 20px;
+    padding-top: 20px;
     text-align: right;
     span {
       cursor: pointer;
@@ -129,8 +129,11 @@ export default {
       font-size: 24px;
       text-align: center;
     }
-    .form-box {
+    .login-form {
       margin-top: 40px;
+      input {
+        border-radius: 20px;
+      }
     }
   }
   .submit-section {

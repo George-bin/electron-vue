@@ -103,7 +103,7 @@ export default {
   .register-component {
     .cancel-register {
       padding-right: 40px;
-      margin-top: 20px;
+      padding-top: 20px;
       text-align: right;
       span:hover {
         color: orange;
@@ -122,6 +122,9 @@ export default {
       }
       .register-form {
         margin-top: 40px;
+        input {
+          border-radius: 20px;
+        }
       }
     }
     .submit-section {

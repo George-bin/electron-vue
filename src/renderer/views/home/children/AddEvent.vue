@@ -1,12 +1,12 @@
 <template>
   <div class="add-event-component">
     <div class="title-section">
-      <h2>ADMIN-ADDEVENT</h2>
+      <h3>新增代办事项</h3>
     </div>
     <!-- 新增事件框 -->
     <div class="content-section">
       <el-form
-        ref="form"
+        ref="createEventForm"
         :model="form"
       >
         <el-form-item>
@@ -38,12 +38,15 @@ export default {
     // 添加待办事项
     addEvent () {
       let data = {
-        state: 0, // 事件状态 0：未完成 1：已完成 2：进入回收站 3：需要今日完成
+        status: 0, // 事件状态 0：未完成 1：已完成 2：进入回收站 3：需要今日完成
         eventName: this.eventName, // 事件名称
-        eventData: this.eventData, // 事件名称
-        username: this.username, // 用户
+        eventData: this.eventData, // 解决方案
+        username: this.username, // 所属用户
         date: Date.now() // 事件创建时间
       }
+      this.$refs.createEventForm.validate((valid) => {
+        
+      })
       this.$store.commit('showLoading');
       request.addevent('/addevent', 'post', data, function cb(res) {
         this.$store.commit('hideLoading');
@@ -60,13 +63,19 @@ export default {
 <style lang="scss">
 .add-event-component {
   .title-section {
-    margin-top: 100px;
+    margin-top: 30px;
     font-size: 30px;
     text-align: center;
+    h3 {
+      font-size: 24px;
+    }
   }
   .content-section {
     width: 500px;
-    margin: 50px auto 0;
+    margin: 40px auto 0;
+    input {
+      /*border-radius: 20px;*/
+    }
   }
 }
 </style>

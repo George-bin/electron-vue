@@ -28,13 +28,14 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 600,
     useContentSize: true,
-    width: 1000,
-    minWidth: 1000,
+    width: 900,
+    minWidth: 900,
     minHeight: 600,
-    maxWidth: 1000,
+    maxWidth: 900,
     maxHeight: 600,
     webPreferences: { webSecurity: false } // 允许跨域访问
   })
+
   // vue.js devtools
   // BrowserWindow.addDevToolsExtension('C:\\Users\\think\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\nhdogjmejiglipccpnnnanhbledajbpd\\4.1.5_0');
 
