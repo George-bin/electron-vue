@@ -7,7 +7,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'event',
+      name: '/',
       redirect: '/login'
       // component: require('@/components/EventList').default
       // component: require('@/components/Editor').default
@@ -23,7 +23,12 @@ export default new Router({
         {
           path: 'addEvent',
           name: 'addEvent',
-          component: require('@/views/home/children/AddEvent').default
+          component: require('@/views/home/children/addEvent').default
+        },
+        {
+          path: 'eventList',
+          name: 'eventList',
+          component: require('@/views/home/children/eventList').default
         }
       ]
     },

@@ -8,8 +8,9 @@
       <el-form
         ref="createEventForm"
         :model="form"
+        :rules="rules"
       >
-        <el-form-item>
+        <el-form-item prop="eventName">
           <el-input
             placeholder="请输入内容按回车键!"
             v-model="form.eventName"
@@ -22,7 +23,9 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
+import { validatorSpace } from '@/utils/script/validatorData'
+
 export default {
   data() {
     return {
@@ -30,32 +33,45 @@ export default {
       form: {
         eventName: '',
         eventData: ''
+      },
+      rules: {
+        eventName: [{ required: true, validator: validatorSpace, trigger: 'blur' }]
       }
     }
   },
+  computed: {
+    ...mapState({
+      username: state => state.user.username
+    })
+  },
   methods: {
-    ...mapActions([]),
+    ...mapActions(['AddEvent']),
     // 添加待办事项
     addEvent () {
       let data = {
         status: 0, // 事件状态 0：未完成 1：已完成 2：进入回收站 3：需要今日完成
-        eventName: this.eventName, // 事件名称
-        eventData: this.eventData, // 解决方案
+        eventName: this.form.eventName, // 事件名称
+        eventData: this.form.eventData, // 解决方案
         username: this.username, // 所属用户
         date: Date.now() // 事件创建时间
       }
       this.$refs.createEventForm.validate((valid) => {
-        
+        if (valid) {
+          this.AddEvent(data)
+            .then(data => {
+              console.log(data)
+              this.form.eventName = ''
+              this.$message({
+                type: 'success',
+                message: '新增事项成功!'
+              })
+            })
+            .catch(err => {
+              console.log(errs)
+            })
+        }
       })
-      this.$store.commit('showLoading');
-      request.addevent('/addevent', 'post', data, function cb(res) {
-        this.$store.commit('hideLoading');
-        this.$message({
-          type: 'success',
-          message: res.data.message
-        })
-      }.bind(this));
-    },
+    }
   }
 }
 </script>
@@ -67,11 +83,11 @@ export default {
     font-size: 30px;
     text-align: center;
     h3 {
-      font-size: 24px;
+      font-size: 20px;
     }
   }
   .content-section {
-    width: 500px;
+    width: 400px;
     margin: 40px auto 0;
     input {
       /*border-radius: 20px;*/

@@ -117,7 +117,7 @@ export default {
       width: 300px;
       transform: translateX(-50%) translateY(-100%);
       h2 {
-        font-size: 24px;
+        font-size: 20px;
         text-align: center;
       }
       .register-form {

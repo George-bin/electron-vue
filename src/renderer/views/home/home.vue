@@ -13,17 +13,20 @@
           background-color="#545454"
           text-color="white"
           active-text-color="orange"
+          :collapse-transition="false"
         >
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-menu"></i>
               <span slot="title">事项管理</span>
             </template>
-            <el-menu-item
-              index="/event/addEvent"
-            >
+            <el-menu-item index="/home/addEvent">
               <i class="iconfont icon-xinzeng"></i>
               新增事项
+            </el-menu-item>
+            <el-menu-item index="/home/eventList">
+              <i class="iconfont icon-liebiao"></i>
+              事项列表
             </el-menu-item>
             <!--<el-menu-item-->
               <!--index="1-1"-->
@@ -56,8 +59,7 @@
             @click="startRotate"
           >
           </i>
-          <!--<strong>{{username}}</strong><span @click="logon">注销</span>-->
-          <strong>geng</strong><span @click="logon">注销</span>
+          <strong>{{username}}</strong><span @click="logon">注销</span>
         </el-header>
         <router-view></router-view>
 
@@ -74,12 +76,11 @@
 <script>
   import request from '@/utils/request.js';
   import eventlistTemplate from '@/components/eventlist-template';
-  import { mapActions } from 'vuex'
+  import { mapState, mapActions } from 'vuex'
   export default {
     name: 'landing-page',
     data () {
       return {
-        username: '', // 用户名
         eventData: '', // 添加事件名字
         eventList: [], // 当前显示事件列表
         allEventList: [], // 总的事件列表
@@ -89,6 +90,11 @@
         activeClass: 'no-end', // 当前选中分类
         isCollapse: false
       }
+    },
+    computed: {
+      ...mapState({
+        username: state => state.user.username
+      })
     },
     created () {
       this.initData();
@@ -103,9 +109,10 @@
       },
       // 注销
       logon () {
+        // this.$router.push('/login');
         let data = {
-          username: 'geng',
-          password: '123456'
+          // username: this.username
+          username: localStorage.getItem('username')
         }
         this.Logon(data)
           .then(data => {
@@ -121,8 +128,7 @@
 
       // 初始化页面信息
       initData () {
-        this.username = localStorage.getItem('username');
-        this.getEventList();
+        // this.getEventList();
       },
 
       // 获取事项列表

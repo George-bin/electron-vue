@@ -9,7 +9,7 @@ const user = {
     // 用户名
     username: ''
   },
-  muations: {
+  mutations: {
     SET_USERNAME: function(state, data) {
       state.username = data
     }
@@ -20,6 +20,7 @@ const user = {
       return new Promise((resolve, reject) => {
         loginRequest(data)
           .then(response => {
+            if (response.data.errcode === 0) commit('SET_USERNAME', data.username)
             resolve(response.data)
           })
           .catch(err => {

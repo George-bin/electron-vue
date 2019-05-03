@@ -48,7 +48,7 @@ export default {
     return {
       form: {
         username: 'geng', // 用户名
-        password: '123456', // 密码
+        password: '123', // 密码
       },
       loading: false, // 登录中
       rules: {
@@ -68,6 +68,9 @@ export default {
             .then(data => {
               this.loading = false
               if (data.errcode === 0) {
+                // TODO:缓存当前用户
+                localStorage.setItem('account', JSON.stringify(this.form))
+                localStorage.setItem('username', this.form.username)
                 this.$message({
                   type: 'success',
                   message: data.message
@@ -97,9 +100,7 @@ export default {
       this.$router.push({ path: '/register' })
     }
   },
-  computed: {
-    filterSpace(type) {}
-  },
+  computed: {},
   watch: {},
   components: {}
 }
@@ -126,7 +127,7 @@ export default {
     transform: translateX(-50%) translateY(-100%);
     width: 300px;
     h2 {
-      font-size: 24px;
+      font-size: 20px;
       text-align: center;
     }
     .login-form {
