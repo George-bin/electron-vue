@@ -4,20 +4,21 @@
       class="event-list-box">
       <!-- 左侧导航 -->
       <el-aside
-        class="event-num"
-        :style="{ 'width': isCollapse ? '64px' : '200px' }"
+        class="aside-menu-section"
+        :style="{ 'width': isCollapse ? '45px' : '170px' }"
       >
         <el-menu
           :collapse="isCollapse"
           :router="true"
-          background-color="#545454"
-          text-color="white"
-          active-text-color="orange"
           :collapse-transition="false"
+          background-color="#545454"
+          text-color="#fff"
+          active-text-color="#ffd04b"
+          default-active="/home/addEvent"
         >
-          <el-submenu index="1">
+          <el-submenu index="eventManage">
             <template slot="title">
-              <i class="el-icon-menu"></i>
+              <i class="el-icon-menu" :style="{ 'padding-left': isCollapse ? '10px' : '20px' }"></i>
               <span slot="title">事项管理</span>
             </template>
             <el-menu-item index="/home/addEvent">
@@ -27,6 +28,10 @@
             <el-menu-item index="/home/eventList">
               <i class="iconfont icon-liebiao"></i>
               事项列表
+            </el-menu-item>
+            <el-menu-item index="/home/recycleBin">
+              <i class="iconfont icon-huishouzhan"></i>
+              回收站
             </el-menu-item>
             <!--<el-menu-item-->
               <!--index="1-1"-->
@@ -59,7 +64,9 @@
             @click="startRotate"
           >
           </i>
-          <strong>{{username}}</strong><span @click="logon">注销</span>
+          <div>
+            <strong>{{username}}</strong><span @click="logon">注销</span>
+          </div>
         </el-header>
         <router-view></router-view>
 
@@ -234,34 +241,9 @@
 <style lang="scss">
   #wrapper {
     height: 100%;
-    // h1 {
-    //   height: 100px;
-    //   line-height: 100px;
-    //   text-align: center;
-    //   font-size: 30px;
-    //   font-weight: normal;
-    // }
-    .add-event-box {
-      margin-top: 20px;
-      .input-box {
-        text-align: center;
-        input {
-          width: 400px;;
-          height: 38px;
-          padding: 0 20px;
-          border: 1px solid #dddddd;
-          border-radius: 10px;
-          outline: none; // 去除输入框焦点高亮显示
-        }
-        input:focus {
-          border: 1px solid #009fd0;
-        }
-      }
-    }
     .event-list-box {
       height: 100%;
-      .event-num {
-        /*width: auto !important;*/
+      .aside-menu-section {
         text-align: left;
         line-height: 30px;
         background: #383838;
@@ -269,21 +251,27 @@
         overflow: hidden;
         .el-menu {
           width: 100%;
-          /*height: 100%;*/
+          .el-submenu__title {
+            display: flex;
+            align-items: center;
+            height: 45px;
+            /*line-height: 45px;*/
+            padding: 0 !important;
+          }
+          .el-menu-item {
+            height: 45px;
+            line-height: 45px;
+          }
         }
-        /*.el-submenu .el-menu-item {*/
-          /*min-width: 150px;*/
-          /*padding: 0 !important;*/
-          /*text-align: center;*/
-        /*}*/
       }
 
       .el-main {
         padding: 0;
         .el-header {
-          position: relative;
-          height: 56px !important;
-          line-height: 56px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 44px !important;
           border-bottom: 1px solid #f3f3f3;
           text-align: right;
           .shrink-menu {
@@ -295,8 +283,6 @@
             transition: transform 0.5s;
           }
           .icon-caidan {
-            position: absolute;
-            left: 10px;
             font-size: 20px;
             cursor: pointer;
           }

@@ -29,6 +29,11 @@ export default new Router({
           path: 'eventList',
           name: 'eventList',
           component: require('@/views/home/children/eventList').default
+        },
+        {
+          path: 'recycleBin',
+          name: 'recycleBin',
+          component: require('@/views/home/children/recycleBin').default
         }
       ]
     },

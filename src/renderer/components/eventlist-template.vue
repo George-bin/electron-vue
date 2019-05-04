@@ -177,74 +177,74 @@ export default {
 
 <style lang="scss">
 .event-list-box {
-  .event-list {
-    height: calc(100vh - 240px);
-    margin-top: 40px;
-    background: #f9f9f9;
-    overflow: auto;
-    span {
-      float: right;
-    }
-    li {
-      position: relative;
-      display: flex;
-      height: 40px;
-      padding: 0 20px;
-      line-height: 40px;
-      color: #333333;
-      .item-content {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        cursor: pointer;
-      }
-      .edit-button {
-        margin-left: 10px;
-        cursor: pointer;
-      }
-      .edit-input {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: #f7f7f7;
-        input {
-          width: calc(100% - 110px);
-          height: 38px;
-          padding: 0 20px;
-          border: 1px solid #dddddd;
-          border-radius: 10px;
-          outline: none; // 去除输入框焦点高亮显示
-        }
-        input:focus {
-          border: 1px solid #009fd0;
-        }
-        button {
-          border: none;
-          font-size: 14px;
-          font-family: '微软雅黑';
-          color: #333333;
-          background: none;
-          outline: none; // 去掉点击时样式
-          cursor: pointer;
-        }
-      }
-    }
-    li:hover {
-      color: white;
-      background: #777777;
-    }
-    .sweet-tip {
-      height: 40px;
-      line-height: 40px;
-      text-align: center;
-    }
-  }
+  /*.event-list {*/
+    /*height: calc(100vh - 240px);*/
+    /*margin-top: 40px;*/
+    /*background: #f9f9f9;*/
+    /*overflow: auto;*/
+    /*span {*/
+      /*float: right;*/
+    /*}*/
+    /*li {*/
+      /*position: relative;*/
+      /*display: flex;*/
+      /*height: 40px;*/
+      /*padding: 0 20px;*/
+      /*line-height: 40px;*/
+      /*color: #333333;*/
+      /*.item-content {*/
+        /*flex: 1;*/
+        /*overflow: hidden;*/
+        /*text-overflow: ellipsis;*/
+        /*white-space: nowrap;*/
+        /*cursor: pointer;*/
+      /*}*/
+      /*.edit-button {*/
+        /*margin-left: 10px;*/
+        /*cursor: pointer;*/
+      /*}*/
+      /*.edit-input {*/
+        /*position: absolute;*/
+        /*left: 0;*/
+        /*top: 0;*/
+        /*width: 100%;*/
+        /*background: #f7f7f7;*/
+        /*input {*/
+          /*width: calc(100% - 110px);*/
+          /*height: 38px;*/
+          /*padding: 0 20px;*/
+          /*border: 1px solid #dddddd;*/
+          /*border-radius: 10px;*/
+          /*outline: none; // 去除输入框焦点高亮显示*/
+        /*}*/
+        /*input:focus {*/
+          /*border: 1px solid #009fd0;*/
+        /*}*/
+        /*button {*/
+          /*border: none;*/
+          /*font-size: 14px;*/
+          /*font-family: '微软雅黑';*/
+          /*color: #333333;*/
+          /*background: none;*/
+          /*outline: none; // 去掉点击时样式*/
+          /*cursor: pointer;*/
+        /*}*/
+      /*}*/
+    /*}*/
+    /*li:hover {*/
+      /*color: white;*/
+      /*background: #777777;*/
+    /*}*/
+    /*.sweet-tip {*/
+      /*height: 40px;*/
+      /*line-height: 40px;*/
+      /*text-align: center;*/
+    /*}*/
+  /*}*/
   // 隐藏滚动条
-  .event-list::-webkit-scrollbar {
-    display: none;
-  }
+  /*.event-list::-webkit-scrollbar {*/
+    /*display: none;*/
+  /*}*/
 }
 </style>
 

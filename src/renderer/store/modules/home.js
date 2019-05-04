@@ -1,6 +1,9 @@
 import {
   addEventRequest,
-  getEventListRequest
+  getEventListRequest,
+  addRecycleBinRequest,
+  destoryEventRequest,
+  outInRecycleBinRequest
 } from "../../api/home";
 
 const home = {
@@ -11,6 +14,23 @@ const home = {
   mutations: {
     SET_EVENT_LIST (state, data) {
       state.eventList = data
+    },
+    ADD_EVENT (state, data) {
+      state.eventList.unshift(data)
+    },
+    UPDATE_EVENT (state, data) {
+      state.eventList.forEach((item, index) => {
+        if (item._id === data._id) {
+          state.eventList.splice(index, 1, data)
+        }
+      })
+    },
+    DELETE_EVENT (state, _id) {
+      state.eventList.forEach((item, index) => {
+        if (item._id === _id) {
+          state.eventList.splice(index, 1)
+        }
+      })
     }
   },
   actions: {
@@ -19,6 +39,7 @@ const home = {
       return new Promise((resolve, reject) => {
         addEventRequest(data)
           .then(response => {
+            if (response.data.errcode === 0) commit('ADD_EVENT', response.data.event)
             resolve(response.data)
           })
           .catch(err => {
@@ -32,6 +53,57 @@ const home = {
         getEventListRequest(data)
           .then(response => {
             if (response.data.errcode === 0) commit('SET_EVENT_LIST', response.data.eventList)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
+    // 删除(移入回收站)
+    AddRecycleBin ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        addRecycleBinRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) {
+              commit('UPDATE_EVENT', response.data.event)
+              resolve(response.data)
+              return
+            }
+            reject(response.data)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
+    // 销毁事件
+    DestoryEvent ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        destoryEventRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) {
+              commit('DELETE_EVENT', response.data._id)
+              resolve(response.data)
+              return
+            }
+            reject(response.data)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
+    // 移出回收站
+    OutInRecycleBin ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        outInRecycleBinRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) {
+              commit('UPDATE_EVENT', response.data.event)
+              resolve(response.data)
+              return
+            }
+            reject(response.data)
           })
           .catch(err => {
             reject(err)

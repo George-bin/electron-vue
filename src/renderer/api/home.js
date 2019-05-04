@@ -17,3 +17,30 @@ export function getEventListRequest(data) {
     params: data
   })
 }
+
+// 删除(移入回收站)
+export function addRecycleBinRequest(data) {
+  return request({
+    url: `/addRecycleBin/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
+// 销毁事件
+export function destoryEventRequest(data) {
+  return request({
+    url: '/clearEvent',
+    method: 'post',
+    data: data
+  })
+}
+
+// 移出回收站
+export function outInRecycleBinRequest(data) {
+  return request({
+    url: `/outInRecycleBin/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
