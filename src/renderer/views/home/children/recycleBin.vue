@@ -47,20 +47,23 @@
 					.then(data => {
 					  this.$message({
 							message: '事件销毁成功!',
-							type: 'success'
+							type: 'success',
+							duration: 700
 						})
 					})
 					.catch(err => {
 					  if (err.errcode) {
               this.$message({
                 message: err.message,
-                type: 'error'
+                type: 'error',
+								duration: 700
               })
 							return
 						}
             this.$message({
               message: '网络错误!',
-              type: 'error'
+              type: 'error',
+							duration: 700
             })
 					})
 			},
@@ -72,20 +75,23 @@
 					.then(data => {
 					  this.$message({
 							message: '事件已移出回收站!',
-							type: 'success'
+							type: 'success',
+							duration: 700
 						})
 					})
 					.catch(err => {
 					  if (err.errcode) {
               this.$message({
                 message: err.message,
-                type: 'success'
+                type: 'success',
+								duration: 700
               })
 							return
 						}
             this.$message({
               message: '网络错误!',
-              type: 'success'
+              type: 'success',
+							duration: 700
             })
 					})
 			}

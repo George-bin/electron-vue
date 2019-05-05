@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <keep-alive>
-      <router-view></router-view>
-    </keep-alive>
+    <router-view></router-view>
 
     <!-- 数据请求客户提示 -->
     <!--<tips-template :type="resState" :message="resMessage" :hidden="stateTemplateShow"></tips-template>-->

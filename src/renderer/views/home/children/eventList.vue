@@ -58,7 +58,7 @@
 	    // 获取事项列表
 	    getEventList () {
 	      this.GetEventList({
-					username: 'geng',
+					username: localStorage.getItem('username'),
 					page: 1,
 					size: 100
 				})
@@ -85,7 +85,8 @@
 					.then(data => {
 					  this.$message({
 							message: '事件已移入回收站!',
-							type: 'success'
+							type: 'success',
+							duration: 700
 						})
 					})
 					.catch(err => {
@@ -93,13 +94,15 @@
 						if (err.errcode) {
               this.$message({
                 message: err.message,
-                type: 'error'
+                type: 'error',
+								duration: 700
               })
 							return
 						}
 						this.$message({
               message: '网络错误!',
-              type: 'error'
+              type: 'error',
+							duration: 700
 						})
 					})
 			}
@@ -110,7 +113,7 @@
 <style lang="scss">
 	.event-list-main-component {
 		.event-list {
-			max-height: calc(100vh - 56px);
+			max-height: calc(100vh - 45px);
 			padding: 0 20px;
 			overflow: auto;
 			li {
@@ -139,15 +142,15 @@
 			li:hover {
 				background: #f7f7f7;
 			}
-			.sweet-tip {
-				height: 40px;
-				line-height: 40px;
-				text-align: center;
-			}
 		}
 		// 隐藏滚动条
 		.event-list::-webkit-scrollbar {
 			display: none;
+		}
+		.sweet-tip {
+			height: 40px;
+			line-height: 40px;
+			text-align: center;
 		}
 	}
 </style>

@@ -70,8 +70,12 @@ export default {
               this.loading = false
               this.$message({
                 type: 'success',
-                message: res.data.message
+                message: '注册成功!',
+                duration: 700
               })
+              this.form.username = ''
+              this.form.password = ''
+              this.$router.back()
             })
             .catch(err => {
               console.log(err)
@@ -79,13 +83,15 @@ export default {
               if (err.errcode) {
                 this.$message({
                   type: 'warning',
-                  message: err.message
+                  message: err.message,
+                  duration: 700
                 })
                 return
               }
               this.$message({
                 type: 'error',
-                message: '网络错误!'
+                message: '网络错误!',
+                duration: 700
               })
             })
         }

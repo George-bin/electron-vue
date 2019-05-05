@@ -63,7 +63,8 @@ export default {
               this.form.eventName = ''
               this.$message({
                 type: 'success',
-                message: '新增事项成功!'
+                message: '新增事项成功!',
+                duration: 700
               })
             })
             .catch(err => {

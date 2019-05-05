@@ -2,6 +2,7 @@
   <div id="wrapper">
     <el-container
       class="event-list-box">
+      <window-frame :isLogin="true" :openSetup="true"></window-frame>
       <!-- 左侧导航 -->
       <el-aside
         class="aside-menu-section"
@@ -14,7 +15,7 @@
           background-color="#545454"
           text-color="#fff"
           active-text-color="#ffd04b"
-          default-active="/home/addEvent"
+          :default-active="normalActiveMenu"
         >
           <el-submenu index="eventManage">
             <template slot="title">
@@ -81,8 +82,9 @@
 </template>
 
 <script>
-  import request from '@/utils/request.js';
-  import eventlistTemplate from '@/components/eventlist-template';
+  import request from '@/utils/request.js'
+  import eventlistTemplate from '@/components/eventlist-template'
+  import windowFrame from '@/components/common/windowFrame-component.vue'
   import { mapState, mapActions } from 'vuex'
   export default {
     name: 'landing-page',
@@ -95,14 +97,20 @@
         noEndEventNum: 0, // 未完成事件的数量
         nowNoEndEventNum: 0, // 今日待完成事项
         activeClass: 'no-end', // 当前选中分类
-        isCollapse: false
+        isCollapse: false,
+        normalActiveMenu: '/home/addEvent'
       }
+    },
+    components: {
+      windowFrame,
+      eventlistTemplate
     },
     computed: {
       ...mapState({
         username: state => state.user.username
       })
     },
+    watch: {},
     created () {
       this.initData();
     },
@@ -126,7 +134,8 @@
             if (data.errcode === 0) {
               this.$message({
                 type: 'success',
-                message: '注销成功!'
+                message: '注销成功!',
+                duration: 700
               })
               this.$router.push('/login');
             }
@@ -231,10 +240,7 @@
     activated () {
       this.initData();
     },
-    mounted () {},
-    components: {
-      eventlistTemplate
-    },
+    mounted () {}
   }
 </script>
 
@@ -243,6 +249,7 @@
     height: 100%;
     .event-list-box {
       height: 100%;
+      padding-top: 24px;
       .aside-menu-section {
         text-align: left;
         line-height: 30px;
@@ -271,7 +278,7 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          height: 44px !important;
+          height: 45px !important;
           border-bottom: 1px solid #f3f3f3;
           text-align: right;
           .shrink-menu {
