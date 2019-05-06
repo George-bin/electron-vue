@@ -113,7 +113,7 @@
 <style lang="scss">
 	.event-list-main-component {
 		.event-list {
-			max-height: calc(100vh - 45px);
+			max-height: calc(100vh - 70px);
 			padding: 0 20px;
 			overflow: auto;
 			li {
@@ -121,7 +121,7 @@
 				display: flex;
 				height: 40px;
 				padding: 0 10px;
-				border-bottom: 1px solid #dfdfdf;
+				border-bottom: 1px solid #f3f3f3;
 				line-height: 40px;
 				color: #333333;
 				.item-content {

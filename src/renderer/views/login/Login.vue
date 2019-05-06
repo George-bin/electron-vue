@@ -1,6 +1,6 @@
 <template>
   <div class="login-main-components">
-    <window-frame :isLogin="false" :openSetup="false"></window-frame>
+    <window-frame :isLogin="false"></window-frame>
     <div class="register-btn">
       <span @click="goRegister">注册</span>
     </div>

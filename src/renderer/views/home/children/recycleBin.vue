@@ -102,7 +102,7 @@
 <style lang="scss">
 	.recycle-bin-main-component {
 		.event-list {
-			max-height: calc(100vh - 56px);
+			max-height: calc(100vh - 70px);
 			padding: 0 20px;
 			overflow: auto;
 			li {

@@ -1,7 +1,7 @@
 <template>
   <div class="add-event-component">
     <div class="title-section">
-      <h3>新增代办事项</h3>
+      <h3>新增待办事项</h3>
     </div>
     <!-- 新增事件框 -->
     <div class="content-section">
@@ -9,8 +9,9 @@
         ref="createEventForm"
         :model="form"
         :rules="rules"
+        @submit.native.prevent=""
       >
-        <el-form-item prop="eventName">
+        <el-form-item prop="eventName" class="submit-box">
           <el-input
             placeholder="请输入内容按回车键!"
             v-model="form.eventName"
@@ -90,8 +91,19 @@ export default {
   .content-section {
     width: 400px;
     margin: 40px auto 0;
-    input {
-      /*border-radius: 20px;*/
+    .submit-box {
+      .el-form-item__content {
+        display: flex;
+        .el-input {
+          flex: 1;
+        }
+        .el-button {
+          margin-left: 10px;
+          border: 0;
+          color: white;
+          background: #3385ff;
+        }
+      }
     }
   }
 }

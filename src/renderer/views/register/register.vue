@@ -1,5 +1,6 @@
 <template>
   <div class="register-component">
+    <window-frame :isLogin="false"></window-frame>
     <div class="cancel-register">
       <span @click="cancelRegister">取消</span>
     </div>
@@ -40,6 +41,7 @@
 
 <script>
 import { validatorSpace } from '@/utils/script/validatorData'
+import windowFrame from '@/components/common/windowFrame-component.vue'
 import { mapActions } from 'vuex'
 
 export default {
@@ -55,6 +57,9 @@ export default {
         password: [{ required: true, validator: validatorSpace, trigger: 'blur' }]
       }
     }
+  },
+  components: {
+    windowFrame
   },
   methods: {
     ...mapActions([
@@ -109,7 +114,7 @@ export default {
   .register-component {
     .cancel-register {
       padding-right: 40px;
-      padding-top: 20px;
+      padding-top: 44px;
       text-align: right;
       span:hover {
         color: orange;
@@ -121,7 +126,7 @@ export default {
       top: 50%;
       left: 50%;
       width: 300px;
-      transform: translateX(-50%) translateY(-100%);
+      transform: translateX(-50%) translateY(-70%);
       h2 {
         font-size: 20px;
         text-align: center;
