@@ -3,20 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="63679877-a12e-4382-8e7e-0d1035a48970" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/api/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/api/home.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/components/eventlist-template.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/eventlist-template.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/router/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/store/modules/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/store/modules/home.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/views/home/children/eventList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/views/home/children/eventList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/views/home/home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/views/home/home.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/demo_index.html" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/demo_index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.eot" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.eot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.ttf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.woff" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.woff" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/iconfont/iconfont.woff2" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/iconfont/iconfont.woff2" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/dist/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -349,12 +335,12 @@
       <workItem from="1556709935872" duration="1669000" />
       <workItem from="1556712372136" duration="1641000" />
       <workItem from="1556860855268" duration="7026000" />
-      <workItem from="1556937269057" duration="9385000" />
+      <workItem from="1556937269057" duration="9793000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="64968000" />
+    <option name="totallyTimeSpent" value="65376000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -367,7 +353,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-17" y="1" width="1386" height="788" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.48730963" visible="true" weight="0.16172107" />
       <window_info id="Structure" order="1" sideWeight="0.5083612" side_tool="true" weight="0.18177028" />
@@ -375,7 +360,7 @@
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49925596" visible="true" weight="0.30839694" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49925596" weight="0.30839694" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
