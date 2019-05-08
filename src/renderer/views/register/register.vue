@@ -1,5 +1,6 @@
 <template>
   <div class="register-component">
+    <window-frame :isLogin="false"></window-frame>
     <div class="cancel-register">
       <span @click="cancelRegister">取消</span>
     </div>
@@ -40,6 +41,7 @@
 
 <script>
 import { validatorSpace } from '@/utils/script/validatorData'
+import windowFrame from '@/components/common/windowFrame-component.vue'
 import { mapActions } from 'vuex'
 
 export default {
@@ -56,6 +58,9 @@ export default {
       }
     }
   },
+  components: {
+    windowFrame
+  },
   methods: {
     ...mapActions([
       'Register'
@@ -70,8 +75,12 @@ export default {
               this.loading = false
               this.$message({
                 type: 'success',
-                message: res.data.message
+                message: '注册成功!',
+                duration: 700
               })
+              this.form.username = ''
+              this.form.password = ''
+              this.$router.back()
             })
             .catch(err => {
               console.log(err)
@@ -79,13 +88,15 @@ export default {
               if (err.errcode) {
                 this.$message({
                   type: 'warning',
-                  message: err.message
+                  message: err.message,
+                  duration: 700
                 })
                 return
               }
               this.$message({
                 type: 'error',
-                message: '网络错误!'
+                message: '网络错误!',
+                duration: 700
               })
             })
         }
@@ -103,7 +114,7 @@ export default {
   .register-component {
     .cancel-register {
       padding-right: 40px;
-      padding-top: 20px;
+      padding-top: 44px;
       text-align: right;
       span:hover {
         color: orange;
@@ -115,7 +126,7 @@ export default {
       top: 50%;
       left: 50%;
       width: 300px;
-      transform: translateX(-50%) translateY(-100%);
+      transform: translateX(-50%) translateY(-70%);
       h2 {
         font-size: 20px;
         text-align: center;

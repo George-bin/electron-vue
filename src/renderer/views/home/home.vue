@@ -1,7 +1,8 @@
 <template>
-  <div id="wrapper">
+  <div id="wrapper" @click="normalSetup">
     <el-container
       class="event-list-box">
+      <window-frame :isLogin="true" @openSetup="openSetup"></window-frame>
       <!-- 左侧导航 -->
       <el-aside
         class="aside-menu-section"
@@ -31,7 +32,7 @@
             </el-menu-item>
             <el-menu-item index="/home/recycleBin">
               <i class="iconfont icon-huishouzhan"></i>
-              回收站
+              废纸篓
             </el-menu-item>
             <!--<el-menu-item-->
               <!--index="1-1"-->
@@ -64,11 +65,21 @@
             @click="startRotate"
           >
           </i>
-          <div>
-            <strong>{{username}}</strong><span @click="logon">注销</span>
+          <div class="search-section" v-if="isShowSearch">
+            <i class="el-icon-search"></i>
+            <input v-model="searchContent" type="text" />
+            <i v-show="searchContent" class="el-icon-error" @click="clearSearchContent" style="width: 14px;"></i>
           </div>
         </el-header>
-        <router-view></router-view>
+        <!--子路由-->
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
+
+        <!--设置选项-->
+        <ul v-if="showSetupListFlag" class="setup-list">
+          <li class="setup-list-item" @click="logon">退出登录</li>
+        </ul>
 
         <!-- 事项列表 -->
         <!--<eventlist-template-->
@@ -81,8 +92,9 @@
 </template>
 
 <script>
-  import request from '@/utils/request.js';
-  import eventlistTemplate from '@/components/eventlist-template';
+  import request from '@/utils/request.js'
+  import eventlistTemplate from '@/components/eventlist-template'
+  import windowFrame from '@/components/common/windowFrame-component.vue'
   import { mapState, mapActions } from 'vuex'
   export default {
     name: 'landing-page',
@@ -95,16 +107,28 @@
         noEndEventNum: 0, // 未完成事件的数量
         nowNoEndEventNum: 0, // 今日待完成事项
         activeClass: 'no-end', // 当前选中分类
-        isCollapse: false
+        isCollapse: false,
+        showSetupListFlag: false,
+        searchContent: ''
       }
+    },
+    components: {
+      windowFrame,
+      eventlistTemplate
     },
     computed: {
       ...mapState({
-        username: state => state.user.username
-      })
+        username: state => state.user.username,
+        activePage: state => state.home.activePage
+      }),
+      isShowSearch () {
+        return this.$route.path !== '/home/addEvent'
+      }
     },
+    watch: {},
     created () {
       this.initData();
+      console.log(this.$route)
     },
     methods: {
       ...mapActions([
@@ -117,49 +141,32 @@
       // 注销
       logon () {
         // this.$router.push('/login');
-        let data = {
-          // username: this.username
-          username: localStorage.getItem('username')
-        }
-        this.Logon(data)
-          .then(data => {
-            if (data.errcode === 0) {
-              this.$message({
-                type: 'success',
-                message: '注销成功!'
-              })
-              this.$router.push('/login');
+        this.$confirm('确定退出登录吗?', '提示', {
+          type: 'warning'
+        })
+          .then(() => {
+            let data = {
+              // username: this.username
+              username: localStorage.getItem('username')
             }
+            this.Logon(data)
+              .then(data => {
+                if (data.errcode === 0) {
+                  this.$message({
+                    type: 'success',
+                    message: '注销成功!',
+                    duration: 700
+                  })
+                  this.$router.push('/login');
+                }
+              })
           })
+          .catch(() => {})
       },
 
       // 初始化页面信息
       initData () {
         // this.getEventList();
-      },
-
-      // 获取事项列表
-      getEventList () {
-        this.$store.commit('showLoading');
-        request.geteventlist('/geteventlist', 'get', '', (res) => {
-          this.$store.commit('hideLoading');
-          if (res.data.errcode === 0) {
-            this.activeClass = 'no-end';
-            this.updateData(res.data.eventList, 'no-end');
-            return;
-          } else {
-            // 全局函数-showTips
-            this.showTips(res);
-            this.$router.push('/login');
-          }
-        })
-      },
-
-      // 触发父组件数据更新
-      updateData (allEventList, type) {
-        this.allEventList = allEventList;
-        this.eventList = this.filterEvent(type);
-        this.calculationEndNum(allEventList)
       },
 
       // 过滤代办事项
@@ -185,6 +192,21 @@
               return item.state === 2;
             });
         }
+      },
+
+      // 打开设置选项
+      openSetup () {
+        this.showSetupListFlag = true
+      },
+
+      // 恢复默认设置
+      normalSetup () {
+        this.showSetupListFlag = false
+      },
+
+      // 清空搜索内容
+      clearSearchContent () {
+        this.searchContent = ''
       },
 
       // 计算事件完成情况
@@ -231,10 +253,7 @@
     activated () {
       this.initData();
     },
-    mounted () {},
-    components: {
-      eventlistTemplate
-    },
+    mounted () {}
   }
 </script>
 
@@ -243,6 +262,7 @@
     height: 100%;
     .event-list-box {
       height: 100%;
+      padding-top: 30px;
       .aside-menu-section {
         text-align: left;
         line-height: 30px;
@@ -271,7 +291,7 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          height: 44px !important;
+          height: 45px !important;
           border-bottom: 1px solid #f3f3f3;
           text-align: right;
           .shrink-menu {
@@ -291,6 +311,35 @@
             color: orange;
           }
           span {
+            cursor: pointer;
+          }
+          .search-section {
+            display: flex;
+            align-items: center;
+            width: 180px;
+            padding: 4px 5px;
+            border-radius: 5px;
+            background: #f3f3f3;
+            input {
+              width: 140px;
+              padding: 0 5px;
+              border: none;
+              outline: none;
+              background: none;
+            }
+          }
+        }
+        .setup-list {
+          position: fixed;
+          right: 42px;
+          top: 24px;
+          border: 1px solid #dfdfdf;
+          z-index: 9999;
+          background: #ffffff;
+          .setup-list-item {
+            height: 24px;
+            line-height: 24px;
+            padding: 0 20px;
             cursor: pointer;
           }
         }

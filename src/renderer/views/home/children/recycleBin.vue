@@ -1,8 +1,8 @@
 <template>
 	<div class="recycle-bin-main-component">
-		<ul v-if="filterEventList.length" class="event-list">
+		<ul v-if="eventlistForRecycleBin.length" class="event-list">
 			<li
-				v-for="item in filterEventList"
+				v-for="item in eventlistForRecycleBin"
 				:key="item._id">
 				<strong
 					@click="editEvent(item)"
@@ -26,18 +26,22 @@
 		},
 		computed: {
 	    ...mapState({
-        eventList: state => state.home.eventList
-			}),
-			filterEventList () {
-	      return this.eventList.filter(item => {
-	        return item.status === 2
-				})
-			}
+				eventlistForRecycleBin: state => state.home.eventlistForRecycleBin
+			})
+		},
+		cretead () {},
+		mounted () {
+			this.GetEventListForRecycle({
+				username: localStorage.getItem('username'),
+				page: 1,
+				size: 100
+			})
 		},
 		methods: {
       ...mapActions([
         'DestoryEvent',
-				'OutInRecycleBin'
+				'OutInRecycleBin',
+				'GetEventListForRecycle'
       ]),
 	    // 销毁事件
       destoryEvent (event) {
@@ -47,20 +51,23 @@
 					.then(data => {
 					  this.$message({
 							message: '事件销毁成功!',
-							type: 'success'
+							type: 'success',
+							duration: 700
 						})
 					})
 					.catch(err => {
 					  if (err.errcode) {
               this.$message({
                 message: err.message,
-                type: 'error'
+                type: 'error',
+								duration: 700
               })
 							return
 						}
             this.$message({
               message: '网络错误!',
-              type: 'error'
+              type: 'error',
+							duration: 700
             })
 					})
 			},
@@ -72,20 +79,23 @@
 					.then(data => {
 					  this.$message({
 							message: '事件已移出回收站!',
-							type: 'success'
+							type: 'success',
+							duration: 700
 						})
 					})
 					.catch(err => {
 					  if (err.errcode) {
               this.$message({
                 message: err.message,
-                type: 'success'
+                type: 'success',
+								duration: 700
               })
 							return
 						}
             this.$message({
               message: '网络错误!',
-              type: 'success'
+              type: 'success',
+							duration: 700
             })
 					})
 			}
@@ -96,7 +106,7 @@
 <style lang="scss">
 	.recycle-bin-main-component {
 		.event-list {
-			max-height: calc(100vh - 56px);
+			max-height: calc(100vh - 76px);
 			padding: 0 20px;
 			overflow: auto;
 			li {

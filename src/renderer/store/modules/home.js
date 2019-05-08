@@ -1,6 +1,7 @@
 import {
   addEventRequest,
   getEventListRequest,
+  getEventListForRecycleBinRequest,
   addRecycleBinRequest,
   destoryEventRequest,
   outInRecycleBinRequest
@@ -9,11 +10,16 @@ import {
 const home = {
   state: {
     // 事项列表
-    eventList: []
+    eventList: [],
+    eventlistForRecycleBin: [],
+    activePage: '/home/addEvent'
   },
   mutations: {
     SET_EVENT_LIST (state, data) {
       state.eventList = data
+    },
+    SET_RECYCLE_EVENT_LIST (state, data) {
+      state.eventlistForRecycleBin = data
     },
     ADD_EVENT (state, data) {
       state.eventList.unshift(data)
@@ -53,6 +59,18 @@ const home = {
         getEventListRequest(data)
           .then(response => {
             if (response.data.errcode === 0) commit('SET_EVENT_LIST', response.data.eventList)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
+    // 获取回收站事项列表
+    GetEventListForRecycle ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        getEventListForRecycleBinRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) commit('SET_RECYCLE_EVENT_LIST', response.data.eventList)
           })
           .catch(err => {
             reject(err)

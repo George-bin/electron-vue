@@ -1,5 +1,6 @@
 <template>
-  <div class="login-components">
+  <div class="login-main-components">
+    <window-frame :isLogin="false"></window-frame>
     <div class="register-btn">
       <span @click="goRegister">注册</span>
     </div>
@@ -13,13 +14,25 @@
         :rules="rules"
         class="login-form"
       >
-        <el-form-item prop="username">
-          <el-input
-            placeholder="请输入用户名!"
-            v-model="form.username"
-            :disabled="loading"
-          >
-          </el-input>
+        <el-form-item prop="username" @click.native="showAccountList">
+          <el-popover
+            placement="bottom"
+            width="200"
+            v-model="accountListVisible">
+            <el-input
+              :disabled="loading"
+              placeholder="请输入用户名!"
+              v-model="form.username"
+              slot="reference"
+            >
+            </el-input>
+            <ul v-if="accountList && accountList.length" class="account-list">
+              <li v-for="item in accountList" :key="item.username" class="account-list-item" @click="useAccount(item)">
+                <span>{{ item.username }}</span>
+                <i class="el-icon-circle-close" @click.stop="deleteLocalAccount(item)"></i>
+              </li>
+            </ul>
+          </el-popover>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
@@ -41,24 +54,49 @@
 
 <script>
 import { mapActions } from 'vuex'
+import {
+  aesEncrypt,
+  aesDecrypt
+} from '../../utils/crypto'
 import { validatorSpace } from '@/utils/script/validatorData'
+import windowFrame from '@/components/common/windowFrame-component.vue'
 
 export default {
   data () {
     return {
       form: {
-        username: 'geng', // 用户名
-        password: '123', // 密码
+        username: '', // 用户名
+        password: '', // 密码
       },
       loading: false, // 登录中
       rules: {
         username: [{ required: true, validator: validatorSpace, trigger: 'blur' }],
         password: [{ required: true, validator: validatorSpace, trigger: 'blur' }]
-      }
+      },
+      accountListVisible: false,
+      accountList: []
     }
+  },
+  computed: {},
+  watch: {},
+  components: {
+    windowFrame
+  },
+  created () {
+    this.initData()
   },
   methods: {
     ...mapActions(['Login']),
+    initData () {
+      let list = JSON.parse(localStorage.getItem('accountList'))
+      if (list && list.length > 0) {
+        this.form = {
+          username: list[0].username,
+          password: aesDecrypt({ encrypted: list[0].password })
+        }
+        this.accountList = JSON.parse(JSON.stringify(list))
+      }
+    },
     // 用户登录
     login () {
       this.$refs.loginForm.validate((valid) => {
@@ -68,18 +106,19 @@ export default {
             .then(data => {
               this.loading = false
               if (data.errcode === 0) {
-                // TODO:缓存当前用户
-                localStorage.setItem('account', JSON.stringify(this.form))
+                this.cacheAccount()
                 localStorage.setItem('username', this.form.username)
                 this.$message({
                   type: 'success',
-                  message: data.message
+                  message: data.message,
+                  duration: 700
                 })
                 this.$router.push('/home')
               } else {
                 this.$message({
                   type: 'warning',
-                  message: '用户名或密码错误!'
+                  message: '用户名或密码错误!',
+                  duration: 700
                 })
               }
             })
@@ -88,30 +127,86 @@ export default {
               console.log(err)
               this.$message({
                 type: 'error',
-                message: '网路错误!'
+                message: '网路错误!',
+                duration: 700
               })
             })
         }
       })
     },
 
+    // 缓存账户，方便下次登录
+    cacheAccount () {
+      let list = JSON.parse(localStorage.getItem('accountList'))
+      if (list && list.length > 0) {
+        if (list.some(item => { return item.username === this.form.username })) {
+          let index = list.findIndex(item => {
+            return item.username === this.form.username
+          })
+          list.splice(index, 1)
+          list.unshift({
+            username: this.form.username,
+            password: aesEncrypt({ data: this.form.password })
+          })
+        } else {
+          list.unshift({
+            username: this.form.username,
+            password: aesEncrypt({ data: this.form.password })
+          })
+        }
+      } else {
+        list = []
+        list.push({
+          username: this.form.username,
+          password: aesEncrypt({ data: this.form.password })
+        })
+      }
+      localStorage.setItem('accountList', JSON.stringify(list))
+    },
+
+    // 使用该账户
+    useAccount () {},
+
+    // 删除本地缓存中的账户
+    deleteLocalAccount (account) {
+      let list = JSON.parse(localStorage.getItem('accountList'))
+      let index = list.findIndex(item => {
+        return item.username === account.username
+      })
+      list.splice(index, 1)
+      localStorage.setItem('accountList', JSON.stringify(list))
+      this.accountList = JSON.parse(JSON.stringify(list))
+      if (this.form.username === account.username) {
+        if (list && list.length > 1) {
+          this.form.username = list[0].username
+          this.form.password = aesDecrypt({ encrypted: list[0].password })
+        } else {
+          this.form.username = ''
+          this.form.password = ''
+        }
+      }
+    },
+
+    showAccountList () {
+      this.accountList = JSON.parse(localStorage.getItem('accountList'))
+      this.accountListVisible = false
+      if (this.accountList && this.accountList.length) this.accountListVisible = true
+    },
+
     // 前往注册
     goRegister() {
       this.$router.push({ path: '/register' })
     }
-  },
-  computed: {},
-  watch: {},
-  components: {}
+  }
 }
 </script>
 
 <style lang="scss">
-.login-components {
+.login-main-components {
   height: 100%;
   .register-btn {
     padding-right: 40px;
-    padding-top: 20px;
+    padding-top: 44px;
     text-align: right;
     span {
       cursor: pointer;
@@ -124,7 +219,7 @@ export default {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(-100%);
+    transform: translateX(-50%) translateY(-70%);
     width: 300px;
     h2 {
       font-size: 20px;
@@ -147,6 +242,20 @@ export default {
       color: white;
       background: #3385ff;
       border-radius: 20px;
+    }
+  }
+}
+.account-list {
+  max-height: 100px;
+  overflow: auto;
+  .account-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+    &:hover {
+      background: #f7f7f7;
     }
   }
 }

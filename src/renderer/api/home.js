@@ -18,6 +18,15 @@ export function getEventListRequest(data) {
   })
 }
 
+// 获取废弃数据
+export function getEventListForRecycleBinRequest(data) {
+  return request({
+    url: '/getEventListForRecycleBin',
+    method: 'get',
+    params: data
+  })
+}
+
 // 删除(移入回收站)
 export function addRecycleBinRequest(data) {
   return request({

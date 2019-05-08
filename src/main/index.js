@@ -4,7 +4,8 @@ import {
   app,
   BrowserWindow,
   Menu,
-  MenuItem
+  MenuItem,
+  ipcMain
 } from 'electron'
 
 /**
@@ -17,7 +18,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
-  ? `http://localhost:9080`
+  ? `http://localhost:9088`
   : `file://${__dirname}/index.html`
 
 // 创建窗口
@@ -26,13 +27,14 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 500,
+    height: 640,
     useContentSize: true,
-    width: 800,
-    minWidth: 800,
-    minHeight: 500,
-    maxWidth: 800,
-    maxHeight: 500,
+    width: 848,
+    minWidth: 848,
+    minHeight: 640,
+    maxWidth: 848,
+    maxHeight: 640,
+    frame: false,
     webPreferences: { webSecurity: false } // 允许跨域访问
   })
   // vue.js devtools
@@ -74,6 +76,30 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+// 窗口最大化
+ipcMain.on('topWinMax', function () {
+  console.log(mainWindow.isMaximized())
+  if (mainWindow.isMaximized()) {
+    mainWindow.restore()
+  } else {
+    mainWindow.maximize()
+  }
+})
+
+// 窗口最小化
+ipcMain.on('topWinMin', function () {
+  console.log('窗口最小化')
+  mainWindow.minimize()
+})
+
+// 退出窗口
+ipcMain.on('topWinClose', function (event) {
+  // mainWindow.destroy()
+  mainWindow.hide()
+  mainWindow.setSkipTaskbar(true)
+  event.preventDefault()
 })
 
 /**
