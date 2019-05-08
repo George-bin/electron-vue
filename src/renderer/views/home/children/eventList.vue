@@ -19,7 +19,7 @@
 						v-else-if="item.status === 3"
 						@click="outInRecycleBin(item)">暂缓完成</span>
 					<span class="edit-button" @click="endEvent(item)">完成</span>
-					<span class="edit-button" @click="addRecycleBin(item)">删除</span>
+					<span class="edit-button" @click="addRecycleBin(item)">丢弃</span>
 				</template>
 				<!--<template v-else-if="item.state === 1">-->
 					<!--<span class="edit-button" @click="addToNoEndEvent(item)">尚未完成</span>-->
@@ -113,7 +113,7 @@
 <style lang="scss">
 	.event-list-main-component {
 		.event-list {
-			max-height: calc(100vh - 70px);
+			max-height: calc(100vh - 76px);
 			padding: 0 20px;
 			overflow: auto;
 			li {

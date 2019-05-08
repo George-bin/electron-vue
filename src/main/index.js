@@ -27,13 +27,13 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 700,
+    height: 640,
     useContentSize: true,
-    width: 1000,
-    minWidth: 1000,
-    minHeight: 700,
-    maxWidth: 1000,
-    maxHeight: 700,
+    width: 848,
+    minWidth: 848,
+    minHeight: 640,
+    maxWidth: 848,
+    maxHeight: 640,
     frame: false,
     webPreferences: { webSecurity: false } // 允许跨域访问
   })

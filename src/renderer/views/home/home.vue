@@ -15,7 +15,7 @@
           background-color="#545454"
           text-color="#fff"
           active-text-color="#ffd04b"
-          :default-active="normalActiveMenu"
+          default-active="/home/addEvent"
         >
           <el-submenu index="eventManage">
             <template slot="title">
@@ -32,7 +32,7 @@
             </el-menu-item>
             <el-menu-item index="/home/recycleBin">
               <i class="iconfont icon-huishouzhan"></i>
-              回收站
+              废纸篓
             </el-menu-item>
             <!--<el-menu-item-->
               <!--index="1-1"-->
@@ -71,7 +71,10 @@
             <i v-show="searchContent" class="el-icon-error" @click="clearSearchContent" style="width: 14px;"></i>
           </div>
         </el-header>
-        <router-view></router-view>
+        <!--子路由-->
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
 
         <!--设置选项-->
         <ul v-if="showSetupListFlag" class="setup-list">
@@ -105,7 +108,6 @@
         nowNoEndEventNum: 0, // 今日待完成事项
         activeClass: 'no-end', // 当前选中分类
         isCollapse: false,
-        normalActiveMenu: '/home/addEvent',
         showSetupListFlag: false,
         searchContent: ''
       }
@@ -116,7 +118,8 @@
     },
     computed: {
       ...mapState({
-        username: state => state.user.username
+        username: state => state.user.username,
+        activePage: state => state.home.activePage
       }),
       isShowSearch () {
         return this.$route.path !== '/home/addEvent'
@@ -259,7 +262,7 @@
     height: 100%;
     .event-list-box {
       height: 100%;
-      padding-top: 24px;
+      padding-top: 30px;
       .aside-menu-section {
         text-align: left;
         line-height: 30px;
