@@ -37,6 +37,14 @@ const home = {
           state.eventList.splice(index, 1)
         }
       })
+    },
+    DELETE_EVENT_TO_RECYCLE (state, _id) {
+      let index = state.eventlistForRecycleBin.findIndex(item => {
+        return item._id === _id
+      })
+      if (index > -1) {
+        state.eventlistForRecycleBin.splice(index, 1)
+      }
     }
   },
   actions: {
@@ -100,7 +108,7 @@ const home = {
         destoryEventRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit('DELETE_EVENT', response.data._id)
+              commit('DELETE_EVENT_TO_RECYCLE', response.data._id)
               resolve(response.data)
               return
             }
