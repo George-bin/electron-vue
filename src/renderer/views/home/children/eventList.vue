@@ -11,17 +11,24 @@
 			</el-date-picker>
 			<div
 				class="no-finish-event-num"
-				:style="{ background: activeClass === 'noEnd' ? 'gray' : '#f3f3f3' }"
+				:class="{'active-switch-tab': activeClass === 'noEnd'}"
 			  @click="swicthTabToNoEnd"
 			>
-				待完成2
+				待完成{{eventList.length}}
 			</div>
 			<div
 				class="finish-event-num"
-				:style="{ background: activeClass === 'end' ? 'gray' : '#f3f3f3' }"
+				:class="{'active-switch-tab': activeClass === 'end'}"
 			  @click="swicthTabToEnd"
 			>
 				已完成0
+			</div>
+			<div
+				class="finish-event-num"
+				:class="{'active-switch-tab': activeClass === 'recycle'}"
+				@click="swicthTabToRecycle"
+			>
+				废纸篓{{eventlistForRecycleBin.length}}
 			</div>
 		</div>
 		<ul v-if="eventList.length" class="event-list">
@@ -71,7 +78,8 @@
 		},
 		computed: {
 	    ...mapState({
-        eventList: state => state.home.eventList
+        eventList: state => state.home.eventList,
+				eventlistForRecycleBin: state => state.home.eventlistForRecycleBin
 			})
 		},
 		mounted () {
@@ -106,8 +114,15 @@
       getEventListToEnd () {},
 			// 获取指定日期的事件
       getEventListToDate () {},
-      swicthTabToNoEnd () {},
-      swicthTabToEnd () {},
+      swicthTabToNoEnd () {
+	    	this.activeClass = 'noEnd'
+			},
+      swicthTabToEnd () {
+				this.activeClass = 'end'
+			},
+			swicthTabToRecycle () {
+				this.activeClass = 'recycle'
+			},
 			// 编辑事件
       editEvent () {},
 			// 今日完成
@@ -115,7 +130,21 @@
 			// 暂缓完成
       outInRecycleBin () {},
 			// 完成
-      endEvent () {},
+      endEvent () {
+				let data = {
+					_id: item._id
+				};
+				this.$store.commit('showLoading');
+				request.endevent(`/endevent/${data._id}`, 'put', data, (res) => {
+					this.$store.commit('hideLoading');
+					// 全局函数-showTips
+					this.showTips(res)
+					if (res.data.errcode === 0) {
+						this.$emit('updateData', res.data.eventList, 'no-end');
+						return;
+					}
+				});
+			},
 			// 删除(移入回收站)
       addRecycleBin (event) {
         this.AddRecycleBin({
@@ -160,12 +189,16 @@
 			}
 			.no-finish-event-num,
 			.finish-event-num {
-				height: 24px;
-				line-height: 24px;
+				height: 28px;
+				line-height: 28px;
 				padding: 0 10px;
 				margin-left: 10px;
 				cursor: pointer;
 				border-radius: 6px;
+			}
+			.active-switch-tab {
+				color: white;
+				background: gray;
 			}
 		}
 		.event-list {

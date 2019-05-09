@@ -9,6 +9,15 @@ export function addEventRequest(data) {
   })
 }
 
+// 完成事件
+export function endEventRequest(data) {
+  return request({
+    url: `/endevent/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
 // 获取事项列表
 export function getEventListRequest(data) {
   return request({
