@@ -1,5 +1,29 @@
 <template>
 	<div class="event-list-main-component">
+		<div class="event-list-nav">
+			<el-date-picker
+				v-model="activeDate"
+				type="date"
+				size="mini"
+				placeholder="选择日期"
+			  @change="getEventListToDate"
+			>
+			</el-date-picker>
+			<div
+				class="no-finish-event-num"
+				:style="{ background: activeClass === 'noEnd' ? 'gray' : '#f3f3f3' }"
+			  @click="swicthTabToNoEnd"
+			>
+				待完成2
+			</div>
+			<div
+				class="finish-event-num"
+				:style="{ background: activeClass === 'end' ? 'gray' : '#f3f3f3' }"
+			  @click="swicthTabToEnd"
+			>
+				已完成0
+			</div>
+		</div>
 		<ul v-if="eventList.length" class="event-list">
 			<li
 				v-for="item in eventList"
@@ -10,14 +34,14 @@
 					class="item-content">{{item.eventName}}
 				</strong>
 				<template v-if="item.status === 0 || item.status === 3">
-          <span
-						class="edit-button"
-						v-if="item.status === 0"
-						@click="addNowEndEventList(item)">今日完成</span>
-					<span
-						class="edit-button"
-						v-else-if="item.status === 3"
-						@click="outInRecycleBin(item)">暂缓完成</span>
+          <!--<span-->
+						<!--class="edit-button"-->
+						<!--v-if="item.status === 0"-->
+						<!--@click="addNowEndEventList(item)">今日完成</span>-->
+					<!--<span-->
+						<!--class="edit-button"-->
+						<!--v-else-if="item.status === 3"-->
+						<!--@click="outInRecycleBin(item)">暂缓完成</span>-->
 					<span class="edit-button" @click="endEvent(item)">完成</span>
 					<span class="edit-button" @click="addRecycleBin(item)">丢弃</span>
 				</template>
@@ -40,7 +64,10 @@
 	import { mapState, mapActions } from 'vuex'
 	export default {
 	  data () {
-	    return {}
+	    return {
+        activeDate: '',
+				activeClass: 'noEnd'
+			}
 		},
 		computed: {
 	    ...mapState({
@@ -49,15 +76,21 @@
 		},
 		mounted () {
 	    this.getEventList()
+			this.activeDate = new Date()
 		},
 		methods: {
 	    ...mapActions([
 	      'GetEventList',
 				'AddRecycleBin'
 			]),
-	    // 获取事项列表
+	    // 获取事项列表（未完成）
 	    getEventList () {
+	      let time = new Date()
+        let startTime = Date.parse(new Date(`${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()}`))
+        let endTime = new Date().setTime((startTime / 1000 + 24 * 60 * 60 - 1) * 1000)
 	      this.GetEventList({
+          startTime: startTime,
+					endTime: endTime,
 					username: localStorage.getItem('username'),
 					page: 1,
 					size: 100
@@ -69,6 +102,12 @@
 					  console.log(err)
 					})
 			},
+			// 获取已完成事件
+      getEventListToEnd () {},
+			// 获取指定日期的事件
+      getEventListToDate () {},
+      swicthTabToNoEnd () {},
+      swicthTabToEnd () {},
 			// 编辑事件
       editEvent () {},
 			// 今日完成
@@ -112,8 +151,25 @@
 
 <style lang="scss">
 	.event-list-main-component {
+		.event-list-nav {
+			display: flex;
+			align-items: center;
+			padding: 5px 20px;
+			.el-date-editor {
+				width: 170px;
+			}
+			.no-finish-event-num,
+			.finish-event-num {
+				height: 24px;
+				line-height: 24px;
+				padding: 0 10px;
+				margin-left: 10px;
+				cursor: pointer;
+				border-radius: 6px;
+			}
+		}
 		.event-list {
-			max-height: calc(100vh - 76px);
+			max-height: calc(100vh - 76px - 38px);
 			padding: 0 20px;
 			overflow: auto;
 			li {
