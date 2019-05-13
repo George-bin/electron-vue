@@ -9,77 +9,66 @@
 			  @change="getEventListToDate"
 			>
 			</el-date-picker>
-			<div
-				class="no-finish-event-num"
-				:class="{'active-switch-tab': activeClass === 'noEnd'}"
-			  @click="swicthTabToNoEnd"
-			>
-				待完成{{eventList.length}}
+			<div class="switch-tab-section">
+				<div
+					class="no-finish-event-num"
+					:class="{'active-switch-tab': activeClass === 'noEnd'}"
+					@click="swicthTabToNoEnd"
+				>
+					待完成{{eventList.length}}
+				</div>
+				<div
+					class="finish-event-num"
+					:class="{'active-switch-tab': activeClass === 'end'}"
+					@click="swicthTabToEnd"
+				>
+					已完成{{endEventList.length}}
+				</div>
+				<div
+					class="finish-event-num"
+					:class="{'active-switch-tab': activeClass === 'recycle'}"
+					@click="swicthTabToRecycle"
+				>
+					废纸篓{{recycleBinList.length}}
+				</div>
 			</div>
-			<div
-				class="finish-event-num"
-				:class="{'active-switch-tab': activeClass === 'end'}"
-			  @click="swicthTabToEnd"
-			>
-				已完成0
-			</div>
-			<div
-				class="finish-event-num"
-				:class="{'active-switch-tab': activeClass === 'recycle'}"
-				@click="swicthTabToRecycle"
-			>
-				废纸篓{{eventlistForRecycleBin.length}}
+			<!--搜索区域-->
+			<div class="search-section">
+				<i class="el-icon-search"></i>
+				<input v-model="searchContent" placeholder="输入关键字搜索!" type="text" />
+				<i v-show="searchContent" class="el-icon-error" @click="clearSearchContent" style="width: 14px;"></i>
 			</div>
 		</div>
-		<ul v-if="eventList.length" class="event-list">
-			<li
-				v-for="item in eventList"
-				v-if="item.status !== 2"
-				:key="item._id">
-				<strong
-					@click="editEvent(item)"
-					class="item-content">{{item.eventName}}
-				</strong>
-				<template v-if="item.status === 0 || item.status === 3">
-          <!--<span-->
-						<!--class="edit-button"-->
-						<!--v-if="item.status === 0"-->
-						<!--@click="addNowEndEventList(item)">今日完成</span>-->
-					<!--<span-->
-						<!--class="edit-button"-->
-						<!--v-else-if="item.status === 3"-->
-						<!--@click="outInRecycleBin(item)">暂缓完成</span>-->
-					<span class="edit-button" @click="endEvent(item)">完成</span>
-					<span class="edit-button" @click="addRecycleBin(item)">丢弃</span>
-				</template>
-				<!--<template v-else-if="item.state === 1">-->
-					<!--<span class="edit-button" @click="addToNoEndEvent(item)">尚未完成</span>-->
-				<!--</template>-->
-				<!--<template v-else>-->
-					<!--<span class="edit-button" @click="clearEvent(item)">销毁</span>-->
-					<!--<span class="edit-button" @click="outInRecycleBin(item)">恢复</span>-->
-				<!--</template>-->
-			</li>
-		</ul>
-		<div v-else class="sweet-tip">
-			<p>待办事项为空!</p>
-		</div>
+		<!--<router-view></router-view>-->
+		<noend-event-component v-show="activeClass === 'noEnd'" :searchContent="searchContent"></noend-event-component>
+		<end-event-component v-show="activeClass === 'end'" :searchContent="searchContent"></end-event-component>
+		<recycle-bin-component v-show="activeClass === 'recycle'" :searchContent="searchContent"></recycle-bin-component>
 	</div>
 </template>
 
 <script>
 	import { mapState, mapActions } from 'vuex'
+	import noendEventComponent from '../../../components/home/noEndEvent-component'
+	import endEventComponent from '../../../components/home/endEvent-component'
+	import recycleBinComponent from '../../../components/home/recycleBin-component'
 	export default {
 	  data () {
 	    return {
         activeDate: '',
-				activeClass: 'noEnd'
+				activeClass: 'noEnd',
+				searchContent: ''
 			}
+		},
+		components: {
+			noendEventComponent,
+			endEventComponent,
+			recycleBinComponent
 		},
 		computed: {
 	    ...mapState({
         eventList: state => state.home.eventList,
-				eventlistForRecycleBin: state => state.home.eventlistForRecycleBin
+				endEventList: state => state.home.endEventList,
+				recycleBinList: state => state.home.recycleBinList
 			})
 		},
 		mounted () {
@@ -88,12 +77,15 @@
 		},
 		methods: {
 	    ...mapActions([
-	      'GetEventList',
-				'AddRecycleBin'
+	      'GetEventList'
 			]),
+			// 清空搜索内容
+			clearSearchContent () {
+				this.searchContent = ''
+			},
 	    // 获取事项列表（未完成）
-	    getEventList () {
-	      let time = new Date()
+	    getEventList (date) {
+	      let time = date ? new Date(date) : new Date()
         let startTime = Date.parse(new Date(`${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()}`))
         let endTime = new Date().setTime((startTime / 1000 + 24 * 60 * 60 - 1) * 1000)
 	      this.GetEventList({
@@ -103,17 +95,32 @@
 					page: 1,
 					size: 100
 				})
-					.then(data => {
-
-					})
+					.then(data => {})
 					.catch(err => {
 					  console.log(err)
+						if (err.errcode) {
+							this.$message({
+								messgae: err.message,
+								type: 'error',
+								duration: 700
+							})
+							return
+						}
+						this.$message({
+							message: '网络错误!',
+							type: 'error',
+							duration: 700
+						})
 					})
 			},
 			// 获取已完成事件
-      getEventListToEnd () {},
+      // getEventListToEnd () {},getEventListForRecycleBin
 			// 获取指定日期的事件
-      getEventListToDate () {},
+      getEventListToDate (event) {
+	    	// console.log(event)
+				let date = this.moment(event).format('YYYY-MM-DD HH:mm:ss')
+				this.getEventList(date)
+			},
       swicthTabToNoEnd () {
 	    	this.activeClass = 'noEnd'
 			},
@@ -144,35 +151,6 @@
 						return;
 					}
 				});
-			},
-			// 删除(移入回收站)
-      addRecycleBin (event) {
-        this.AddRecycleBin({
-          _id: event._id
-				})
-					.then(data => {
-					  this.$message({
-							message: '事件已移入回收站!',
-							type: 'success',
-							duration: 700
-						})
-					})
-					.catch(err => {
-						console.log(err)
-						if (err.errcode) {
-              this.$message({
-                message: err.message,
-                type: 'error',
-								duration: 700
-              })
-							return
-						}
-						this.$message({
-              message: '网络错误!',
-              type: 'error',
-							duration: 700
-						})
-					})
 			}
 		}
 	}
@@ -183,58 +161,45 @@
 		.event-list-nav {
 			display: flex;
 			align-items: center;
-			padding: 5px 20px;
+			padding: 10px 20px;
+			border-bottom: 1px solid #e6e6e6;
 			.el-date-editor {
 				width: 170px;
 			}
-			.no-finish-event-num,
-			.finish-event-num {
-				height: 28px;
-				line-height: 28px;
-				padding: 0 10px;
-				margin-left: 10px;
-				cursor: pointer;
-				border-radius: 6px;
-			}
-			.active-switch-tab {
-				color: white;
-				background: gray;
-			}
-		}
-		.event-list {
-			max-height: calc(100vh - 76px - 38px);
-			padding: 0 20px;
-			overflow: auto;
-			li {
-				position: relative;
+			.switch-tab-section {
+				flex: 1;
 				display: flex;
-				height: 40px;
-				padding: 0 10px;
-				border-bottom: 1px solid #f3f3f3;
-				line-height: 40px;
-				color: #333333;
-				.item-content {
-					flex: 1;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
-					cursor: pointer;
-				}
-				.edit-button {
+				.no-finish-event-num,
+				.finish-event-num {
+					height: 28px;
+					line-height: 28px;
+					padding: 0 10px;
 					margin-left: 10px;
 					cursor: pointer;
+					border-radius: 6px;
 				}
-				.edit-button:hover {
-					color: orange;
+				.active-switch-tab {
+					color: white;
+					background: #383838;
 				}
 			}
-			li:hover {
-				background: #f7f7f7;
+			.search-section {
+				display: flex;
+				align-items: center;
+				width: 180px;
+				padding: 4px 5px;
+				border-radius: 5px;
+				background: #f3f3f3;
+				input {
+					flex: 1;
+					width: 140px;
+					padding: 0 5px;
+					border: none;
+					font-family: "Microsoft YaHei","Arial","黑体","宋体",sans-serif;
+					outline: none;
+					background: none;
+				}
 			}
-		}
-		// 隐藏滚动条
-		.event-list::-webkit-scrollbar {
-			display: none;
 		}
 		.sweet-tip {
 			height: 40px;

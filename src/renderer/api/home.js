@@ -1,5 +1,14 @@
 import request from '../utils/request'
 
+// 编辑事件
+export function editEventRequest (data) {
+  return request({
+    url: `/editevent/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
 // 新增待办事项
 export function addEventRequest(data) {
   return request({
@@ -58,6 +67,15 @@ export function destoryEventRequest(data) {
 export function outInRecycleBinRequest(data) {
   return request({
     url: `/outInRecycleBin/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
+// 从完成移至未完成
+export function addToNoEndEventRequest(data) {
+  return request({
+    url: `/toNoEndEvent/${data._id}`,
     method: 'put',
     data: data
   })

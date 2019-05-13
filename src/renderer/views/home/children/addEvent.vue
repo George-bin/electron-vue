@@ -53,7 +53,8 @@ export default {
         status: 0, // 事件状态 0：未完成 1：已完成 2：进入回收站 3：需要今日完成
         eventName: this.form.eventName, // 事件名称
         eventData: this.form.eventData, // 解决方案
-        username: this.username, // 所属用户
+        // username: this.username, // 所属用户
+        username: localStorage.getItem('username'),
         date: Date.now() // 事件创建时间
       }
       this.$refs.createEventForm.validate((valid) => {
@@ -69,6 +70,7 @@ export default {
               })
             })
             .catch(err => {
+              this.form.eventName = ''
               console.log(errs)
             })
         }

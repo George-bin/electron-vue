@@ -31,9 +31,14 @@ export default new Router({
           component: require('@/views/home/children/eventList').default
         },
         {
-          path: 'recycleBin',
-          name: 'recycleBin',
-          component: require('@/views/home/children/recycleBin').default
+          path: 'editorevent',
+          name: 'editorevent',
+          component: () => require('@/views/home/children/Editor').default
+        },
+        {
+          path: 'eventDetail',
+          name: 'eventDetail',
+          component: () => require('@/views/home/children/eventDetail').default
         }
       ]
     },
@@ -45,12 +50,14 @@ export default new Router({
     {
       path: '/register',
       name: 'register',
-      component: () => import('@/views/register/register')
+      component: () => require('@/views/register/register').default
     },
+
     {
       path: '/editorevent',
-      name: 'editor-home',
-      component: require('@/views/EventDetail').default
+      name: 'editorevent',
+      component: () => require('@/views/home/children/Editor').default
+      // component: require('@/views/EventDetail').default
     }
   ]
 })

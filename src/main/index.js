@@ -44,7 +44,7 @@ function createWindow () {
   mainWindow.loadURL(winURL)
 
   // 打开开发者工具
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // 监听窗口关闭
   mainWindow.on('closed', () => {

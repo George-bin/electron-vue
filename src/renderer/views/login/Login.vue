@@ -1,6 +1,5 @@
 <template>
   <div class="login-main-components">
-    <window-frame :isLogin="false"></window-frame>
     <div class="register-btn">
       <span @click="goRegister">注册</span>
     </div>
@@ -59,7 +58,6 @@ import {
   aesDecrypt
 } from '../../utils/crypto'
 import { validatorSpace } from '@/utils/script/validatorData'
-import windowFrame from '@/components/common/windowFrame-component.vue'
 
 export default {
   data () {
@@ -79,9 +77,7 @@ export default {
   },
   computed: {},
   watch: {},
-  components: {
-    windowFrame
-  },
+  components: {},
   created () {
     this.initData()
   },
@@ -165,7 +161,11 @@ export default {
     },
 
     // 使用该账户
-    useAccount () {},
+    useAccount (event) {
+      this.accountListVisible = false
+      this.form.username = event.username
+      this.form.password = aesDecrypt({ encrypted: event.password })
+    },
 
     // 删除本地缓存中的账户
     deleteLocalAccount (account) {

@@ -1,8 +1,7 @@
 <template>
-  <div id="wrapper" @click="normalSetup">
+  <div id="wrapper">
     <el-container
       class="event-list-box">
-      <window-frame :isLogin="true" @openSetup="openSetup"></window-frame>
       <!-- 左侧导航 -->
       <el-aside
         class="aside-menu-section"
@@ -30,28 +29,6 @@
               <i class="iconfont icon-liebiao"></i>
               事项列表
             </el-menu-item>
-            <el-menu-item index="/home/recycleBin">
-              <i class="iconfont icon-huishouzhan"></i>
-              废纸篓
-            </el-menu-item>
-            <!--<el-menu-item-->
-              <!--index="1-1"-->
-              <!--route="/now"-->
-            <!--&gt;-->
-              <!--今日待完成：{{nowNoEndEventNum}}-->
-            <!--</el-menu-item>-->
-            <!--<el-menu-item-->
-              <!--index="1-2"-->
-              <!--route="/end"-->
-            <!--&gt;-->
-              <!--已完成事项：{{endEventNum}}-->
-            <!--</el-menu-item>-->
-            <!--<el-menu-item-->
-              <!--index="1-3"-->
-              <!--route="/no"-->
-            <!--&gt;-->
-              <!--未完成事项：{{noEndEventNum}}-->
-            <!--</el-menu-item>-->
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -65,34 +42,24 @@
             @click="startRotate"
           >
           </i>
-          <div class="search-section" v-if="isShowSearch">
-            <i class="el-icon-search"></i>
-            <input v-model="searchContent" type="text" />
-            <i v-show="searchContent" class="el-icon-error" @click="clearSearchContent" style="width: 14px;"></i>
-          </div>
+          <!--当前编辑事件的名称-->
+          <h3 v-if="editEvent && !isEditEventNameFlag" class="edit-event-name ellipsis" title="点击编辑" @click="startEditEventName">{{ editEvent.eventName }}</h3>
+          <!--编辑事件名称-->
+          <input v-show="editEvent && isEditEventNameFlag" ref="eventNameInput" class="edit-event-name-input" v-model="newEventName" type="text" @blur="editEventName" />
+          <i class="iconfont icon-bofang play-music-btn" :class="{ 'play-music-btn-remote': isPlayingFlag }" @click="playMusic" title="静心聆听"></i>
+          <audio src="../../../../static/music/花粥-纸短情长.mp3" loop ref="audioElement"></audio>
         </el-header>
         <!--子路由-->
         <keep-alive>
           <router-view></router-view>
         </keep-alive>
-
-        <!--设置选项-->
-        <ul v-if="showSetupListFlag" class="setup-list">
-          <li class="setup-list-item" @click="logon">退出登录</li>
-        </ul>
-
-        <!-- 事项列表 -->
-        <!--<eventlist-template-->
-          <!--:eventList="this.eventList"-->
-          <!--@updateData="updateData">-->
-        <!--</eventlist-template>-->
       </el-main>
     </el-container>
   </div>
 </template>
 
 <script>
-  import request from '@/utils/request.js'
+  import Aplayer from 'vue-aplayer'
   import eventlistTemplate from '@/components/eventlist-template'
   import windowFrame from '@/components/common/windowFrame-component.vue'
   import { mapState, mapActions } from 'vuex'
@@ -103,65 +70,95 @@
         eventData: '', // 添加事件名字
         eventList: [], // 当前显示事件列表
         allEventList: [], // 总的事件列表
-        endEventNum: 0, // 完成事件的数量
-        noEndEventNum: 0, // 未完成事件的数量
-        nowNoEndEventNum: 0, // 今日待完成事项
         activeClass: 'no-end', // 当前选中分类
         isCollapse: false,
-        showSetupListFlag: false,
-        searchContent: ''
+        isPlayingFlag: false,
+        // 开始编辑事件名称
+        isEditEventNameFlag: false,
+        // 新的事件名称
+        newEventName: ''
       }
     },
     components: {
       windowFrame,
-      eventlistTemplate
+      eventlistTemplate,
+      Aplayer
     },
     computed: {
       ...mapState({
         username: state => state.user.username,
-        activePage: state => state.home.activePage
-      }),
-      isShowSearch () {
-        return this.$route.path !== '/home/addEvent'
-      }
+        editEvent: state => state.home.editEvent
+      })
     },
     watch: {},
     created () {
       this.initData();
       console.log(this.$route)
     },
+    // activated () {
+    //   this.initData();
+    // },
+    mounted () {},
     methods: {
       ...mapActions([
-        'Logon'
+        'EditEvent'
       ]),
+      // 开始编辑事件名称
+      startEditEventName () {
+        this.isEditEventNameFlag = true
+        this.newEventName = this.editEvent.eventName
+        this.$nextTick(() => {
+          this.$refs.eventNameInput.focus()
+        })
+      },
+      // 编辑事件名称
+      editEventName () {
+        if (!this.newEventName.replace(/\s/g, '')) {
+          this.$message({
+            message: '请输入有效的事件名称!',
+            type: 'warning'
+          })
+          this.$nextTick(() => {
+            this.$refs.eventNameInput.focus()
+          })
+          return
+        }
+        this.EditEvent({
+          ...this.editEvent,
+          eventName: this.newEventName
+        })
+          .then(data => {
+            this.isEditEventNameFlag = false
+          })
+          .catch(err => {
+            if (err.errcode) {
+              this.$message({
+                message: err.message,
+                type: 'error',
+                duration: 700
+              })
+              return
+            }
+            this.$message({
+              message: '网络错误!',
+              type: 'error',
+              duration: 700
+            })
+          })
+      },
+      // 播放音乐
+      playMusic () {
+        if (this.isPlayingFlag) {
+          this.$refs.audioElement.pause()
+          this.isPlayingFlag = false
+          return
+        }
+        this.isPlayingFlag = true
+        this.$refs.audioElement.play()
+      },
       // 展示/收缩菜单
       startRotate() {
         this.isCollapse = !this.isCollapse
-      },
-      // 注销
-      logon () {
-        // this.$router.push('/login');
-        this.$confirm('确定退出登录吗?', '提示', {
-          type: 'warning'
-        })
-          .then(() => {
-            let data = {
-              // username: this.username
-              username: localStorage.getItem('username')
-            }
-            this.Logon(data)
-              .then(data => {
-                if (data.errcode === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '注销成功!',
-                    duration: 700
-                  })
-                  this.$router.push('/login');
-                }
-              })
-          })
-          .catch(() => {})
       },
 
       // 初始化页面信息
@@ -194,37 +191,6 @@
         }
       },
 
-      // 打开设置选项
-      openSetup () {
-        this.showSetupListFlag = true
-      },
-
-      // 恢复默认设置
-      normalSetup () {
-        this.showSetupListFlag = false
-      },
-
-      // 清空搜索内容
-      clearSearchContent () {
-        this.searchContent = ''
-      },
-
-      // 计算事件完成情况
-      calculationEndNum (events) {
-        let endEventsList = events.filter(item => {
-          return item.state === 1;
-        });
-        let recycleBinEventList = events.filter(item => {
-          return item.state === 2;
-        });
-        let nowEndEventList = events.filter(item => {
-          return item.state === 3;
-        });
-        this.endEventNum = endEventsList.length;
-        this.noEndEventNum = events.length - endEventsList.length - recycleBinEventList.length;
-        this.nowNoEndEventNum = nowEndEventList.length;
-      },
-
       // 获取已完成事项的数据
       getEndEventList () {
         this.activeClass = 'end';
@@ -248,12 +214,7 @@
         this.activeClass = 'recycle-bin';
         this.eventList = this.filterEvent('recycle-bin');
       }
-    },
-
-    activated () {
-      this.initData();
-    },
-    mounted () {}
+    }
   }
 </script>
 
@@ -292,8 +253,20 @@
           align-items: center;
           justify-content: space-between;
           height: 45px !important;
-          border-bottom: 1px solid #f3f3f3;
+          border-bottom: 1px solid #e6e6e6;
           text-align: right;
+          background: #F7F7F7;
+          .edit-event-name {
+            width: 320px;
+            text-align: center;
+            cursor: pointer;
+          }
+          .edit-event-name-input {
+            width: 320px;
+            border: none;
+            outline: none;
+            background: none;
+          }
           .shrink-menu {
             transform: rotate(90deg);
             transition: transform 0.5s;
@@ -313,34 +286,17 @@
           span {
             cursor: pointer;
           }
-          .search-section {
-            display: flex;
-            align-items: center;
-            width: 180px;
-            padding: 4px 5px;
-            border-radius: 5px;
-            background: #f3f3f3;
-            input {
-              width: 140px;
-              padding: 0 5px;
-              border: none;
-              outline: none;
-              background: none;
-            }
-          }
-        }
-        .setup-list {
-          position: fixed;
-          right: 42px;
-          top: 24px;
-          border: 1px solid #dfdfdf;
-          z-index: 9999;
-          background: #ffffff;
-          .setup-list-item {
-            height: 24px;
-            line-height: 24px;
-            padding: 0 20px;
+          .play-music-btn {
+            font-size: 24px;
             cursor: pointer;
+          }
+          .play-music-btn-remote {
+            animation: rotate 3s linear infinite;
+          }
+          @keyframes remote
+          {
+            from{-webkit-transform: rotate(0deg)}
+            to{-webkit-transform: rotate(360deg)}
           }
         }
       }

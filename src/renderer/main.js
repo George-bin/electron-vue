@@ -23,6 +23,7 @@ import './utils/script/global-function'
 import '../../static/css/index.css'
 
 Vue.use(VueQuillEditor)
+Vue.prototype.moment = require('moment')
 
 // 以web形式渲染，打包需注释
 // process.env.IS_WEB = 'web'
