@@ -39,7 +39,7 @@
           this.showSetupBtnFlag = false
         }
         // 是否显示编辑标题
-        if (to.path !== '/home/editorevent') this.SET_EDIT_EVENT('')
+        if (to.path !== '/home/editorevent' && to.path !== '/home/eventDetail') this.SET_EDIT_EVENT('')
       }
     },
     methods: {

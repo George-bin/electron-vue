@@ -1,9 +1,9 @@
 <template>
   <div class="editor-content-main-component">
-    <div class="button-group">
-      <span class="btn-item cancel-btn" @click="cancelEditor">取消</span>
-      <span class="btn-item sure-btn" @click="updateEvent">保存</span>
-    </div>
+    <!--<div class="button-group">-->
+      <!--<span class="btn-item cancel-btn" @click="cancelEditor">取消</span>-->
+      <!--<span class="btn-item sure-btn" @click="updateEvent">保存</span>-->
+    <!--</div>-->
     <quill-editor
       v-model="content"
       ref="myQuillEditor"
@@ -12,11 +12,14 @@
       @focus="onEditorFocus($event)"
       @change="onEditorChange($event)">
     </quill-editor>
+    <!--返回组件-->
+    <back-component></back-component>
   </div>
 </template>
 
 <script>
   import { mapState, mapMutations, mapActions } from 'vuex'
+  import backComponent from '@/components/common/back-component'
   export default {
     data () {
       return {
@@ -49,7 +52,9 @@
         }
       }
     },
-    components: {},
+    components: {
+      backComponent
+    },
     computed: {
       ...mapState({
         editEvent: state => state.home.editEvent
@@ -123,7 +128,6 @@
       height: 30px;
       line-height: 30px;
       padding: 0 10px;
-      /*padding-top: 40px;*/
       text-align: right;
       .btn-item {
         cursor: pointer;
@@ -132,14 +136,16 @@
         margin-left: 10px;
         color: orange;
       }
-      /*span:hover {*/
-        /*color: orange;*/
-      /*}*/
+    }
+    .ql-snow {
+      border-left: none !important;
+      border-right: none !important;
+      border-top: none !important;
     }
     .ql-container {
-      max-height: calc(100vh - 75px - 30px - 42px);
-      border: none;
-      overflow: auto;
+      height: calc(100vh - 75px - 35px - 42px) !important;
+      border: none !important;
+      overflow: auto !important;
     }
   }
 </style>

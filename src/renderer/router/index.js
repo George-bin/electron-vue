@@ -33,12 +33,12 @@ export default new Router({
         {
           path: 'editorevent',
           name: 'editorevent',
-          component: () => require('@/views/home/children/Editor').default
+          component: require('@/views/home/children/Editor').default
         },
         {
           path: 'eventDetail',
           name: 'eventDetail',
-          component: () => require('@/views/home/children/eventDetail').default
+          component: require('@/views/home/children/eventDetail').default
         }
       ]
     },

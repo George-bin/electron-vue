@@ -105,6 +105,9 @@
       ]),
       // 开始编辑事件名称
       startEditEventName () {
+        if (this.$router.path === '/home/eventDetail') {
+          return
+        }
         this.isEditEventNameFlag = true
         this.newEventName = this.editEvent.eventName
         this.$nextTick(() => {
@@ -253,7 +256,7 @@
           align-items: center;
           justify-content: space-between;
           height: 45px !important;
-          border-bottom: 1px solid #e6e6e6;
+          border-bottom: 1px solid #CCCCCC;
           text-align: right;
           background: #F7F7F7;
           .edit-event-name {
