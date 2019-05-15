@@ -5,8 +5,10 @@
         v-for="item in filterEventList"
         v-if="item.status !== 2"
         :key="item._id">
-        <strong @click="goEventDetail(item)" class="item-content">{{item.eventName}}</strong>
-        <span class="edit-button" @click="editEvent(item)">编辑</span>
+        <div class="item-content" @click="goEventDetail(item)">
+          <strong class="event-name">{{item.eventName}}</strong>
+          <div class="event-date">{{ item.date }}</div>
+        </div>
         <span class="edit-button" @click="endEvent(item)">完成</span>
         <span class="edit-button" @click="addRecycleBin(item)">丢弃</span>
         <!--<template v-if="item.status === 0 || item.status === 3">-->
@@ -54,7 +56,8 @@
     },
     methods: {
       ...mapMutations([
-        'SET_EDIT_EVENT'
+        'SET_EDIT_EVENT',
+        'SET_SHOW_LEFT_MENU_FLAG'
       ]),
       ...mapActions([
         'AddRecycleBin',
@@ -62,15 +65,10 @@
       ]),
       // 查看事件详情
       goEventDetail (event) {
+        this.SET_SHOW_LEFT_MENU_FLAG(false)
         this.SET_EDIT_EVENT(JSON.parse(JSON.stringify(event)))
         console.log(this.$router)
         this.$router.push('/home/eventDetail')
-      },
-
-      // 编辑事件
-      editEvent (event) {
-        this.SET_EDIT_EVENT(JSON.parse(JSON.stringify(event)))
-        this.$router.push('/home/editorevent')
       },
 
       // 添加到完成事件
@@ -151,10 +149,11 @@
       li {
         position: relative;
         display: flex;
-        height: 60px;
+        align-items: center;
+        /*height: 60px;*/
         padding: 0 10px;
         border: 1px solid #e6e6e6;
-        line-height: 60px;
+        /*line-height: 60px;*/
         color: #333333;
         border-radius: 5px;
         box-shadow: 0 0 10px #dedede;
@@ -164,6 +163,14 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           cursor: pointer;
+          .event-name {
+            line-height: 40px;
+          }
+          .event-date {
+            line-height: 20px;
+            font-size: 12px;
+            color: gray;
+          }
         }
         .edit-button {
           margin-left: 10px;

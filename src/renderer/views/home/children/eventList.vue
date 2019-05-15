@@ -43,6 +43,11 @@
 		<noend-event-component v-show="activeClass === 'noEnd'" :searchContent="searchContent"></noend-event-component>
 		<end-event-component v-show="activeClass === 'end'" :searchContent="searchContent"></end-event-component>
 		<recycle-bin-component v-show="activeClass === 'recycle'" :searchContent="searchContent"></recycle-bin-component>
+
+		<!--新增事件按钮-->
+		<div class="add-event-btn" @click="goAddEvent">
+			<i class="iconfont icon-xinzeng"></i>
+		</div>
 	</div>
 </template>
 
@@ -151,6 +156,10 @@
 						return;
 					}
 				});
+			},
+			// 前往新增事项
+			goAddEvent () {
+	    	this.$router.push('/home/addEvent')
 			}
 		}
 	}
@@ -162,7 +171,7 @@
 			display: flex;
 			align-items: center;
 			padding: 10px 20px;
-			border-bottom: 1px solid #e6e6e6;
+			border-bottom: 1px solid #CCCCCC;
 			.el-date-editor {
 				width: 170px;
 			}
@@ -205,6 +214,23 @@
 			height: 40px;
 			line-height: 40px;
 			text-align: center;
+		}
+		.add-event-btn {
+			position: fixed;
+			bottom: 30px;
+			right: 20px;
+			width: 50px;
+			height: 50px;
+			line-height: 50px;
+			text-align: center;
+			color: #FFFFFF;
+			background: #333333;
+			border-radius: 50%;
+			cursor: pointer;
+			box-shadow: 0 0 10px #666666;
+			.icon-xinzeng {
+				font-size: 20px;
+			}
 		}
 	}
 </style>

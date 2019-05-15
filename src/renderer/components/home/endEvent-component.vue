@@ -4,7 +4,10 @@
       <li
         v-for="item in filterEventList"
         :key="item._id">
-        <strong @click="editEvent(item)" class="item-content">{{item.eventName}}</strong>
+        <div class="item-content" @click="goEventDetail(item)">
+          <strong class="event-name">{{item.eventName}}</strong>
+          <div class="event-date">{{ item.date }}</div>
+        </div>
         <span class="edit-button" @click="addToNoEndEvent(item)">未完成</span>
       </li>
     </ul>
@@ -79,6 +82,8 @@
           }
         });
       },
+      // 前往事件详情
+      goEventDetail () {}
     }
   }
 </script>
@@ -92,10 +97,9 @@
       li {
         position: relative;
         display: flex;
-        height: 60px;
+        align-items: center;
         padding: 0 10px;
         border: 1px solid #e6e6e6;
-        line-height: 60px;
         color: #333333;
         border-radius: 5px;
         box-shadow: 0 0 10px #dedede;
@@ -105,6 +109,14 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           cursor: pointer;
+          .event-name {
+            line-height: 40px;
+          }
+          .event-date {
+            line-height: 20px;
+            font-size: 12px;
+            color: gray;
+          }
         }
         .edit-button {
           margin-left: 10px;

@@ -6,6 +6,7 @@
       <el-aside
         class="aside-menu-section"
         :style="{ 'width': isCollapse ? '45px' : '170px' }"
+        v-show="showLeftMenuFlag"
       >
         <el-menu
           :collapse="isCollapse"
@@ -14,20 +15,20 @@
           background-color="#545454"
           text-color="#fff"
           active-text-color="#ffd04b"
-          default-active="/home/addEvent"
+          default-active="/home/eventList"
         >
           <el-submenu index="eventManage">
             <template slot="title">
               <i class="el-icon-menu" :style="{ 'padding-left': isCollapse ? '10px' : '20px' }"></i>
               <span slot="title">事项管理</span>
             </template>
-            <el-menu-item index="/home/addEvent">
-              <i class="iconfont icon-xinzeng"></i>
-              新增事项
-            </el-menu-item>
             <el-menu-item index="/home/eventList">
               <i class="iconfont icon-liebiao"></i>
               事项列表
+            </el-menu-item>
+            <el-menu-item index="/home/addEvent">
+              <i class="iconfont icon-xinzeng"></i>
+              代办
             </el-menu-item>
           </el-submenu>
         </el-menu>
@@ -40,8 +41,10 @@
           <i
             :class="['iconfont', 'icon-caidan', isCollapse ? 'shrink-menu' : 'an-menu']"
             @click="startRotate"
+            v-if="showLeftMenuFlag"
           >
           </i>
+          <i v-else class="iconfont icon-fanhui back-btn" title="返回" @click="goBack"></i>
           <!--当前编辑事件的名称-->
           <h3 v-if="editEvent && !isEditEventNameFlag" class="edit-event-name ellipsis" title="点击编辑" @click="startEditEventName">{{ editEvent.eventName }}</h3>
           <!--编辑事件名称-->
@@ -62,7 +65,7 @@
   import Aplayer from 'vue-aplayer'
   import eventlistTemplate from '@/components/eventlist-template'
   import windowFrame from '@/components/common/windowFrame-component.vue'
-  import { mapState, mapActions } from 'vuex'
+  import { mapState, mapMutations, mapActions } from 'vuex'
   export default {
     name: 'landing-page',
     data () {
@@ -71,7 +74,7 @@
         eventList: [], // 当前显示事件列表
         allEventList: [], // 总的事件列表
         activeClass: 'no-end', // 当前选中分类
-        isCollapse: false,
+        isCollapse: true,
         isPlayingFlag: false,
         // 开始编辑事件名称
         isEditEventNameFlag: false,
@@ -87,7 +90,8 @@
     computed: {
       ...mapState({
         username: state => state.user.username,
-        editEvent: state => state.home.editEvent
+        editEvent: state => state.home.editEvent,
+        showLeftMenuFlag: state => state.home.showLeftMenuFlag
       })
     },
     watch: {},
@@ -100,14 +104,18 @@
     // },
     mounted () {},
     methods: {
+      ...mapMutations([
+        'SET_SHOW_LEFT_MENU_FLAG'
+      ]),
       ...mapActions([
         'EditEvent'
       ]),
+      goBack () {
+        this.SET_SHOW_LEFT_MENU_FLAG(true)
+        this.$router.back()
+      },
       // 开始编辑事件名称
       startEditEventName () {
-        if (this.$router.path === '/home/eventDetail') {
-          return
-        }
         this.isEditEventNameFlag = true
         this.newEventName = this.editEvent.eventName
         this.$nextTick(() => {
@@ -128,7 +136,8 @@
         }
         this.EditEvent({
           ...this.editEvent,
-          eventName: this.newEventName
+          eventName: this.newEventName,
+          date: new Date(this.editEvent.date).getTime()
         })
           .then(data => {
             this.isEditEventNameFlag = false
@@ -264,11 +273,18 @@
             text-align: center;
             cursor: pointer;
           }
+          .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+          }
           .edit-event-name-input {
-            width: 320px;
+            width: 300px;
+            height: 30px;
+            line-height: 30px;
+            padding: 0 10px;
             border: none;
             outline: none;
-            background: none;
+            background: #DFDFDF;
           }
           .shrink-menu {
             transform: rotate(90deg);

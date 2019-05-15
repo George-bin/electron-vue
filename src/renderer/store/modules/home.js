@@ -9,6 +9,7 @@ import {
   addToNoEndEventRequest,
   editEventRequest
 } from "../../api/home";
+import moment from 'moment'
 
 const home = {
   state: {
@@ -17,17 +18,31 @@ const home = {
     endEventList: [],
     recycleBinList: [],
     // 当前编辑事件
-    editEvent: {}
+    editEvent: {},
+    // 显示左侧导航
+    showLeftMenuFlag: true
   },
   mutations: {
     // 获取到事件列表后，分配给各个列表
     SET_ALL_EVENT_LIST (state, data) {
-      state.eventList = data.noEndEvent.list
-      state.endEventList = data.endEvent.list
-      state.recycleBinList = data.recycleBin.list
+      state.eventList = data.noEndEvent.list.filter(item => {
+        item.date = moment(item.date).format('YYYY-MM-DD HH:mm:ss')
+        return item
+      })
+      state.endEventList = data.endEvent.list.filter(item => {
+        item.date = moment(item.date).format('YYYY-MM-DD HH:mm:ss')
+        return item
+      })
+      state.recycleBinList = data.recycleBin.list.filter(item => {
+        item.date = moment(item.date).format('YYYY-MM-DD HH:mm:ss')
+        return item
+      })
     },
     SET_EDIT_EVENT (state, event) {
       state.editEvent = event
+    },
+    SET_SHOW_LEFT_MENU_FLAG (state, data) {
+      state.showLeftMenuFlag = data
     },
     SET_EVENT_LIST (state, data) {
       state.eventList = data

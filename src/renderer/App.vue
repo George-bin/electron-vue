@@ -12,6 +12,7 @@
     <!--设置选项-->
     <ul v-if="showSetupListFlag" class="setup-list">
       <li class="setup-list-item" @click="logon">退出登录</li>
+      <li class="setup-list-item">账户设置</li>
     </ul>
   </div>
 </template>
@@ -44,7 +45,8 @@
     },
     methods: {
       ...mapMutations([
-        'SET_EDIT_EVENT'
+        'SET_EDIT_EVENT',
+        'SET_SHOW_LEFT_MENU_FLAG'
       ]),
       ...mapActions([
         'Logon'
@@ -62,6 +64,7 @@
           type: 'warning'
         })
           .then(() => {
+            this.SET_SHOW_LEFT_MENU_FLAG(true)
             let data = {
               // username: this.username
               username: localStorage.getItem('username')
@@ -114,8 +117,8 @@
   .setup-list {
     position: fixed;
     right: 42px;
-    top: 24px;
-    border: 1px solid #dfdfdf;
+    top: 30px;
+    border: 1px solid #7D7D7D;
     z-index: 9999;
     background: #ffffff;
     .setup-list-item {
@@ -123,6 +126,12 @@
       line-height: 24px;
       padding: 0 20px;
       cursor: pointer;
+    }
+    .setup-list-item:hover {
+      background: #DFDFDF;
+    }
+    .setup-list-item + .setup-list-item {
+      border-top: 1px solid #7D7D7D;
     }
   }
 </style>
