@@ -1,11 +1,10 @@
 <template>
-  <div class="editor-content-main-component" @keyup.ctrl.83="updateEvent">
-    <!--<div class="button-group">-->
-      <!--<span class="btn-item cancel-btn" @click="cancelEditor">取消</span>-->
-      <!--<span class="btn-item sure-btn" @click="updateEvent">保存</span>-->
-    <!--</div>-->
+  <div class="editor-content-main-component" @keyup.ctrl.83="updateNote">
+    <el-header class="title-section">
+      <input placeholder="标题" class="note-title-input" :style="{'border': isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'}" v-model="note.noteName" type="text" @focus="onFocus" @blur="onBlur" />
+    </el-header>
     <quill-editor
-      v-model="editEvent.eventData"
+      v-model="note.noteContent"
       ref="myQuillEditor"
       :options="editorOption"
       @blur="onEditorBlur($event)"
@@ -17,11 +16,11 @@
 
 <script>
   import { mapState, mapMutations, mapActions } from 'vuex'
-  import backComponent from '@/components/common/back-component'
   export default {
     data () {
       return {
-        content: `<p>hello world</p>`,
+        note: {},
+        isEditNoteNameFlag: false,
         editorOption: {
           modules:{
             toolbar:[
@@ -50,29 +49,36 @@
         }
       }
     },
-    components: {
-      backComponent
-    },
+    components: {},
     computed: {
       ...mapState({
-        editEvent: state => state.home.editEvent
+        activeNote: state => state.home.activeNote
       })
     },
-    watch: {},
-    mounted () {},
+    watch: {
+      activeNote: {
+        handler: function(val, oldval) {
+          this.note = JSON.parse(JSON.stringify(val))
+        },
+        deep: true
+      }
+    },
+    mounted () {
+      this.note = JSON.parse(JSON.stringify(this.activeNote))
+    },
     methods: {
-      ...mapMutations([
-        'SET_EDIT_EVENT'
-      ]),
+      ...mapMutations([]),
       ...mapActions([
-        'EditEvent'
+        'UpdateNote'
       ]),
+      onFocus () {},
+      onBlur () {},
       // 更新事件
-      updateEvent () {
-        this.EditEvent({
-          ...this.editEvent,
-          eventData: this.content,
-          date: new Date(this.editEvent.date).getTime()
+      updateNote () {
+        this.UpdateNote({
+          ...this.activeNote,
+          noteContent: this.note.noteContent,
+          noteName: this.note.noteName
         })
           .then(data => {
             this.$message({
@@ -103,7 +109,6 @@
           type: 'warning'
         })
           .then(() => {
-            this.SET_EDIT_EVENT('')
             this.$router.back()
           })
           .catch(() => {})
@@ -122,17 +127,25 @@
 
 <style lang="scss">
   .editor-content-main-component {
-    .button-group {
-      height: 30px;
-      line-height: 30px;
-      padding: 0 10px;
+    .title-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 45px !important;
+      padding: 0 5px;
+      border-bottom: 1px solid #CCCCCC;
       text-align: right;
-      .btn-item {
-        cursor: pointer;
+      background: #FFFFFF !important;
+      .note-title-input {
+        flex: 1;
+        height: 30px;
+        line-height: 30px;
+        padding: 0 5px;
+        border: 1px solid #FFFFFF;
+        outline: none;
       }
-      .sure-btn {
-        margin-left: 10px;
-        color: orange;
+      .note-title-input:hover {
+        border: 1px solid #CCCCCC !important;
       }
     }
     .ql-snow {
@@ -141,7 +154,7 @@
       border-top: none !important;
     }
     .ql-container {
-      height: calc(100vh - 75px - 42px) !important;
+      height: calc(100vh - 75px - 43px) !important;
       border: none !important;
       overflow: auto !important;
     }

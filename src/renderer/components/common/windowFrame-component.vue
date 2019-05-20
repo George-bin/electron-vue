@@ -4,7 +4,8 @@
       <img src="../../assets/images/logo.png" width="16" height="16" alt="logo" />
       <span>小耿记事本</span>
     </div>
-    <div class="global-top-btn set-top-btn setup-btn" v-if="isLogin" @click.stop="startOpenSetup">
+    <!--v-if="isLogin"-->
+    <div class="global-top-btn set-top-btn setup-btn" @click.stop="startOpenSetup">
       <img src="../../assets/images/top-setup.png" width="20" height="23" title="设置">
     </div>
     <div class="global-top-btn"  @click="windowMin">

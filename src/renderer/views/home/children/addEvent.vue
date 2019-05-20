@@ -55,7 +55,7 @@ export default {
         eventData: this.form.eventData, // 解决方案
         // username: this.username, // 所属用户
         username: localStorage.getItem('username'),
-        date: Date.now() // 事件创建时间
+        createTime: Date.now() // 事件创建时间
       }
       this.$refs.createEventForm.validate((valid) => {
         if (valid) {

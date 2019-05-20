@@ -195,6 +195,7 @@ export default {
 
     // 前往注册
     goRegister() {
+      console.log(123)
       this.$router.push({ path: '/register' })
     }
   }

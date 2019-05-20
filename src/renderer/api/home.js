@@ -1,9 +1,54 @@
 import request from '../utils/request'
 
-// 编辑事件
-export function editEventRequest (data) {
+// 获取笔记本结构树
+export function getNotebookTreeRequest (data) {
   return request({
-    url: `/editevent/${data._id}`,
+    url: `/getNotebookTree`,
+    method: 'get',
+    params: data
+  })
+}
+
+// 创建笔记本
+export function createNotebookRequest (data) {
+  return request({
+    url: '/createNotebook',
+    method: 'post',
+    data: data
+  })
+}
+
+// 创建笔记
+export function createNoteRequest (data) {
+  return request({
+    url: '/createNote',
+    method: 'post',
+    data: data
+  })
+}
+
+// 删除笔记本
+export function deleteNotebookRequest (data) {
+  return request({
+    url: '/deleteNotebook',
+    method: 'post',
+    data: data
+  })
+}
+
+// 获取笔记列表
+export function getNoteListRequest (data) {
+  return request({
+    url: '/getNoteList',
+    method: 'get',
+    params: data
+  })
+}
+
+// 编辑事件
+export function updateNoteRequest (data) {
+  return request({
+    url: `/updateNote/${data._id}`,
     method: 'put',
     data: data
   })
@@ -46,9 +91,9 @@ export function getEventListForRecycleBinRequest(data) {
 }
 
 // 删除(移入回收站)
-export function addRecycleBinRequest(data) {
+export function deleteNoteRequest(data) {
   return request({
-    url: `/addRecycleBin/${data._id}`,
+    url: `/deleteNote/${data._id}`,
     method: 'put',
     data: data
   })

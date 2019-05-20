@@ -18,7 +18,7 @@ export default new Router({
       path: '/home',
       name: 'event',
       component: require('@/views/home/home').default,
-      redirect: '/home/eventList',
+      redirect: '/home/noContent',
       children: [
         {
           path: 'addEvent',
@@ -31,9 +31,19 @@ export default new Router({
           component: require('@/views/home/children/eventList').default
         },
         {
-          path: 'eventDetail',
-          name: 'eventDetail',
-          component: require('@/views/home/children/eventDetail').default
+          path: 'noteDetail',
+          name: 'noteDetail',
+          component: require('@/views/home/children/noteDetail').default
+        },
+        {
+          path: 'createNode',
+          name: 'createNode',
+          component: () => import('@/views/home/children/createNote')
+        },
+        {
+          path: 'noContent',
+          name: 'noContent',
+          component: () => import('@/views/home/children/noContent')
         }
       ]
     },
@@ -41,11 +51,12 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: () => import('@/views/login/Login')
+      // component: () => import('@/views/home/children/demo')
     },
     {
       path: '/register',
       name: 'register',
-      component: () => require('@/views/register/register').default
+      component: require('@/views/register/register').default
     }
   ]
 })

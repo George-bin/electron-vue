@@ -6,7 +6,7 @@
 				:key="item._id">
 				<div class="item-content" @click="goEventDetail(item)">
 					<strong class="event-name">{{item.eventName}}</strong>
-					<div class="event-date">{{ item.date }}</div>
+					<div class="event-date">{{ item.createTime }}</div>
 				</div>
 				<span class="edit-button" @click="destoryEvent(item)">销毁</span>
 				<span class="edit-button" @click="outInRecycleBin(item)">恢复</span>

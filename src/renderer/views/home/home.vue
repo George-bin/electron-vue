@@ -1,70 +1,48 @@
 <template>
-  <div id="wrapper">
-    <el-container
-      class="event-list-box">
-      <!-- 左侧导航 -->
+  <div id="wrapper" @click="recovalNormal">
+    <el-container class="event-list-box">
       <el-aside
         class="aside-menu-section"
-        :style="{ 'width': isCollapse ? '45px' : '170px' }"
-        v-show="showLeftMenuFlag"
+        style="width: 240px"
       >
-        <el-menu
-          :collapse="isCollapse"
-          :router="true"
-          :collapse-transition="false"
-          background-color="#545454"
-          text-color="#fff"
-          active-text-color="#ffd04b"
-          default-active="/home/eventList"
-        >
-          <el-submenu index="eventManage">
-            <template slot="title">
-              <i class="el-icon-menu" :style="{ 'padding-left': isCollapse ? '10px' : '20px' }"></i>
-              <span slot="title">事项管理</span>
-            </template>
-            <el-menu-item index="/home/eventList">
-              <i class="iconfont icon-liebiao"></i>
-              事项列表
-            </el-menu-item>
-            <el-menu-item index="/home/addEvent">
-              <i class="iconfont icon-xinzeng"></i>
-              代办
-            </el-menu-item>
-          </el-submenu>
-        </el-menu>
+        <div class="create-note">
+          <i class="iconfont icon-jiahao"></i>
+          <span>新建笔记</span>
+        </div>
+        <tree :folder="notebookTree"></tree>
+        <div class="recycle-bin">
+          <i class="iconfont icon-huishouzhan"></i>
+          <span>废纸篓</span>
+        </div>
       </el-aside>
 
-      <!-- 右侧显示 -->
+      <!--右侧显示-->
       <el-main>
-        <el-header class="title-box">
-          <!--转换-->
-          <i
-            :class="['iconfont', 'icon-caidan', isCollapse ? 'shrink-menu' : 'an-menu']"
-            @click="startRotate"
-            v-if="showLeftMenuFlag"
-          >
-          </i>
-          <i v-else class="iconfont icon-fanhui back-btn" title="返回" @click="goBack"></i>
-          <!--当前编辑事件的名称-->
-          <h3 v-if="editEvent && !isEditEventNameFlag" class="edit-event-name ellipsis" title="点击编辑" @click="startEditEventName">{{ editEvent.eventName }}</h3>
-          <!--编辑事件名称-->
-          <input v-show="editEvent && isEditEventNameFlag" ref="eventNameInput" class="edit-event-name-input" v-model="newEventName" type="text" @blur="editEventName" />
-          <i class="iconfont icon-bofang play-music-btn" :class="{ 'play-music-btn-remote': isPlayingFlag }" @click="playMusic" title="静心聆听"></i>
-          <audio src="../../../../static/music/花粥-纸短情长.mp3" loop ref="audioElement"></audio>
-        </el-header>
-        <!--子路由-->
-        <keep-alive>
+        <!--当前笔记本中的笔记-->
+        <div class="left-section">
+          <note-list></note-list>
+        </div>
+        <!--<i v-else class="iconfont icon-fanhui back-btn" title="返回" @click="goBack"></i>-->
+        <!--<i class="iconfont icon-bofang play-music-btn" :class="{ 'play-music-btn-remote': isPlayingFlag }" @click="playMusic" title="静心聆听"></i>-->
+        <!--<audio src="../../../../static/music/花粥-纸短情长.mp3" loop ref="audioElement"></audio>-->
+        <div class="right-section">
+          <!--子路由-->
           <router-view></router-view>
-        </keep-alive>
+        </div>
       </el-main>
+      <!--创建笔记本-->
+      <create-notebook-dialog ref="createNotebookDialog"></create-notebook-dialog>
     </el-container>
   </div>
 </template>
 
 <script>
   import Aplayer from 'vue-aplayer'
+  import tree from '@/components/common/tree-component'
   import eventlistTemplate from '@/components/eventlist-template'
   import windowFrame from '@/components/common/windowFrame-component.vue'
+  import createNotebookDialog from '@/components/home/createNotebook-dialog.vue'
+  import noteList from '@/components/home/noteList-component.vue'
   import { mapState, mapMutations, mapActions } from 'vuex'
   export default {
     name: 'landing-page',
@@ -74,27 +52,40 @@
         eventList: [], // 当前显示事件列表
         allEventList: [], // 总的事件列表
         activeClass: 'no-end', // 当前选中分类
-        isCollapse: true,
         isPlayingFlag: false,
         // 开始编辑事件名称
         isEditEventNameFlag: false,
         // 新的事件名称
-        newEventName: ''
+        newEventName: '',
+        defaultProps: {
+          children: 'children',
+          label: 'notebookName'
+        }
       }
     },
     components: {
       windowFrame,
       eventlistTemplate,
-      Aplayer
+      Aplayer,
+      tree,
+      createNotebookDialog,
+      noteList
     },
     computed: {
       ...mapState({
         username: state => state.user.username,
         editEvent: state => state.home.editEvent,
-        showLeftMenuFlag: state => state.home.showLeftMenuFlag
+        showLeftMenuFlag: state => state.home.showLeftMenuFlag,
+        notebookTree: state => state.home.notebookTree,
+        parentNode: state => state.home.parentNode
       })
     },
-    watch: {},
+    watch: {
+      parentNode: function (val, oldVal) {
+        if (!val) return
+        this.$refs.createNotebookDialog.$emit('showDialog')
+      }
+    },
     created () {
       this.initData();
       console.log(this.$route)
@@ -105,14 +96,34 @@
     mounted () {},
     methods: {
       ...mapMutations([
-        'SET_SHOW_LEFT_MENU_FLAG'
+        'SET_SHOW_LEFT_MENU_FLAG',
+        'RECOVER_NOTEBOOK_TREE'
       ]),
       ...mapActions([
+        'GetNotebookTree',
+        'CreateNotebook',
         'EditEvent'
       ]),
+      // 初始化页面信息
+      initData () {
+        // this.getEventList();
+        this.getNotebookTree()
+      },
       goBack () {
         this.SET_SHOW_LEFT_MENU_FLAG(true)
         this.$router.back()
+      },
+      // 恢复默认行为
+      recovalNormal () {
+        this.RECOVER_NOTEBOOK_TREE()
+      },
+      // 获取笔记本结构树
+      getNotebookTree () {
+        this.GetNotebookTree({
+          username: localStorage.getItem('username')
+        })
+          .then(data => {})
+          .catch(err => {})
       },
       // 开始编辑事件名称
       startEditEventName () {
@@ -137,7 +148,7 @@
         this.EditEvent({
           ...this.editEvent,
           eventName: this.newEventName,
-          date: new Date(this.editEvent.date).getTime()
+          createTime: new Date(this.editEvent.createTime).getTime()
         })
           .then(data => {
             this.isEditEventNameFlag = false
@@ -167,15 +178,6 @@
         }
         this.isPlayingFlag = true
         this.$refs.audioElement.play()
-      },
-      // 展示/收缩菜单
-      startRotate() {
-        this.isCollapse = !this.isCollapse
-      },
-
-      // 初始化页面信息
-      initData () {
-        // this.getEventList();
       },
 
       // 过滤代办事项
@@ -237,11 +239,43 @@
       height: 100%;
       padding-top: 30px;
       .aside-menu-section {
+        height: calc(100vh - 30px);
         text-align: left;
         line-height: 30px;
         background: #383838;
         color: white;
         overflow: hidden;
+        transition: left 1s;
+        .create-note  {
+          display: flex;
+          align-items: center;
+          height: 45px;
+          font-size: 16px;
+          color: #E6E6E6;
+          .icon-jiahao {
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            margin-left: 10px;
+            font-size: 16px;
+            text-align: center;
+            color: white;
+            background: orange;
+            border-radius: 50%;
+          }
+          span {
+            margin-left: 10px;
+          }
+        }
+        .create-note:hover {
+          color: white;
+          cursor: pointer;
+        }
+        .recycle-bin {
+          height: 40px;
+          line-height: 40px;
+          padding: 0 10px;
+        }
         .el-menu {
           width: 100%;
           .el-submenu__title {
@@ -257,9 +291,11 @@
           }
         }
       }
-
       .el-main {
+        display: flex;
         padding: 0;
+        border-top: 1px solid #CCCCCC;
+        transition: margin-left 1s;
         .el-header {
           display: flex;
           align-items: center;
@@ -286,18 +322,6 @@
             outline: none;
             background: #DFDFDF;
           }
-          .shrink-menu {
-            transform: rotate(90deg);
-            transition: transform 0.5s;
-          }
-          .an-menu {
-            transform: rotate(0deg);
-            transition: transform 0.5s;
-          }
-          .icon-caidan {
-            font-size: 20px;
-            cursor: pointer;
-          }
           strong {
             margin-right: 10px;
             color: orange;
@@ -317,6 +341,9 @@
             from{-webkit-transform: rotate(0deg)}
             to{-webkit-transform: rotate(360deg)}
           }
+        }
+        .right-section {
+          flex: 1;
         }
       }
     }

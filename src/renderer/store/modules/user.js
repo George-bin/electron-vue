@@ -49,6 +49,7 @@ const user = {
       return new Promise((resolve, reject) => {
         logonRequest(data)
           .then(response => {
+            commit('SET_NOTE_LIST', [])
             resolve(response.data)
           })
           .catch(err => {
