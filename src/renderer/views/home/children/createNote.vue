@@ -1,11 +1,14 @@
 <template>
   <div class="create-note-main-component" @keyup.ctrl.83="createNote">
     <el-header class="title-section">
-      <!--当前编辑笔记的名称-->
-      <!--<h3 v-if="editEvent && !isEditEventNameFlag" class="edit-event-name ellipsis" title="点击编辑" @click="startEditEventName">{{ editEvent.eventName }}</h3>-->
-      <!--笔记名称-->
-      <!--<input v-show="editEvent && isEditEventNameFlag" ref="eventNameInput" class="edit-event-name-input" v-model="newEventName" type="text" @blur="editEventName" />-->
-      <input placeholder="标题" class="note-title-input" :style="{'border': isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'}" v-model="note.noteName" type="text" @focus="onFocus" @blur="onBlur" />
+      <input
+        placeholder="标题"
+        class="note-title-input"
+        :style="{'border': isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'}"
+        v-model="note.noteName"
+        type="text"
+        @focus="onFocus"
+        @blur="onBlur" />
     </el-header>
     <quill-editor
       v-model="note.noteContent"
@@ -80,9 +83,7 @@
       this.content = this.editEvent.eventData
     },
     methods: {
-      ...mapMutations([
-        'SET_EDIT_EVENT'
-      ]),
+      ...mapMutations([]),
       ...mapActions([
         'EditEvent',
         'CreateNote'
@@ -107,7 +108,7 @@
             this.$message({
               message: '笔记创建成功!',
               type: 'success',
-              duration: 700
+              duration: 1500
             })
           })
           .catch(err => {
@@ -115,14 +116,14 @@
               this.$message({
                 message: err.message,
                 type: 'error',
-                duration: 700
+                duration: 1500
               })
               return
             }
             this.$message({
               message: '网络错误!',
               type: 'error',
-              duration: 700
+              duration: 1500
             })
           })
       },
@@ -137,7 +138,7 @@
             this.$message({
               message: '保存成功!',
               type: 'success',
-              duration: 700
+              duration: 1500
             })
           })
           .catch(err => {
@@ -145,14 +146,14 @@
               this.$message({
                 message: err.message,
                 type: 'error',
-                duration: 700
+                duration: 1500
               })
               return
             }
             this.$message({
               message: '网络错误!',
               type: 'error',
-              duration: 700
+              duration: 1500
             })
           })
       },
@@ -162,7 +163,6 @@
           type: 'warning'
         })
           .then(() => {
-            this.SET_EDIT_EVENT('')
             this.$router.back()
           })
           .catch(() => {})

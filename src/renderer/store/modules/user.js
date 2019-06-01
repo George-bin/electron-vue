@@ -20,7 +20,10 @@ const user = {
       return new Promise((resolve, reject) => {
         loginRequest(data)
           .then(response => {
-            if (response.data.errcode === 0) commit('SET_USERNAME', data.username)
+            if (response.data.errcode === 0) {
+              commit('SET_USERNAME', data.username)
+              commit('INIT_LOGIN', response.data.data)
+            }
             resolve(response.data)
           })
           .catch(err => {
@@ -50,6 +53,7 @@ const user = {
         logonRequest(data)
           .then(response => {
             commit('SET_NOTE_LIST', [])
+            commit('SET_ACTIVE_MODULE', '')
             resolve(response.data)
           })
           .catch(err => {

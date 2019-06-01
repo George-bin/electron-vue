@@ -1,6 +1,5 @@
 <template>
   <div class="register-component">
-    <window-frame :isLogin="false"></window-frame>
     <div class="cancel-register">
       <span @click="cancelRegister">取消</span>
     </div>
@@ -76,7 +75,7 @@ export default {
               this.$message({
                 type: 'success',
                 message: '注册成功!',
-                duration: 700
+                duration: 1500
               })
               this.form.username = ''
               this.form.password = ''
@@ -89,14 +88,14 @@ export default {
                 this.$message({
                   type: 'warning',
                   message: err.message,
-                  duration: 700
+                  duration: 1500
                 })
                 return
               }
               this.$message({
                 type: 'error',
                 message: '网络错误!',
-                duration: 700
+                duration: 1500
               })
             })
         }

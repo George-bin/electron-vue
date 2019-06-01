@@ -21,11 +21,6 @@ export default new Router({
       redirect: '/home/noContent',
       children: [
         {
-          path: 'addEvent',
-          name: 'addEvent',
-          component: require('@/views/home/children/addEvent').default
-        },
-        {
           path: 'eventList',
           name: 'eventList',
           component: require('@/views/home/children/eventList').default

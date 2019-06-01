@@ -107,14 +107,14 @@
 							this.$message({
 								messgae: err.message,
 								type: 'error',
-								duration: 700
+								duration: 1500
 							})
 							return
 						}
 						this.$message({
 							message: '网络错误!',
 							type: 'error',
-							duration: 700
+							duration: 1500
 						})
 					})
 			},
@@ -156,10 +156,6 @@
 						return;
 					}
 				});
-			},
-			// 前往新增事项
-			goAddEvent () {
-	    	this.$router.push('/home/addEvent')
 			}
 		}
 	}

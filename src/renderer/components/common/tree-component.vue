@@ -5,10 +5,10 @@
         class="notebook-name"
         @click="selectNode(item)"
         @click.right="showRightKeyMenu($event, item)"
-        :style="{'padding-left': item.nodeClass * 10 + 'px', 'background': item.isActive ? '#333333' : '#383838'}"
+        :style="{'padding-left': item.nodeClass * 20 + 'px', 'background': item.isActive && activeModule === 'tree' ? '#525252' : '#333333'}"
         :class="[{'top-level-node': item.nodeClass === 1}]"
       >
-        <img v-if="item.children && item.children.length" src="../../../../static/img/sanjiaoxing.png" style="width: 14px; height: 14px;" :class="{'expand-node': item.show}" alt="icon" />
+        <img v-if="item.children && item.children.length" src="../../../../static/img/sanjiaoxing.png" style="width: 12px; height: 12px;" :class="{'expand-node': item.show}" alt="icon" />
         <i class="iconfont icon-bijiben"></i>
         <span class="content ellipsis" :title="item.label">{{ item.label }}</span>
         <span class="note-num" v-if="item.nodeClass === 3">({{ item.noteNum }})</span>
@@ -20,8 +20,9 @@
         class="right-key-menu-list"
         :style="{'top': rightKeyMenuPosition.y, 'left': rightKeyMenuPosition.x}"
       >
-        <li @click="startCreateNotebook(item)">新建笔记本</li>
-        <li v-if="item.nodeClass !== 1" @click="deleteBotebook(item)">删除笔记本</li>
+        <li @click="startCreateNotebook(item)">在“{{ item.label }}”中创建笔记本</li>
+        <li v-if="item.nodeClass !== 1" @click="startUpdateNotebook(item)">重命名</li>
+        <li v-if="item.nodeClass !== 1" @click="deleteBotebook(item)">删除</li>
       </ul>
       <!--右键菜单 笔记-->
       <ul
@@ -29,6 +30,7 @@
         class="right-key-menu-list"
         :style="{'top': rightKeyMenuPosition.y, 'left': rightKeyMenuPosition.x}"
       >
+        <li>重命名</li>
         <li @click="startCreateNote(item)">新建笔记</li>
         <li @click="deleteBotebook(item)">删除笔记本</li>
       </ul>
@@ -53,7 +55,11 @@
       }
     },
     components: {},
-    computed: {},
+    computed: {
+      ...mapState({
+        activeModule: state => state.home.activeModule
+      })
+    },
     watch: {},
     mounted () {},
     methods: {
@@ -62,6 +68,7 @@
         'SET_ACTIVE_NOTEBOOK',
         'SET_RIGHT_KEY_MENU_TREE',
         'SET_ACTIVE_NODE',
+        'SET_UPDATE_NOTEBOOK'
       ]),
       ...mapActions([
         'DeleteNotebook',
@@ -100,14 +107,14 @@
               this.$message({
                 message: err.message,
                 type: 'error',
-                duration: 700
+                duration: 1500
               })
               return
             }
             this.$message({
               message: '网络错误!',
               type: 'error',
-              duration: 700
+              duration: 1500
             })
           })
       },
@@ -124,7 +131,7 @@
                 this.$message({
                   message: '笔记本已删除!',
                   type: 'success',
-                  duration: 700
+                  duration: 1500
                 })
               })
               .catch(err => {
@@ -132,18 +139,22 @@
                   this.$message({
                     message: err.message,
                     type: 'error',
-                    duration: 700
+                    duration: 1500
                   })
                   return
                 }
                 this.$message({
                   message: '网络错误!',
                   type: 'error',
-                  duration: 700
+                  duration: 1500
                 })
               })
           })
           .catch(() => {})
+      },
+      // 准备更新笔记本
+      startUpdateNotebook (notebook) {
+        this.SET_UPDATE_NOTEBOOK(notebook)
       }
     }
   }
@@ -171,7 +182,7 @@
           margin: 0 10px;
         }
         .icon-jiahao {
-          margin: 0 10px;
+          margin: 0 20px;
           font-size: 12px;
         }
         .icon-bijiben {
@@ -184,30 +195,28 @@
         font-size: 16px;
       }
       .active-node {
-        background: #333333;
+        background: #525252;
       }
       .notebook-name:hover {
-        background: #333333 !important;
+        background: #525252 !important;
       }
       .right-key-menu-list {
         position: fixed;
-        border: 1px solid #666666;
+        width: 200px;
+        padding: 0 10px 0 20px;
+        border: 1px solid #A7A7A7;
         font-size: 12px;
         color: #333333;
-        background: white;
+        background: #F7F7F7;
         z-index: 999;
         li {
-          width: 80px;
-          height: 24px;
-          line-height: 24px;
-          text-align: center;
+          height: 28px;
+          line-height: 28px;
+          text-align: left;
           cursor: pointer;
         }
         li + li {
-          border-top: 1px solid #666666;
-        }
-        li:hover {
-          background: #F3F3F3;
+          border-top: 1px solid #DFDFDF;
         }
       }
     }

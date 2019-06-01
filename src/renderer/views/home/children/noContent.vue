@@ -1,6 +1,6 @@
 <template>
   <div class="no-content-main-component">
-    <img class="logon" src="../../../assets/images/logo.png" alt="">
+    <img class="logon" src="../../../../../static/img/logo.jpg" alt="">
   </div>
 </template>
 
@@ -19,8 +19,8 @@
     justify-content: center;
     height: calc(100vh - 75px);
     .logon {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       opacity: 0.3;
     }
   }

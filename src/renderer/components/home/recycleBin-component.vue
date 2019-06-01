@@ -61,7 +61,7 @@
 								this.$message({
 									message: '事件销毁成功!',
 									type: 'success',
-									duration: 700
+									duration: 1500
 								})
 							})
 							.catch(err => {
@@ -69,14 +69,14 @@
 									this.$message({
 										message: err.message,
 										type: 'error',
-										duration: 700
+										duration: 1500
 									})
 									return
 								}
 								this.$message({
 									message: '网络错误!',
 									type: 'error',
-									duration: 700
+									duration: 1500
 								})
 							})
 					})
@@ -94,7 +94,7 @@
 								this.$message({
 									message: '事件已移出回收站!',
 									type: 'success',
-									duration: 700
+									duration: 1500
 								})
 							})
 							.catch(err => {
@@ -102,14 +102,14 @@
 									this.$message({
 										message: err.message,
 										type: 'success',
-										duration: 700
+										duration: 1500
 									})
 									return
 								}
 								this.$message({
 									message: '网络错误!',
 									type: 'success',
-									duration: 700
+									duration: 1500
 								})
 							})
 					})

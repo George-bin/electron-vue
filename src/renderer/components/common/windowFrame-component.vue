@@ -1,7 +1,7 @@
 <template>
   <div class="global-drag-window">
-    <div style="flex: 1; display: flex; align-items: center; height: 30px; padding-left: 5px; font-size: 12px;">
-      <img src="../../assets/images/logo.png" width="16" height="16" alt="logo" />
+    <div style="flex: 1; display: flex; align-items: center; height: 30px; padding-left: 5px; font-size: 14px;">
+      <img src="../../../../static/img/logo.jpg" width="20" height="20" alt="logo" style="margin-right: 5px" />
       <span>小耿记事本</span>
     </div>
     <!--v-if="isLogin"-->
@@ -11,7 +11,8 @@
     <div class="global-top-btn"  @click="windowMin">
       <img src="../../assets/images/top-min.png" title="最小化" width="25" height="23">
     </div>
-    <div class="global-top-btn" v-if="isLogin" @click="windowMax">
+    <!--v-if="isLogin"-->
+    <div class="global-top-btn" @click="windowMax">
       <img src="../../assets/images/top-max.png" title="最大化" width="20" height="21" />
     </div>
     <div class="global-top-btn-close" @click="windowClose" alt="关闭窗口" title="关闭窗口">&nbsp;</div>

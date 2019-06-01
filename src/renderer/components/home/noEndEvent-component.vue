@@ -55,18 +55,13 @@
       }
     },
     methods: {
-      ...mapMutations([
-        'SET_EDIT_EVENT',
-        'SET_SHOW_LEFT_MENU_FLAG'
-      ]),
+      ...mapMutations([]),
       ...mapActions([
         'AddRecycleBin',
         'EndEvent'
       ]),
       // 查看事件详情
       goEventDetail (event) {
-        this.SET_SHOW_LEFT_MENU_FLAG(false)
-        this.SET_EDIT_EVENT(JSON.parse(JSON.stringify(event)))
         console.log(this.$router)
         this.$router.push('/home/eventDetail')
       },
@@ -81,7 +76,7 @@
             this.$message({
               message: '已添加至完成事件!',
               type: 'success',
-              duration: 700
+              duration: 1500
             })
           })
           .catch(err => {
@@ -89,14 +84,14 @@
               this.$message({
                 message: err.message,
                 type: 'error',
-                duration: 700
+                duration: 1500
               })
               return
             }
             this.$message({
               message: err,
               type: 'error',
-              duration: 700
+              duration: 1500
             })
           })
       },
@@ -114,7 +109,7 @@
                 this.$message({
                   message: '事件已移入回收站!',
                   type: 'success',
-                  duration: 700
+                  duration: 1500
                 })
               })
               .catch(err => {
@@ -123,14 +118,14 @@
                   this.$message({
                     message: err.message,
                     type: 'error',
-                    duration: 700
+                    duration: 1500
                   })
                   return
                 }
                 this.$message({
                   message: '网络错误!',
                   type: 'error',
-                  duration: 700
+                  duration: 1500
                 })
               })
           })

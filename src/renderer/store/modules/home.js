@@ -2,17 +2,20 @@ import {
   getNotebookTreeRequest,
   createNotebookRequest,
   deleteNotebookRequest,
+  updateNotebookRequest,
   createNoteRequest,
   getNoteListRequest,
-  addEventRequest,
-  getEventListRequest,
-  getEventListForRecycleBinRequest,
+  getRecycleBinNoteListRequest,
+  restoreNoteRequest,
   deleteNoteRequest,
-  endEventRequest,
-  destoryEventRequest,
-  outInRecycleBinRequest,
-  addToNoEndEventRequest,
   updateNoteRequest
+  // endEventRequest,
+  // destoryEventRequest,
+  // outInRecycleBinRequest,
+  // addToNoEndEventRequest,
+  // addEventRequest,
+  // getEventListRequest,
+  // getEventListForRecycleBinRequest,
 } from "../../api/home";
 import {
   recursionSetTreeNode,
@@ -30,7 +33,8 @@ const home = {
     // 事项列表
     eventList: [],
     endEventList: [],
-    recycleBinList: [],
+    // 废纸篓中笔记的数量
+    recycleBinNoteNum: 0,
     // 当前编辑事件
     editEvent: {},
     // 显示左侧导航
@@ -41,12 +45,24 @@ const home = {
     parentNode: null,
     // 当前选中的笔记本
     activeNotebook: {},
+    // 将要更新的笔记本
+    updateNotebook: {},
     // 笔记列表
     noteList: [],
     // 当前编辑笔记
-    activeNote: {}
+    activeNote: {},
+    // 当前显示模块
+    activeModule: ''
   },
   mutations: {
+    // 设置要更新的笔记本
+    SET_UPDATE_NOTEBOOK (state, notebook) {
+      state.updateNotebook = JSON.parse(JSON.stringify(notebook))
+    },
+    // 登录初始化数据
+    INIT_LOGIN (state, data) {
+      state.recycleBinNoteNum = data.recycleBinNoteNum
+    },
     // 当前选中的笔记本
     SET_ACTIVE_NOTEBOOK (state, data) {
       state.activeNotebook = data
@@ -55,13 +71,14 @@ const home = {
     SET_ACTIVE_NOTE (state, data) {
       state.activeNote = JSON.parse(JSON.stringify(data))
     },
+    // 设置父级节点
     SET_PARENT_NODE (state, data) {
       state.parentNode = JSON.parse(JSON.stringify(data))
     },
     SET_NOTEBOOK_TREE (state, data) {
       state.notebookTree = data
       recursionSetTreeNode(state.notebookTree)
-      console.log(state.notebookTree)
+      // console.log(state.notebookTree)
     },
     RECOVER_NOTEBOOK_TREE (state) {
       recoverSetTreeNode(state.notebookTree)
@@ -86,70 +103,50 @@ const home = {
     UPDATE_NOTEBOOK_NOTENUM (state, { notebookCode, type }) {
       recursionUpdateNoteNum(state.notebookTree, notebookCode, type)
     },
+    // 设置当前显示模块
+    SET_ACTIVE_MODULE (state, moduleName) {
+      state.activeModule = moduleName
+    },
     // 设置笔记列表
     SET_NOTE_LIST (state, data) {
       data.forEach(item => {
         item.createTime = moment(item.createTime).format('YYYY/MM/DD')
+        item.rightKeyMenu = false
       })
       state.noteList = data
+      // state.activeModule = 'tree'
+    },
+    // 显示某笔记右键菜单
+    SET_NOTE_RIGHT_KEY_MENU (state, _id) {
+      state.noteList.forEach(item  => {
+        if (item._id === _id) {
+          item.rightKeyMenu = true
+        } else {
+          item.rightKeyMenu = false
+        }
+      })
     },
     // 添加笔记
     ADD_NOTE (state, data) {
       state.noteList.push(data)
     },
     // 删除笔记
-    DELETE_NOTE (state, _id) {
+    DELETE_NOTE (state, data) {
+      state.recycleBinNoteNum += 1
       let index = state.noteList.findIndex(item => {
-        return item._id === _id
+        return item._id === data._id
       })
       state.noteList.splice(index, 1)
+      recursionUpdateNoteNum(state.notebookTree, data.notebookCode, 'deleteNote')
     },
-    // 获取到事件列表后，分配给各个列表
-    SET_ALL_EVENT_LIST (state, data) {
-      state.eventList = data.noEndEvent.list.filter(item => {
-        item.createTime = moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')
-        return item
-      })
-      state.endEventList = data.endEvent.list.filter(item => {
-        item.createTime = moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')
-        return item
-      })
-      state.recycleBinList = data.recycleBin.list.filter(item => {
-        item.createTime = moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')
-        return item
-      })
-    },
-    SET_SHOW_LEFT_MENU_FLAG (state, data) {
-      state.showLeftMenuFlag = data
-    },
-    SET_EVENT_LIST (state, data) {
-      state.eventList = data
-    },
-    SET_RECYCLE_EVENT_LIST (state, data) {
-      state.recycleBinList = data
-    },
-    ADD_EVENT (state, data) {
-      state.eventList.unshift(data)
-    },
-    // 从完成移至未完成
-    ADD_EVENT_FROM_END (state, data) {
-      let index = state.endEventList.findIndex(item => {
+    // 还原笔记
+    RESTORE_NOTE (state, data) {
+      state.recycleBinNoteNum -= 1
+      let index = state.noteList.findIndex(item => {
         return item._id === data._id
       })
-      state.endEventList.splice(index, 1)
-      state.eventList.push(data)
-    },
-    // 设置完成事件
-    SET_END_EVENT (state, data) {
-      state.endEventList = data
-    },
-    // 添加到完成事件
-    ADD_EVENT_END (state, data) {
-      let index = state.eventList.findIndex(item => {
-        return item._id === data._id
-      })
-      state.eventList.splice(index, 1)
-      state.endEventList.push(data)
+      state.noteList.splice(index, 1)
+      recursionUpdateNoteNum(state.notebookTree, data.notebookCode, 'addNote')
     },
     // 更新笔记
     UPDATE_NOTE (state, data) {
@@ -158,28 +155,72 @@ const home = {
       })
       state.noteList.splice(index, 1, data)
     },
-    DELETE_EVENT_RECYCLE (state, data) {
-      let index = state.recycleBinList.findIndex(item => {
-        return item._id === data._id
-      })
-      state.recycleBinList.splice(index, 1)
-      state.eventList.push(data)
-    },
-    DELETE_EVENT (state, _id) {
-      state.eventList.forEach((item, index) => {
-        if (item._id === _id) {
-          state.eventList.splice(index, 1)
-        }
-      })
-    },
-    DELETE_EVENT_TO_RECYCLE (state, _id) {
-      let index = state.recycleBinList.findIndex(item => {
-        return item._id === _id
-      })
-      if (index > -1) {
-        state.recycleBinList.splice(index, 1)
-      }
-    }
+    // 获取到事件列表后，分配给各个列表
+    // SET_ALL_EVENT_LIST (state, data) {
+    //   state.eventList = data.noEndEvent.list.filter(item => {
+    //     item.createTime = moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')
+    //     return item
+    //   })
+    //   state.endEventList = data.endEvent.list.filter(item => {
+    //     item.createTime = moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')
+    //     return item
+    //   })
+    //   state.recycleBinList = data.recycleBin.list.filter(item => {
+    //     item.createTime = moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')
+    //     return item
+    //   })
+    // },
+    // SET_SHOW_LEFT_MENU_FLAG (state, data) {
+    //   state.showLeftMenuFlag = data
+    // },
+    // SET_EVENT_LIST (state, data) {
+    //   state.eventList = data
+    // },
+    // ADD_EVENT (state, data) {
+    //   state.eventList.unshift(data)
+    // },
+    // 从完成移至未完成
+    // ADD_EVENT_FROM_END (state, data) {
+    //   let index = state.endEventList.findIndex(item => {
+    //     return item._id === data._id
+    //   })
+    //   state.endEventList.splice(index, 1)
+    //   state.eventList.push(data)
+    // },
+    // 设置完成事件
+    // SET_END_EVENT (state, data) {
+    //   state.endEventList = data
+    // },
+    // 添加到完成事件
+    // ADD_EVENT_END (state, data) {
+    //   let index = state.eventList.findIndex(item => {
+    //     return item._id === data._id
+    //   })
+    //   state.eventList.splice(index, 1)
+    //   state.endEventList.push(data)
+    // },
+    // DELETE_EVENT_RECYCLE (state, data) {
+    //   let index = state.recycleBinList.findIndex(item => {
+    //     return item._id === data._id
+    //   })
+    //   state.recycleBinList.splice(index, 1)
+    //   state.eventList.push(data)
+    // },
+    // DELETE_EVENT (state, _id) {
+    //   state.eventList.forEach((item, index) => {
+    //     if (item._id === _id) {
+    //       state.eventList.splice(index, 1)
+    //     }
+    //   })
+    // },
+    // DELETE_EVENT_TO_RECYCLE (state, _id) {
+    //   let index = state.recycleBinList.findIndex(item => {
+    //     return item._id === _id
+    //   })
+    //   if (index > -1) {
+    //     state.recycleBinList.splice(index, 1)
+    //   }
+    // }
   },
   actions: {
     // 获取笔记本结构树
@@ -236,6 +277,21 @@ const home = {
           })
       })
     },
+    // 更新笔记本
+    UpdateNotebook ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        updateNotebookRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) {
+              return resolve()
+            }
+            reject(response.data)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
     // 创建笔记
     CreateNote ({ commit }, data) {
       return new Promise((resolve, reject) => {
@@ -259,6 +315,7 @@ const home = {
         getNoteListRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
+              commit('SET_ACTIVE_MODULE', 'tree')
               commit('SET_NOTE_LIST', response.data.noteList)
               return resolve()
             }
@@ -292,92 +349,17 @@ const home = {
           })
       })
     },
-    // 新增事项
-    AddEvent ({ commit }, data) {
+    // 获取废纸篓中的数据
+    GetRecycleBinNoteList ({ commit }, data) {
       return new Promise((resolve, reject) => {
-        addEventRequest(data)
+        getRecycleBinNoteListRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit('ADD_EVENT', response.data.event)
-              resolve()
-              return
-            }
-            reject()
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    },
-    // 从完成移至未完成
-    AddToNoEndEvent ({ commit }, data) {
-      return new Promise((resolve, reject) => {
-        addToNoEndEventRequest(data)
-          .then(response => {
-            if (response.data.errcode === 0) {
-              commit('ADD_EVENT_FROM_END', response.data.event)
-              resolve()
-              return
+              commit('SET_ACTIVE_MODULE', 'recycleBin')
+              commit('SET_NOTE_LIST', response.data.noteList)
+              return resolve()
             }
             reject(response.data)
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    },
-    // 完成事件
-    EndEvent ({ commit }, data) {
-      return new Promise((resolve, reject) => {
-        endEventRequest(data)
-          .then(response => {
-            if (response.data.errcode === 0) {
-              commit('ADD_EVENT_END', response.data.event)
-              resolve()
-              return
-            }
-            reject(response.data)
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    },
-    // 获取事项列表
-    GetEventList ({ commit }, data) {
-      return new Promise((resolve, reject) => {
-        getEventListRequest(data)
-          .then(response => {
-            if (response.data.errcode === 0) {
-              commit('SET_ALL_EVENT_LIST', response.data.event)
-              resolve()
-              return
-            }
-            reject(response.data)
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    },
-    // 获取某天完成的事件列表
-    GetEventListToEnd (data) {
-      return new Promise((resolve, reject) => {
-        getEventListToEndRequest(data)
-          .then(response => {
-            // if (response.data.errcode === 0)
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    },
-    // 获取回收站事项列表
-    GetEventListForRecycle ({ commit }, data) {
-      return new Promise((resolve, reject) => {
-        getEventListForRecycleBinRequest(data)
-          .then(response => {
-            if (response.data.errcode === 0) commit('SET_RECYCLE_EVENT_LIST', response.data.eventList)
           })
           .catch(err => {
             reject(err)
@@ -390,7 +372,7 @@ const home = {
         deleteNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit('DELETE_NOTE', response.data._id)
+              commit('DELETE_NOTE', response.data.data)
               resolve()
               return
             }
@@ -401,40 +383,136 @@ const home = {
           })
       })
     },
+    // 还原笔记(移出回收站)
+    RestoreNote ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        restoreNoteRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) {
+              commit('RESTORE_NOTE', data)
+              return resolve()
+            }
+            reject(response.data)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    },
+    // 新增事项
+    // AddEvent ({ commit }, data) {
+    //   return new Promise((resolve, reject) => {
+    //     addEventRequest(data)
+    //       .then(response => {
+    //         if (response.data.errcode === 0) {
+    //           commit('ADD_EVENT', response.data.event)
+    //           resolve()
+    //           return
+    //         }
+    //         reject()
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // },
+    // 从完成移至未完成
+    // AddToNoEndEvent ({ commit }, data) {
+    //   return new Promise((resolve, reject) => {
+    //     addToNoEndEventRequest(data)
+    //       .then(response => {
+    //         if (response.data.errcode === 0) {
+    //           commit('ADD_EVENT_FROM_END', response.data.event)
+    //           resolve()
+    //           return
+    //         }
+    //         reject(response.data)
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // },
+    // 完成事件
+    // EndEvent ({ commit }, data) {
+    //   return new Promise((resolve, reject) => {
+    //     endEventRequest(data)
+    //       .then(response => {
+    //         if (response.data.errcode === 0) {
+    //           commit('ADD_EVENT_END', response.data.event)
+    //           resolve()
+    //           return
+    //         }
+    //         reject(response.data)
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // },
+    // 获取事项列表
+    // GetEventList ({ commit }, data) {
+    //   return new Promise((resolve, reject) => {
+    //     getEventListRequest(data)
+    //       .then(response => {
+    //         if (response.data.errcode === 0) {
+    //           commit('SET_ALL_EVENT_LIST', response.data.event)
+    //           resolve()
+    //           return
+    //         }
+    //         reject(response.data)
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // },
+    // 获取某天完成的事件列表
+    // GetEventListToEnd (data) {
+    //   return new Promise((resolve, reject) => {
+    //     getEventListToEndRequest(data)
+    //       .then(response => {
+    //         // if (response.data.errcode === 0)
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // },
     // 销毁事件
-    DestoryEvent ({ commit }, data) {
-      return new Promise((resolve, reject) => {
-        destoryEventRequest(data)
-          .then(response => {
-            if (response.data.errcode === 0) {
-              commit('DELETE_EVENT_TO_RECYCLE', response.data._id)
-              resolve()
-              return
-            }
-            reject(response.data)
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    },
+    // DestoryEvent ({ commit }, data) {
+    //   return new Promise((resolve, reject) => {
+    //     destoryEventRequest(data)
+    //       .then(response => {
+    //         if (response.data.errcode === 0) {
+    //           commit('DELETE_EVENT_TO_RECYCLE', response.data._id)
+    //           resolve()
+    //           return
+    //         }
+    //         reject(response.data)
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // },
     // 移出回收站
-    OutInRecycleBin ({ commit }, data) {
-      return new Promise((resolve, reject) => {
-        outInRecycleBinRequest(data)
-          .then(response => {
-            if (response.data.errcode === 0) {
-              commit('DELETE_EVENT_RECYCLE', response.data.event)
-              resolve()
-              return
-            }
-            reject(response.data)
-          })
-          .catch(err => {
-            reject(err)
-          })
-      })
-    }
+    // OutInRecycleBin ({ commit }, data) {
+    //   return new Promise((resolve, reject) => {
+    //     outInRecycleBinRequest(data)
+    //       .then(response => {
+    //         if (response.data.errcode === 0) {
+    //           commit('DELETE_EVENT_RECYCLE', response.data.event)
+    //           resolve()
+    //           return
+    //         }
+    //         reject(response.data)
+    //       })
+    //       .catch(err => {
+    //         reject(err)
+    //       })
+    //   })
+    // }
   }
 }
 

@@ -36,6 +36,15 @@ export function deleteNotebookRequest (data) {
   })
 }
 
+// 更新笔记本
+export function updateNotebookRequest (data) {
+  return request({
+    url: `/updateNotebook/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
 // 获取笔记列表
 export function getNoteListRequest (data) {
   return request({
@@ -49,6 +58,24 @@ export function getNoteListRequest (data) {
 export function updateNoteRequest (data) {
   return request({
     url: `/updateNote/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
+// 获取废纸篓数据
+export function getRecycleBinNoteListRequest (data) {
+  return request({
+    url: '/getRecycleBinNoteList',
+    method: 'get',
+    params: data
+  })
+}
+
+// 还原笔记
+export function restoreNoteRequest (data) {
+  return request({
+    url: `/restoreNote/${data._id}`,
     method: 'put',
     data: data
   })

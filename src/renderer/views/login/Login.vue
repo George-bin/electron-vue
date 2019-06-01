@@ -107,14 +107,14 @@ export default {
                 this.$message({
                   type: 'success',
                   message: data.message,
-                  duration: 700
+                  duration: 1500
                 })
                 this.$router.push('/home')
               } else {
                 this.$message({
                   type: 'warning',
                   message: '用户名或密码错误!',
-                  duration: 700
+                  duration: 1500
                 })
               }
             })
@@ -123,8 +123,8 @@ export default {
               console.log(err)
               this.$message({
                 type: 'error',
-                message: '网路错误!',
-                duration: 700
+                message: '网络错误!',
+                duration: 1500
               })
             })
         }

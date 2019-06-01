@@ -31,23 +31,9 @@
       }
     },
     created () {},
-    watch: {
-      $route(to,from){
-        console.log(to.path);
-        if (to.path !== '/login') {
-          this.showSetupBtnFlag = true
-        } else {
-          this.showSetupBtnFlag = false
-        }
-        // 是否显示编辑标题
-        if (to.path !== '/home/editorevent' && to.path !== '/home/eventDetail') this.SET_EDIT_EVENT('')
-      }
-    },
+    watch: {},
     methods: {
-      ...mapMutations([
-        'SET_EDIT_EVENT',
-        'SET_SHOW_LEFT_MENU_FLAG'
-      ]),
+      ...mapMutations([]),
       ...mapActions([
         'Logon'
       ]),
@@ -64,7 +50,6 @@
           type: 'warning'
         })
           .then(() => {
-            this.SET_SHOW_LEFT_MENU_FLAG(true)
             let data = {
               // username: this.username
               username: localStorage.getItem('username')
@@ -75,7 +60,7 @@
                   this.$message({
                     type: 'success',
                     message: '注销成功!',
-                    duration: 700
+                    duration: 1500
                   })
                   this.$router.push('/login');
                 }

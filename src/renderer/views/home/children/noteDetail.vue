@@ -1,12 +1,21 @@
 <template>
   <div class="editor-content-main-component" @keyup.ctrl.83="updateNote">
     <el-header class="title-section">
-      <input placeholder="标题" class="note-title-input" :style="{'border': isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'}" v-model="note.noteName" type="text" @focus="onFocus" @blur="onBlur" />
+      <input
+        placeholder="标题"
+        class="note-title-input"
+        :disabled="activeModule === 'recycleBin'"
+        :style="{'border': isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'}"
+        v-model="note.noteName"
+        type="text"
+        @focus="onFocus"
+        @blur="onBlur" />
     </el-header>
     <quill-editor
       v-model="note.noteContent"
       ref="myQuillEditor"
       :options="editorOption"
+      :disabled="activeModule === 'recycleBin'"
       @blur="onEditorBlur($event)"
       @focus="onEditorFocus($event)"
       @change="onEditorChange($event)">
@@ -52,7 +61,8 @@
     components: {},
     computed: {
       ...mapState({
-        activeNote: state => state.home.activeNote
+        activeNote: state => state.home.activeNote,
+        activeModule: state => state.home.activeModule
       })
     },
     watch: {
@@ -71,8 +81,12 @@
       ...mapActions([
         'UpdateNote'
       ]),
-      onFocus () {},
-      onBlur () {},
+      onFocus () {
+        this.isEditNoteNameFlag = true
+      },
+      onBlur () {
+        this.isEditNoteNameFlag = false
+      },
       // 更新事件
       updateNote () {
         this.UpdateNote({
@@ -84,7 +98,7 @@
             this.$message({
               message: '保存成功!',
               type: 'success',
-              duration: 700
+              duration: 1500
             })
           })
           .catch(err => {
@@ -92,14 +106,14 @@
               this.$message({
                 message: err.message,
                 type: 'error',
-                duration: 700
+                duration: 1500
               })
               return
             }
             this.$message({
               message: '网络错误!',
               type: 'error',
-              duration: 700
+              duration: 1500
             })
           })
       },
@@ -142,6 +156,7 @@
         line-height: 30px;
         padding: 0 5px;
         border: 1px solid #FFFFFF;
+        background: none;
         outline: none;
       }
       .note-title-input:hover {
