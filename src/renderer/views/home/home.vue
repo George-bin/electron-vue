@@ -5,8 +5,11 @@
         class="aside-menu-section"
         style="width: 240px"
       >
-        <div class="create-note">
-          <i class="iconfont icon-jiahao"></i>
+        <div
+          class="create-note"
+          @click="startCreateNote"
+        >
+          <i class="iconfont icon-jiahao" :style="{background: activeNotebook.nodeClass === 3 ? 'orange' : 'gray'}"></i>
           <span>新建笔记</span>
         </div>
         <tree :folder="notebookTree"></tree>
@@ -88,7 +91,8 @@
         parentNode: state => state.home.parentNode,
         recycleBinNoteNum: state => state.home.recycleBinNoteNum,
         activeModule: state => state.home.activeModule,
-        updateNotebook: state => state.home.updateNotebook
+        updateNotebook: state => state.home.updateNotebook,
+        activeNotebook: state => state.home.activeNotebook
       })
     },
     watch: {
@@ -105,14 +109,12 @@
       this.initData();
       console.log(this.$route)
     },
-    // activated () {
-    //   this.initData();
-    // },
     mounted () {},
     methods: {
       ...mapMutations([
         'RECOVER_NOTEBOOK_TREE',
-        'SET_NOTE_RIGHT_KEY_MENU'
+        'SET_NOTE_RIGHT_KEY_MENU',
+        'SET_ACTIVE_NOTE'
       ]),
       ...mapActions([
         'GetNotebookTree',
@@ -146,51 +148,19 @@
         this.GetRecycleBinNoteList({
           username: localStorage.getItem('username')
         })
+          .then(data => {
+            if (data.length) {
+              this.SET_ACTIVE_NOTE(data[0])
+              this.$router.push('/home/noteDetail')
+            } else {
+              this.$router.push('/home/noContent')
+            }
+          })
+      },
+      // 开始新建笔记
+      startCreateNote () {
+        this.$router.push({ name: 'createNode', params: { type: 'createNote' }})
       }
-      // 开始编辑事件名称
-      // startEditEventName () {
-      //   this.isEditEventNameFlag = true
-      //   this.newEventName = this.editEvent.eventName
-      //   this.$nextTick(() => {
-      //     this.$refs.eventNameInput.focus()
-      //   })
-      // },
-      // 编辑事件名称
-      // editEventName () {
-      //   if (!this.newEventName.replace(/\s/g, '')) {
-      //     this.$message({
-      //       message: '请输入有效的事件名称!',
-      //       type: 'warning'
-      //     })
-      //     this.$nextTick(() => {
-      //       this.$refs.eventNameInput.focus()
-      //     })
-      //     return
-      //   }
-      //   this.EditEvent({
-      //     ...this.editEvent,
-      //     eventName: this.newEventName,
-      //     createTime: new Date(this.editEvent.createTime).getTime()
-      //   })
-      //     .then(data => {
-      //       this.isEditEventNameFlag = false
-      //     })
-      //     .catch(err => {
-      //       if (err.errcode) {
-      //         this.$message({
-      //           message: err.message,
-      //           type: 'error',
-      //           duration: 1500
-      //         })
-      //         return
-      //       }
-      //       this.$message({
-      //         message: '网络错误!',
-      //         type: 'error',
-      //         duration: 1500
-      //       })
-      //     })
-      // },
       // 播放音乐
       // playMusic () {
       //   if (this.isPlayingFlag) {
@@ -201,50 +171,6 @@
       //   this.isPlayingFlag = true
       //   this.$refs.audioElement.play()
       // },
-      // 过滤代办事项
-      // filterEvent (type) {
-      //   switch (type) {
-      //     case 'now-end':
-      //       return this.allEventList.filter(item => {
-      //         return item.state === 3
-      //       });
-      //       break;
-      //     case 'no-end':
-      //       return this.allEventList.filter(item => {
-      //         return item.state === 0 || item.state === 3;
-      //       });
-      //       break;
-      //     case 'end':
-      //       return this.allEventList.filter(item => {
-      //         return item.state === 1;
-      //       });
-      //       break;
-      //     default:
-      //       return this.allEventList.filter(item => {
-      //         return item.state === 2;
-      //       });
-      //   }
-      // },
-      // 获取已完成事项的数据
-      // getEndEventList () {
-      //   this.activeClass = 'end';
-      //   this.eventList = this.filterEvent('end');
-      // },
-      // 获取未完成事项的数据
-      // getNoEndEventList () {
-      //   this.activeClass = 'no-end';
-      //   this.eventList = this.filterEvent('no-end');
-      // },
-      // 获取今日需完成的事项数据
-      // getNowEndEventList () {
-      //   this.activeClass = 'now-end';
-      //   this.eventList = this.filterEvent('now-end');
-      // },
-      // 前往回收站
-      // goRecycleBin () {
-      //   this.activeClass = 'recycle-bin';
-      //   this.eventList = this.filterEvent('recycle-bin');
-      // }
     }
   }
 </script>
@@ -263,7 +189,7 @@
         color: white;
         overflow: hidden;
         transition: left 1s;
-        .create-note  {
+        .create-note, .create-note-book  {
           display: flex;
           align-items: center;
           height: 45px;

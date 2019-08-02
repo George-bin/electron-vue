@@ -129,3 +129,19 @@ export function recursionUpdateNoteNum (tree, notebookCode, type) {
   }
   return toParse(tree)
 }
+
+// 递归更新笔记本
+export function recursionUpdateNoteBook (tree, notebook) {
+  function toParse (arr) {
+    arr.forEach((item, index) => {
+      if (item.flag === 'notebook' && notebook.notebookCode === item.notebookCode) {
+        item.label = notebook.notebookName
+      }
+      if (item.children && item.children.length) {
+        toParse(item.children)
+      }
+    })
+    return arr
+  }
+  return toParse(tree)
+}

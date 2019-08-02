@@ -13,7 +13,7 @@
          class="note-list-item"
          @click="goNoteDetail(item)"
          @click.right="showRightKeyMenu($event, item)"
-         :style="{'background': activeNoteId === item._id ? '#DFDFDF' : '#FFFFFF'}"
+         :class="{'active-note-style': activeNote._id === item._id}"
       >
         <p class="note-title ellipsis">{{ item.noteName }}</p>
         <!--<p class="note-content">{{ item.noteContent }}</p>-->
@@ -31,7 +31,7 @@
           </template>
           <template v-else-if="item.status === 2">
             <li class="right-key-menu-item" @click="restoreNote(item)">还原笔记</li>
-            <li class="right-key-menu-item" @click="">永久删除笔记</li>
+            <li class="right-key-menu-item" @click="clearNote(item)">永久删除笔记</li>
           </template>
         </ul>
       </li>
@@ -44,8 +44,6 @@
   export default {
     data () {
       return {
-        // 当前选中笔记的id
-        activeNoteId: '',
         searchContent: '',
         // 右键菜单的位置
         rightKeyMenuPosition: {
@@ -56,7 +54,8 @@
     },
     computed: {
       ...mapState({
-        noteList: state => state.home.noteList
+        noteList: state => state.home.noteList,
+        activeNote: state => state.home.activeNote
       }),
       filterNoteList () {
         return this.noteList.filter(item => {
@@ -65,17 +64,13 @@
       }
     },
     watch: {
-      noteList: {
-        handler: function(val, oldVal) {
-          // debugger
-          if (val.length) {
-            this.activeNoteId = val[0]._id
-            this.SET_ACTIVE_NOTE(val[0])
-            this.$router.push('/home/noteDetail')
-          }
-        },
-        deep: true
-      }
+      // noteList: {
+      //   handler: function(val, oldVal) {
+      //     this.$nextTick(() => {
+      //     })
+      //   },
+      //   deep: true
+      // }
     },
     methods: {
       ...mapMutations([
@@ -84,7 +79,8 @@
       ]),
       ...mapActions([
         'DeleteNote',
-        'RestoreNote'
+        'RestoreNote',
+        'ClearNote'
       ]),
       // 显示右键菜单
       showRightKeyMenu (event, note) {
@@ -92,7 +88,6 @@
         this.rightKeyMenuPosition.x = event.x + 'px'
         this.rightKeyMenuPosition.y = event.y + 'px'
         this.SET_NOTE_RIGHT_KEY_MENU(note._id)
-        this.activeNoteId = note._id
         this.SET_ACTIVE_NOTE(note)
       },
       // 清空搜索框
@@ -101,7 +96,6 @@
       },
       // 查看笔记详情
       goNoteDetail (note) {
-        this.activeNoteId = note._id
         this.SET_ACTIVE_NOTE(note)
         this.$router.push('/home/noteDetail')
       },
@@ -119,6 +113,7 @@
                 this.$message({
                   message: '笔记已删除，可在废纸篓中查看!'
                 })
+                this.$router.push('/home/noContent')
               })
               .catch(err => {
                 if (err.errcode) {
@@ -148,6 +143,9 @@
               _id: note._id,
               notebookCode: note.notebookCode
             })
+              .then(() => {
+                this.$router.push('/home/noContent')
+              })
           })
           .catch(err => {
             if (err.errcode) {
@@ -164,6 +162,38 @@
               duration: 1500
             })
           })
+      },
+      // 永久删除笔记
+      clearNote (note) {
+        this.$confirm('确定永久性删除该笔记吗?', '提示', {
+          type: 'warning'
+        })
+          .then(() => {
+            this.ClearNote(note)
+              .then(() => {
+                this.$message({
+                  type: 'success',
+                  message: '删除笔记成功!',
+                  duration: 1500
+                })
+                this.$router.push('/home/noContent')
+              })
+              .catch(err => {
+                if (err.errcode) {
+                  this.$message({
+                    message: err.message,
+                    type: 'error',
+                    duration: 1500
+                  })
+                  return
+                }
+                this.$message({
+                  message: '网络错误!',
+                  type: 'error',
+                  duration: 1500
+                })
+              })
+          })
       }
     }
   }
@@ -173,10 +203,8 @@
   .note-list-main-component {
     height: calc(100vh - 31px) !important;
     border-right: 1px solid #CCCCCC;
-    overflow: auto;
     .search-section {
-      padding: 0 5px;
-      padding-top: 5px;
+      padding: 5px;
       .search-content {
         display: flex;
         align-items: center;
@@ -196,12 +224,18 @@
     }
     .note-list {
       width: 200px;
-      padding: 5px;
+      height: calc(100% - 45px) !important;
+      padding: 0 5px;
+      padding-bottom: 5px;
+      overflow: auto;
       .note-list-item {
         padding: 5px;
         /*border-bottom: 2px solid #FFFFFF;*/
         border-bottom: 1px solid #DFDFDF;
         cursor: pointer;
+        &:hover {
+          background: rgba(37, 215, 255, 0.2);
+        }
         .note-title {
           color: #000000;
         }
@@ -229,9 +263,13 @@
           }
         }
       }
-      .note-list-item:hover {
-        background: #DFDFDF !important;
+      .active-note-style {
+        background: #DFDFDF;
+        &:hover {
+          background: #DFDFDF;
+        }
       }
+
     }
   }
 </style>

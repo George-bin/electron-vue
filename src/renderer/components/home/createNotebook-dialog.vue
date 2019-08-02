@@ -9,7 +9,14 @@
       <h3 slot="title" class="el-dialog__headertitle">新建笔记本</h3>
       <div class="el-dialog__content">
         <p style="padding-top: 10px">笔记本名称:</p>
-        <input class="el-dialog__contentInp" v-model="notebookName" type="text" placeholder="请输入笔记本名称!" />
+        <input
+          class="el-dialog__contentInp"
+          id="noteBookNameInput"
+          v-model="notebookName"
+          ref="notebookNameInput"
+          type="text"
+          @keyup.enter="createNotebook"
+          placeholder="请输入笔记本名称!" />
       </div>
       <div class="el-dialog__btngtoup">
         <button @click="onClose">取消</button>
@@ -37,6 +44,9 @@
       this.$nextTick(() => {
         this.$on('showDialog', () => {
           this.dialogVisible = true
+          this.$nextTick(() => {
+            this.$refs['notebookNameInput'].focus()
+          })
         })
       })
     },

@@ -40,6 +40,9 @@
       ...mapMutations([
         'SET_UPDATE_NOTEBOOK'
       ]),
+      ...mapActions([
+        'UpdateNotebook'
+      ]),
       onClose () {
         this.dialogVisible = false
         this.notebookName = ''
@@ -51,9 +54,12 @@
           _id: this.notebook._id,
           notebookName: this.notebook.notebookName
         })
-          .then(data => {})
+          .then(data => {
+            this.dialogVisible = false
+          })
           .catch(err => {
             console.log(err)
+            this.dialogVisible = false
           })
       }
     }

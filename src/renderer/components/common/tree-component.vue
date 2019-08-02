@@ -30,7 +30,7 @@
         class="right-key-menu-list"
         :style="{'top': rightKeyMenuPosition.y, 'left': rightKeyMenuPosition.x}"
       >
-        <li>重命名</li>
+        <li v-if="item.nodeClass !== 1" @click="startUpdateNotebook(item)">重命名</li>
         <li @click="startCreateNote(item)">新建笔记</li>
         <li @click="deleteBotebook(item)">删除笔记本</li>
       </ul>
@@ -68,7 +68,8 @@
         'SET_ACTIVE_NOTEBOOK',
         'SET_RIGHT_KEY_MENU_TREE',
         'SET_ACTIVE_NODE',
-        'SET_UPDATE_NOTEBOOK'
+        'SET_UPDATE_NOTEBOOK',
+        'SET_ACTIVE_NOTE'
       ]),
       ...mapActions([
         'DeleteNotebook',
@@ -97,11 +98,24 @@
       selectNode (item) {
         this.activeNode = item._id
         this.SET_ACTIVE_NODE(item)
+
+        let noteBook = JSON.parse(JSON.stringify(item))
+        delete noteBook.children
+        this.SET_ACTIVE_NOTEBOOK(noteBook)
+
         this.GetNoteList({
           username: localStorage.getItem('username'),
           notebookCode: item.notebookCode
         })
-          .then(data => {})
+          .then(data => {
+            if (data.length) {
+              this.SET_ACTIVE_NOTE(data[0])
+              this.$router.push('/home/noteDetail')
+            } else {
+              this.SET_ACTIVE_NOTE({})
+              this.$router.push('/home/noContent')
+            }
+          })
           .catch(err => {
             if (err.errcode) {
               this.$message({

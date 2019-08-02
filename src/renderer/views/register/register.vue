@@ -6,7 +6,7 @@
     <!--输入框区域-->
     <div class="register-form-section">
       <div class="register-title">
-        <h2>用户注册</h2>
+        <h2>注册</h2>
       </div>
       <el-form
         ref="registerForm"
@@ -111,13 +111,17 @@ export default {
 
 <style lang="scss">
   .register-component {
+    height: 100%;
+    background: url("../../../../static/img/login-bg.jpg");
+    background-size: 100% 100%;
     .cancel-register {
       padding-right: 40px;
       padding-top: 44px;
       text-align: right;
+      color: #000000;
       span:hover {
-        color: orange;
         cursor: pointer;
+        color: white;
       }
     }
     .register-form-section {
@@ -127,8 +131,10 @@ export default {
       width: 300px;
       transform: translateX(-50%) translateY(-70%);
       h2 {
-        font-size: 20px;
+        font-size: 24px;
         text-align: center;
+        color: white;
+        letter-spacing: 4px;
       }
       .register-form {
         margin-top: 40px;

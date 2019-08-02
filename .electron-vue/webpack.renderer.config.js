@@ -124,8 +124,23 @@ let rendererConfig = {
         : false
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.ProvidePlugin({
+      jQuery: "jquery",
+      $: "jquery"
+    })
   ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          name: "commons",
+          chunks: "initial",
+          minChunks: 2
+        }
+      }
+    }
+  },
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',

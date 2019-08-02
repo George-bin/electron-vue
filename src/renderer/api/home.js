@@ -81,6 +81,15 @@ export function restoreNoteRequest (data) {
   })
 }
 
+// 永久性删除笔记
+export function clearNoteRequest (data) {
+  return request({
+    url: `/clearNote/${data._id}`,
+    method: 'put',
+    data: data
+  })
+}
+
 // 新增待办事项
 export function addEventRequest(data) {
   return request({

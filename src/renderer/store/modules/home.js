@@ -8,7 +8,8 @@ import {
   getRecycleBinNoteListRequest,
   restoreNoteRequest,
   deleteNoteRequest,
-  updateNoteRequest
+  updateNoteRequest,
+  clearNoteRequest
   // endEventRequest,
   // destoryEventRequest,
   // outInRecycleBinRequest,
@@ -24,7 +25,8 @@ import {
   recursionShowNode,
   recursionDeleteNotebook,
   recursionInsertNode,
-  recursionUpdateNoteNum
+  recursionUpdateNoteNum,
+  recursionUpdateNoteBook
 } from '../../utils/home'
 import moment from 'moment'
 
@@ -52,12 +54,17 @@ const home = {
     // 当前编辑笔记
     activeNote: {},
     // 当前显示模块
-    activeModule: ''
+    activeModule: '',
+
   },
   mutations: {
     // 设置要更新的笔记本
     SET_UPDATE_NOTEBOOK (state, notebook) {
       state.updateNotebook = JSON.parse(JSON.stringify(notebook))
+    },
+    // 递归更新笔记
+    UPDATE_NOTEBOOK (state, notebook) {
+      recursionUpdateNoteBook(state.notebookTree, notebook)
     },
     // 登录初始化数据
     INIT_LOGIN (state, data) {
@@ -109,10 +116,6 @@ const home = {
     },
     // 设置笔记列表
     SET_NOTE_LIST (state, data) {
-      data.forEach(item => {
-        item.createTime = moment(item.createTime).format('YYYY/MM/DD')
-        item.rightKeyMenu = false
-      })
       state.noteList = data
       // state.activeModule = 'tree'
     },
@@ -155,6 +158,13 @@ const home = {
       })
       state.noteList.splice(index, 1, data)
     },
+    // 永久性删除笔记
+    CLEAR_NOTE (state, data) {
+      let index = state.noteList.findIndex(item => {
+        return item._id === data._id
+      })
+      state.noteList.splice(index, 1)
+    }
     // 获取到事件列表后，分配给各个列表
     // SET_ALL_EVENT_LIST (state, data) {
     //   state.eventList = data.noEndEvent.list.filter(item => {
@@ -283,6 +293,8 @@ const home = {
         updateNotebookRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
+              commit('SET_UPDATE_NOTEBOOK', null)
+              commit('UPDATE_NOTEBOOK', response.data.data)
               return resolve()
             }
             reject(response.data)
@@ -298,8 +310,13 @@ const home = {
         createNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit('ADD_NOTE', response.data.note)
+              commit('ADD_NOTE', {
+                ...response.data.note,
+                createTime: moment(response.data.note.createTime).format('YYYY/MM/DD'),
+                rightKeyMenu: false
+              })
               commit('UPDATE_NOTEBOOK_NOTENUM', {notebookCode: response.data.note.notebookCode, type: 'addNote'})
+              commit('SET_ACTIVE_NOTE', response.data.note)
               return resolve()
             }
             reject(response.data)
@@ -316,8 +333,12 @@ const home = {
           .then(response => {
             if (response.data.errcode === 0) {
               commit('SET_ACTIVE_MODULE', 'tree')
+              response.data.noteList.forEach(item => {
+                item.createTime = moment(item.createTime).format('YYYY/MM/DD')
+                item.rightKeyMenu = false
+              })
               commit('SET_NOTE_LIST', response.data.noteList)
-              return resolve()
+              return resolve(response.data.noteList)
             }
             reject(response.data)
           })
@@ -357,7 +378,7 @@ const home = {
             if (response.data.errcode === 0) {
               commit('SET_ACTIVE_MODULE', 'recycleBin')
               commit('SET_NOTE_LIST', response.data.noteList)
-              return resolve()
+              return resolve(response.data.noteList)
             }
             reject(response.data)
           })
@@ -399,6 +420,22 @@ const home = {
           })
       })
     },
+    // 永久性删除笔记
+    ClearNote({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        clearNoteRequest(data)
+          .then(response => {
+            if (response.data.errcode === 0) {
+              commit('CLEAR_NOTE', response.data)
+              return resolve()
+            }
+            reject()
+          })
+          .catch(err => {
+            reject()
+          })
+      })
+    }
     // 新增事项
     // AddEvent ({ commit }, data) {
     //   return new Promise((resolve, reject) => {

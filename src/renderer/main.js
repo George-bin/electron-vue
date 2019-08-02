@@ -21,6 +21,7 @@ import './utils/script/global-function'
 
 // 引入css文件
 import '../../static/css/index.css'
+import $ from 'jquery'
 
 Vue.use(VueQuillEditor)
 Vue.prototype.moment = require('moment')

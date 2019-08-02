@@ -56,6 +56,7 @@
     height: 30px;
     z-index: 999;
     -webkit-app-region: drag;
+    background: white;
     // opacity:0.5;
     .global-top-btn {
       display: flex;

@@ -5,7 +5,7 @@
     </div>
     <div class="content-section">
       <div class="title">
-        <h2>用户登录</h2>
+        <h2>登录</h2>
       </div>
       <el-form
         ref="loginForm"
@@ -205,15 +205,19 @@ export default {
 <style lang="scss">
 .login-main-components {
   height: 100%;
+  background: url("../../../../static/img/login-bg.jpg") no-repeat;
+  background-size: 100% 100%;
+  /*background: linear-gradient(red, blue); !* 标准的语法 *!*/
   .register-btn {
     padding-right: 40px;
     padding-top: 44px;
     text-align: right;
+    color: #000000;
     span {
       cursor: pointer;
     }
     span:hover {
-      color: orange;
+      color: white;
     }
   }
   .content-section {
@@ -223,8 +227,10 @@ export default {
     transform: translateX(-50%) translateY(-70%);
     width: 300px;
     h2 {
-      font-size: 20px;
+      font-size: 24px;
       text-align: center;
+      color: white;
+      letter-spacing: 4px;
     }
     .login-form {
       margin-top: 40px;
