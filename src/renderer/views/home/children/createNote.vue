@@ -9,6 +9,10 @@
         type="text"
         @focus="onFocus"
         @blur="onBlur" />
+      <select class="set-note-label" v-model="note.noteLabel">
+        <option value="note" selected>笔记</option>
+        <option value="jottings">随笔</option>
+      </select>
     </el-header>
     <quill-editor
       v-model="note.noteContent"
@@ -28,7 +32,8 @@
       return {
         note: {
           noteName: '',
-          noteContent: ''
+          noteContent: '',
+          noteLabel: 'note'
         },
         // 是否编辑编辑标题
         isEditNoteNameFlag: '',
@@ -83,7 +88,9 @@
       this.content = this.editEvent.eventData
     },
     methods: {
-      ...mapMutations([]),
+      ...mapMutations([
+        'SET_ACTIVE_NOTE'
+      ]),
       ...mapActions([
         'EditEvent',
         'CreateNote'
@@ -99,6 +106,8 @@
         this.CreateNote({
           noteName: this.note.noteName,
           noteContent: this.note.noteContent,
+          noteLabel: this.note.noteLabel,
+          notebookName: this.activeNotebook.notebookName,
           username: localStorage.getItem('username'),
           notebookCode: this.activeNotebook.notebookCode,
           status: 0,
@@ -110,6 +119,7 @@
               type: 'success',
               duration: 1500
             })
+            this.$router.push('/home/noteDetail')
           })
           .catch(err => {
             if (err.errcode) {
@@ -200,6 +210,12 @@
       }
       .note-title-input:hover {
         border: 1px solid #CCCCCC !important;
+      }
+      .set-note-label {
+        width: 60px;
+        height: 32px;
+        margin-left: 10px;
+        outline: none;
       }
     }
     .ql-snow {

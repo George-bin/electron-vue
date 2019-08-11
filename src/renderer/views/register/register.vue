@@ -112,8 +112,6 @@ export default {
 <style lang="scss">
   .register-component {
     height: 100%;
-    background: url("../../../../static/img/login-bg.jpg");
-    background-size: 100% 100%;
     .cancel-register {
       padding-right: 40px;
       padding-top: 44px;
@@ -121,7 +119,7 @@ export default {
       color: #000000;
       span:hover {
         cursor: pointer;
-        color: white;
+        color: orange;
       }
     }
     .register-form-section {
@@ -133,7 +131,7 @@ export default {
       h2 {
         font-size: 24px;
         text-align: center;
-        color: white;
+        color: #333333;
         letter-spacing: 4px;
       }
       .register-form {

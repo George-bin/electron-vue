@@ -205,8 +205,6 @@ export default {
 <style lang="scss">
 .login-main-components {
   height: 100%;
-  background: url("../../../../static/img/login-bg.jpg") no-repeat;
-  background-size: 100% 100%;
   /*background: linear-gradient(red, blue); !* 标准的语法 *!*/
   .register-btn {
     padding-right: 40px;
@@ -217,7 +215,7 @@ export default {
       cursor: pointer;
     }
     span:hover {
-      color: white;
+      color: orange;
     }
   }
   .content-section {
@@ -229,7 +227,7 @@ export default {
     h2 {
       font-size: 24px;
       text-align: center;
-      color: white;
+      color: #333333;
       letter-spacing: 4px;
     }
     .login-form {

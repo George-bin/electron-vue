@@ -10,6 +10,10 @@
         type="text"
         @focus="onFocus"
         @blur="onBlur" />
+      <select class="set-note-label" v-model="note.noteLabel">
+        <option value="note" selected>笔记</option>
+        <option value="jottings">随笔</option>
+      </select>
     </el-header>
     <quill-editor
       v-model="note.noteContent"
@@ -91,6 +95,7 @@
       updateNote () {
         this.UpdateNote({
           ...this.activeNote,
+          noteLabel: this.note.noteLabel,
           noteContent: this.note.noteContent,
           noteName: this.note.noteName
         })
@@ -161,6 +166,12 @@
       }
       .note-title-input:hover {
         border: 1px solid #CCCCCC !important;
+      }
+      .set-note-label {
+        width: 60px;
+        height: 32px;
+        margin-left: 10px;
+        outline: none;
       }
     }
     .ql-snow {

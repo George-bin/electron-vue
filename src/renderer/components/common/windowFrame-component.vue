@@ -2,7 +2,7 @@
   <div class="global-drag-window">
     <div style="flex: 1; display: flex; align-items: center; height: 30px; padding-left: 5px; font-size: 14px;">
       <img src="../../../../static/img/logo.jpg" width="20" height="20" alt="logo" style="margin-right: 5px" />
-      <span>小耿记事本</span>
+      <span>博客管理端</span>
     </div>
     <!--v-if="isLogin"-->
     <div class="global-top-btn set-top-btn setup-btn" @click.stop="startOpenSetup">

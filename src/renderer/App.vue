@@ -66,7 +66,9 @@
                 }
               })
           })
-          .catch(() => {})
+          .catch(() => {
+            this.$router.push('/login');
+          })
       }
     },
     computed: {
