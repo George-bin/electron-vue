@@ -1,6 +1,6 @@
 <template>
-  <div id="app" @click="normalSetup">
-    <window-frame :isLogin="showSetupBtnFlag" @openSetup="openSetup"></window-frame>
+  <div id="app">
+    <window-frame :isLogin="showSetupBtnFlag" @openSetup="openSetup.call(this)"></window-frame>
     <router-view></router-view>
 
     <!-- 数据请求客户提示 -->
@@ -10,10 +10,7 @@
     <!--<loading-template :loadingShow="loadingShow"></loading-template>-->
 
     <!--设置选项-->
-    <ul v-if="showSetupListFlag" class="setup-list">
-      <li class="setup-list-item" @click="logon">退出登录</li>
-      <li class="setup-list-item">账户设置</li>
-    </ul>
+    <main-set ref="mainSet"></main-set>
   </div>
 </template>
 
@@ -26,50 +23,14 @@
     name: 'admin-tools',
     data () {
       return {
-        showSetupListFlag: false,
         showSetupBtnFlag: false
       }
     },
-    created () {},
-    watch: {},
-    methods: {
-      ...mapMutations([]),
-      ...mapActions([
-        'Logon'
-      ]),
-      openSetup () {
-        this.showSetupListFlag = true
-      },
-      // 恢复默认设置
-      normalSetup () {
-        this.showSetupListFlag = false
-      },
-      // 注销
-      logon () {
-        this.$confirm('确定退出登录吗?', '提示', {
-          type: 'warning'
-        })
-          .then(() => {
-            let data = {
-              // username: this.username
-              username: localStorage.getItem('username')
-            }
-            this.Logon(data)
-              .then(data => {
-                if (data.errcode === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '注销成功!',
-                    duration: 1500
-                  })
-                  this.$router.push('/login');
-                }
-              })
-          })
-          .catch(() => {
-            this.$router.push('/login');
-          })
-      }
+    components: {
+      TipsTemplate,
+      LoadingTemplate,
+      windowFrame,
+      mainSet: () => import('@/components/mainSet-component.vue')
     },
     computed: {
       ...mapState({
@@ -79,10 +40,16 @@
         loadingShow: state => state.loadingStore.loadingShow // 加载动画显示/隐藏
       })
     },
-    components: {
-      TipsTemplate,
-      LoadingTemplate,
-      windowFrame
+    created () {},
+    watch: {},
+    methods: {
+      ...mapMutations([]),
+      ...mapActions([
+        'Logon'
+      ]),
+      openSetup () {
+        this.$refs.mainSet.$emit('openNetwork')
+      }
     }
   }
 </script>
@@ -100,25 +67,5 @@
   }
   #app {
     height: 100%
-  }
-  .setup-list {
-    position: fixed;
-    right: 42px;
-    top: 30px;
-    border: 1px solid #7D7D7D;
-    z-index: 9999;
-    background: #ffffff;
-    .setup-list-item {
-      height: 24px;
-      line-height: 24px;
-      padding: 0 20px;
-      cursor: pointer;
-    }
-    .setup-list-item:hover {
-      background: #DFDFDF;
-    }
-    .setup-list-item + .setup-list-item {
-      border-top: 1px solid #7D7D7D;
-    }
   }
 </style>

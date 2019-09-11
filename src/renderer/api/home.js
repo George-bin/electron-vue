@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import { request } from '../utils/request'
 
 // 获取笔记本结构树
 export function getNotebookTreeRequest (data) {
