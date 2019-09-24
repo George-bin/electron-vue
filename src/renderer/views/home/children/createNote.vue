@@ -1,232 +1,265 @@
 <template>
-  <div class="create-note-main-component" @keyup.ctrl.83="createNote">
+  <div class="create-note-main-component" @keyup.ctrl.83="handleCreateNote">
     <el-header class="title-section">
       <input
         placeholder="标题"
         class="note-title-input"
-        :style="{'border': isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'}"
+        :style="{
+          border: isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'
+        }"
         v-model="note.noteName"
         type="text"
         @focus="onFocus"
-        @blur="onBlur" />
+        @blur="onBlur"
+      />
       <select class="set-note-label" v-model="note.noteLabel">
         <option value="note" selected>笔记</option>
         <option value="jottings">随笔</option>
       </select>
     </el-header>
-    <quill-editor
-      v-model="note.noteContent"
-      ref="myQuillEditor"
-      :options="editorOption"
-      @blur="onEditorBlur($event)"
-      @focus="onEditorFocus($event)"
-      @change="onEditorChange($event)">
-    </quill-editor>
+    <div class="">
+      <el-upload
+        v-show="false"
+        class="avatar-uploader"
+        :action="serverUrl"
+        name="img"
+        :show-file-list="false"
+        :on-success="handleUploadImgSuccess"
+        :on-error="handleUploadImgError"
+        :before-upload="handleBeforeUploadImg"
+      >
+      </el-upload>
+      <el-row v-loading="uploadingImg">
+        <quill-editor
+          v-model="note.noteContent"
+          ref="myQuillEditor"
+          :options="editorOption"
+          @blur="onEditorBlur($event)"
+          @focus="onEditorFocus($event)"
+          @change="onEditorChange($event)"
+        >
+        </quill-editor>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
-  import { mapState, mapMutations, mapActions } from 'vuex'
-  export default {
-    data () {
-      return {
-        note: {
-          noteName: '',
-          noteContent: '',
-          noteLabel: 'note'
-        },
-        // 是否编辑编辑标题
-        isEditNoteNameFlag: '',
-        editorOption: {
-          modules:{
-            toolbar:[
-              // 字体样式
-              ['bold', 'italic', 'underline', 'strike'],
-              // 代码编写
-              ['blockquote', 'code-block'],
-              // 标题，键值对的形式；1、2表示字体大小
-              // [{ 'header': 1 }, { 'header': 2 }],
-              // 几级标题
-              [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-              // 字体颜色，字体背景颜色
-              [{ 'color': [] }, { 'background': [] }],
-              // 列表
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              // 上下标
-              [{ 'script': 'sub'}, { 'script': 'super' }],
-              // 缩进
-              [{ 'indent': '-1'}, { 'indent': '+1' }],
-              // 字体
-              // [{ 'font': ['Microsoft YaHei', 'Arial', '黑体', '宋体'] }],
-              // 对齐方式
-              [{ 'align': [] }],
-            ]
+import { mapState, mapMutations, mapActions } from "vuex";
+import editorConfig from "../../../assets/js/editorConfig";
+export default {
+  data() {
+    return {
+      note: {
+        noteName: "",
+        noteContent: "",
+        noteLabel: "note"
+      },
+      // 是否编辑编辑标题
+      isEditNoteNameFlag: "",
+      editorOption: {
+        // placeholder: "",
+        theme: "snow", // or 'bubble'
+        modules: {
+          toolbar: {
+            // 工具栏
+            container: editorConfig,
+            handlers: {
+              image: function(value) {
+                if (value) {
+                  // 触发input框选择图片文件
+                  document.querySelector(".avatar-uploader input").click();
+                } else {
+                  this.quill.format("image", false);
+                }
+              }
+            }
           }
         }
-      }
+      },
+      serverUrl: "",
+      uploadingImg: ""
+    };
+  },
+  components: {},
+  computed: {
+    ...mapState({
+      editEvent: state => state.home.editEvent,
+      activeNotebook: state => state.home.activeNotebook
+    })
+  },
+  watch: {
+    editEvent: {
+      handler: function(val, oldval) {
+        this.content = val.eventData;
+      },
+      deep: true
+    }
+  },
+  created() {
+    // debugger
+    console.log(this.$route.params);
+  },
+  mounted() {
+    this.serverUrl = localStorage.getItem("baseUrl") + "/api/blog/uploadfile";
+    this.content = this.editEvent.eventData;
+  },
+  methods: {
+    ...mapMutations(["SET_ACTIVE_NOTE"]),
+
+    ...mapActions(["CreateNote"]),
+
+    onFocus() {
+      this.isEditNoteNameFlag = true;
     },
-    components: {},
-    computed: {
-      ...mapState({
-        editEvent: state => state.home.editEvent,
-        activeNotebook: state => state.home.activeNotebook
+
+    onBlur() {
+      this.isEditNoteNameFlag = false;
+    },
+
+    // 创建笔记
+    handleCreateNote() {
+      this.CreateNote({
+        noteName: this.note.noteName,
+        noteContent: this.note.noteContent,
+        noteLabel: this.note.noteLabel,
+        notebookName: this.activeNotebook.notebookName,
+        username: localStorage.getItem("username"),
+        notebookCode: this.activeNotebook.notebookCode,
+        status: 0,
+        flag: "note",
+        noteNum: this.activeNotebook.noteNum
       })
+        .then(data => {
+          this.$message({
+            message: "笔记创建成功!",
+            type: "success",
+            duration: 1500
+          });
+          this.$router.push("/home/noteDetail");
+        })
+        .catch(err => {
+          if (err.errcode) {
+            this.$message({
+              message: err.message,
+              type: "error",
+              duration: 1500
+            });
+            return;
+          }
+          this.$message({
+            message: "网络错误!",
+            type: "error",
+            duration: 1500
+          });
+        });
     },
-    watch: {
-      editEvent: {
-        handler: function(val, oldval) {
-          this.content = val.eventData
-        },
-        deep: true
+
+    // 取消编辑
+    cancelEditor() {
+      this.$confirm("确定取消编辑吗?", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          this.$router.back();
+        })
+        .catch(() => {});
+    },
+
+    // 失去焦点事件
+    onEditorBlur(event) {
+      console.log(this.content);
+    },
+
+    // 获得焦点事件
+    onEditorFocus() {},
+
+    // 内容改变事件
+    onEditorChange() {},
+
+    // 图片上传成功
+    handleUploadImgSuccess(res) {
+      this.uploadingImg = false;
+      // 获取富文本组件实例
+      let quill = this.$refs.myQuillEditor.quill;
+      // 如果上传成功
+      if (res.errcode === 0 && res.filePath) {
+        // 获取光标所在位置
+        let length = quill.getSelection().index;
+        // 插入图片  res.info为服务器返回的图片地址
+        console.log("图片地址:", `http://${location.hostname}${res.filePath}`);
+        quill.insertEmbed(
+          length,
+          "image",
+          `http://${location.hostname}${res.filePath}`
+        );
+        // 调整光标到最后
+        quill.setSelection(length + 1);
+      } else {
+        this.$message.error("图片插入失败");
       }
     },
-    created () {
-      // debugger
-      console.log(this.$route.params)
+
+    // 图片上传失败
+    handleUploadImgError() {
+      this.uploadingImg = false;
+      this.$message({
+        type: "error",
+        message: "图片上传失败!"
+      });
     },
-    mounted () {
-      this.content = this.editEvent.eventData
-    },
-    methods: {
-      ...mapMutations([
-        'SET_ACTIVE_NOTE'
-      ]),
-      ...mapActions([
-        'EditEvent',
-        'CreateNote'
-      ]),
-      onFocus () {
-        this.isEditNoteNameFlag = true
-      },
-      onBlur () {
-        this.isEditNoteNameFlag = false
-      },
-      // 创建笔记
-      createNote () {
-        this.CreateNote({
-          noteName: this.note.noteName,
-          noteContent: this.note.noteContent,
-          noteLabel: this.note.noteLabel,
-          notebookName: this.activeNotebook.notebookName,
-          username: localStorage.getItem('username'),
-          notebookCode: this.activeNotebook.notebookCode,
-          status: 0,
-          flag: 'note'
-        })
-          .then(data => {
-            this.$message({
-              message: '笔记创建成功!',
-              type: 'success',
-              duration: 1500
-            })
-            this.$router.push('/home/noteDetail')
-          })
-          .catch(err => {
-            if (err.errcode) {
-              this.$message({
-                message: err.message,
-                type: 'error',
-                duration: 1500
-              })
-              return
-            }
-            this.$message({
-              message: '网络错误!',
-              type: 'error',
-              duration: 1500
-            })
-          })
-      },
-      // 更新事件
-      updateEvent () {
-        this.EditEvent({
-          ...this.editEvent,
-          eventData: this.content,
-          createTime: new Date(this.editEvent.createTime).getTime()
-        })
-          .then(data => {
-            this.$message({
-              message: '保存成功!',
-              type: 'success',
-              duration: 1500
-            })
-          })
-          .catch(err => {
-            if (err.errcode) {
-              this.$message({
-                message: err.message,
-                type: 'error',
-                duration: 1500
-              })
-              return
-            }
-            this.$message({
-              message: '网络错误!',
-              type: 'error',
-              duration: 1500
-            })
-          })
-      },
-      // 取消编辑
-      cancelEditor () {
-        this.$confirm('确定取消编辑吗?', '提示', {
-          type: 'warning'
-        })
-          .then(() => {
-            this.$router.back()
-          })
-          .catch(() => {})
-      },
-      // 失去焦点事件
-      onEditorBlur (event) {
-        console.log(this.content)
-      },
-      // 获得焦点事件
-      onEditorFocus () {},
-      // 内容改变事件
-      onEditorChange () {}
+
+    // 上传图片之前
+    handleBeforeUploadImg() {
+      this.uploadingImg = true;
     }
   }
+};
 </script>
 
 <style lang="scss">
-  .create-note-main-component {
-    .title-section {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 45px !important;
+.create-note-main-component {
+  .title-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 45px !important;
+    padding: 0 5px;
+    border-bottom: 1px solid #cccccc;
+    text-align: right;
+    background: #ffffff !important;
+    .note-title-input {
+      flex: 1;
+      height: 30px;
+      line-height: 30px;
       padding: 0 5px;
-      border-bottom: 1px solid #CCCCCC;
-      text-align: right;
-      background: #FFFFFF !important;
-      .note-title-input {
-        flex: 1;
-        height: 30px;
-        line-height: 30px;
-        padding: 0 5px;
-        border: 1px solid #FFFFFF;
-        outline: none;
-      }
-      .note-title-input:hover {
-        border: 1px solid #CCCCCC !important;
-      }
-      .set-note-label {
-        width: 60px;
-        height: 32px;
-        margin-left: 10px;
-        outline: none;
-      }
+      border: 1px solid #ffffff;
+      outline: none;
     }
-    .ql-snow {
-      border-left: none !important;
-      border-right: none !important;
-      border-top: none !important;
+    .note-title-input:hover {
+      border: 1px solid #cccccc !important;
     }
-    .ql-container {
-      height: calc(100vh - 75px - 42px) !important;
-      border: none !important;
-      overflow: auto !important;
+    .set-note-label {
+      width: 60px;
+      height: 32px;
+      margin-left: 10px;
+      outline: none;
     }
   }
+  .ql-snow {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+  }
+
+  .ql-formats {
+    margin-right: 0px !important;
+  }
+
+  .ql-container {
+    height: calc(100vh - 75px - 42px) !important;
+    border: none !important;
+    overflow: auto !important;
+  }
+}
 </style>

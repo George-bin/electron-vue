@@ -20,7 +20,7 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "小斌记事本",
+    "productName": "博客管理端",
     "appId": "com.example.yourapp",
     "directories": {
       "output": "build"

@@ -1,33 +1,107 @@
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td { margin:0; padding:0; }
-body { background:#fff; color:#555; font-size:14px; font-family: Verdana, Arial, Helvetica, sans-serif; }
-td,th,caption { font-size:14px; }
-h1, h2, h3, h4, h5, h6 { font-weight:normal; font-size:100%; }
-/*address, caption, cite, code, dfn, em, strong, th, var { font-style:normal; font-weight:normal;}*/
-a { color:#555; text-decoration:none; }
-a:hover { text-decoration:underline; }
-img { border:none; }
-ol,ul,li { list-style:none; }
-input, textarea, select, button {
-  font-size: 14px;
-  font-family: "Microsoft YaHei","Arial","黑体","宋体",sans-serif;
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+code,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
 }
-table { border-collapse:collapse; }
-html {overflow-y: scroll;}
+body {
+  background: #fff;
+  color: #555;
+  font-size: 14px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+td,
+th,
+caption {
+  font-size: 14px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+  font-size: 100%;
+}
+/*address, caption, cite, code, dfn, em, strong, th, var { font-style:normal; font-weight:normal;}*/
+a {
+  color: #555;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+img {
+  border: none;
+}
+ol,
+ul,
+li {
+  list-style: none;
+}
+input,
+textarea,
+select,
+button {
+  font-size: 14px;
+  font-family: "Microsoft YaHei", "Arial", "黑体", "宋体", sans-serif;
+}
+table {
+  border-collapse: collapse;
+}
+html {
+  overflow-y: scroll;
+}
 
-.clearfix:after {content: "."; display: block; height:0; clear:both; visibility: hidden;}
-.clearfix { *zoom:1; }
+.clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.clearfix {
+  *zoom: 1;
+}
 
 .ellipsis {
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 pre {
   padding: 10px;
-  color: #FFFFFF;
-  background: #333333;
+  background: #1c2327;
   border-radius: 5px;
+}
+
+.ql-snow .ql-editor pre.ql-syntax {
+  color: #f7f7f7;
+  background: #1c2327;
 }
 
 /*禁止文字选中*/
@@ -36,25 +110,25 @@ body {
   -moz-user-select: none; /*火狐 firefox*/
   -webkit-user-select: none; /*webkit浏览器*/
   -ms-user-select: none; /*IE10+*/
-  -khtml-user-select :none; /*早期的浏览器*/
+  -khtml-user-select: none; /*早期的浏览器*/
   user-select: none;
 }
 
 /*滚动条整体样式*/
 ::-webkit-scrollbar {
-   width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
-   height: 1px;
- }
+  width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
+  height: 1px;
+}
 /*滚动条里面小方块*/
 ::-webkit-scrollbar-thumb {
-   border-radius: 10px;
-   -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-   /*background: #535353;*/
-   background: #BABABA;
- }
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  /*background: #535353;*/
+  background: #bababa;
+}
 /*滚动条里面轨道*/
 ::-webkit-scrollbar-track {
-   -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-   border-radius: 10px;
-   background: #DFDFDF;
- }
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background: #dfdfdf;
+}

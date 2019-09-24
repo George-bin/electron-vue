@@ -7,17 +7,13 @@
       <div class="title">
         <h2>登录</h2>
       </div>
-      <el-form
-        ref="loginForm"
-        :model="form"
-        :rules="rules"
-        class="login-form"
-      >
+      <el-form ref="loginForm" :model="form" :rules="rules" class="login-form">
         <el-form-item prop="username" @click.native="showAccountList">
           <el-popover
             placement="bottom"
             width="200"
-            v-model="accountListVisible">
+            v-model="accountListVisible"
+          >
             <el-input
               :disabled="loading"
               placeholder="请输入用户名!"
@@ -26,9 +22,17 @@
             >
             </el-input>
             <ul v-if="accountList && accountList.length" class="account-list">
-              <li v-for="item in accountList" :key="item.username" class="account-list-item" @click="useAccount(item)">
+              <li
+                v-for="item in accountList"
+                :key="item.username"
+                class="account-list-item"
+                @click="useAccount(item)"
+              >
                 <span>{{ item.username }}</span>
-                <i class="el-icon-circle-close" @click.stop="deleteLocalAccount(item)"></i>
+                <i
+                  class="el-icon-circle-close"
+                  @click.stop="deleteLocalAccount(item)"
+                ></i>
               </li>
             </ul>
           </el-popover>
@@ -52,154 +56,163 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import {
-  aesEncrypt,
-  aesDecrypt
-} from '../../utils/crypto'
-import { validatorSpace } from '@/utils/script/validatorData'
+import { mapActions } from "vuex";
+import { aesEncrypt, aesDecrypt } from "../../utils/crypto";
+import { validatorSpace } from "@/utils/script/validatorData";
 
 export default {
-  data () {
+  data() {
     return {
       form: {
-        username: '', // 用户名
-        password: '', // 密码
+        username: "", // 用户名
+        password: "" // 密码
       },
       loading: false, // 登录中
       rules: {
-        username: [{ required: true, validator: validatorSpace, trigger: 'blur' }],
-        password: [{ required: true, validator: validatorSpace, trigger: 'blur' }]
+        username: [
+          { required: true, validator: validatorSpace, trigger: "blur" }
+        ],
+        password: [
+          { required: true, validator: validatorSpace, trigger: "blur" }
+        ]
       },
       accountListVisible: false,
       accountList: []
-    }
+    };
   },
   computed: {},
   watch: {},
   components: {},
-  created () {
-    this.initData()
+  created() {
+    this.initData();
   },
   methods: {
-    ...mapActions(['Login']),
-    initData () {
-      let list = JSON.parse(localStorage.getItem('accountList'))
+    ...mapActions(["Login"]),
+    initData() {
+      let list = JSON.parse(localStorage.getItem("accountList"));
       if (list && list.length > 0) {
         this.form = {
           username: list[0].username,
           password: aesDecrypt({ encrypted: list[0].password })
-        }
-        this.accountList = JSON.parse(JSON.stringify(list))
+        };
+        this.accountList = JSON.parse(JSON.stringify(list));
       }
     },
     // 用户登录
-    login () {
-      this.$refs.loginForm.validate((valid) => {
+    login() {
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
           this.Login(this.form)
             .then(data => {
-              this.loading = false
               if (data.errcode === 0) {
-                this.cacheAccount()
-                localStorage.setItem('username', this.form.username)
-                this.$message({
-                  type: 'success',
-                  message: data.message,
-                  duration: 1500
-                })
-                this.$router.push('/home')
+                setTimeout(() => {
+                  this.loading = false;
+                  this.cacheAccount();
+                  localStorage.setItem("username", this.form.username);
+                  this.$message({
+                    type: "success",
+                    message: data.message,
+                    duration: 1500
+                  });
+                  this.$router.push("/home");
+                }, 3000);
               } else {
+                this.loading = false;
                 this.$message({
-                  type: 'warning',
-                  message: '用户名或密码错误!',
+                  type: "warning",
+                  message: "用户名或密码错误!",
                   duration: 1500
-                })
+                });
               }
             })
             .catch(err => {
-              this.loading = false
-              console.log(err)
+              this.loading = false;
+              console.log(err);
               this.$message({
-                type: 'error',
-                message: '网络错误!',
+                type: "error",
+                message: "网络错误!",
                 duration: 1500
-              })
-            })
+              });
+            });
         }
-      })
+      });
     },
 
     // 缓存账户，方便下次登录
-    cacheAccount () {
-      let list = JSON.parse(localStorage.getItem('accountList'))
+    cacheAccount() {
+      let list = JSON.parse(localStorage.getItem("accountList"));
       if (list && list.length > 0) {
-        if (list.some(item => { return item.username === this.form.username })) {
-          let index = list.findIndex(item => {
-            return item.username === this.form.username
+        if (
+          list.some(item => {
+            return item.username === this.form.username;
           })
-          list.splice(index, 1)
+        ) {
+          let index = list.findIndex(item => {
+            return item.username === this.form.username;
+          });
+          list.splice(index, 1);
           list.unshift({
             username: this.form.username,
             password: aesEncrypt({ data: this.form.password })
-          })
+          });
         } else {
           list.unshift({
             username: this.form.username,
             password: aesEncrypt({ data: this.form.password })
-          })
+          });
         }
       } else {
-        list = []
+        list = [];
         list.push({
           username: this.form.username,
           password: aesEncrypt({ data: this.form.password })
-        })
+        });
       }
-      localStorage.setItem('accountList', JSON.stringify(list))
+      localStorage.setItem("accountList", JSON.stringify(list));
     },
 
     // 使用该账户
-    useAccount (event) {
-      this.accountListVisible = false
-      this.form.username = event.username
-      this.form.password = aesDecrypt({ encrypted: event.password })
+    useAccount(event) {
+      this.accountListVisible = false;
+      this.form.username = event.username;
+      this.form.password = aesDecrypt({ encrypted: event.password });
     },
 
     // 删除本地缓存中的账户
-    deleteLocalAccount (account) {
-      let list = JSON.parse(localStorage.getItem('accountList'))
+    deleteLocalAccount(account) {
+      let list = JSON.parse(localStorage.getItem("accountList"));
       let index = list.findIndex(item => {
-        return item.username === account.username
-      })
-      list.splice(index, 1)
-      localStorage.setItem('accountList', JSON.stringify(list))
-      this.accountList = JSON.parse(JSON.stringify(list))
+        return item.username === account.username;
+      });
+      list.splice(index, 1);
+      localStorage.setItem("accountList", JSON.stringify(list));
+      this.accountList = JSON.parse(JSON.stringify(list));
       if (this.form.username === account.username) {
         if (list && list.length > 1) {
-          this.form.username = list[0].username
-          this.form.password = aesDecrypt({ encrypted: list[0].password })
+          this.form.username = list[0].username;
+          this.form.password = aesDecrypt({ encrypted: list[0].password });
         } else {
-          this.form.username = ''
-          this.form.password = ''
+          this.form.username = "";
+          this.form.password = "";
         }
       }
     },
 
-    showAccountList () {
-      this.accountList = JSON.parse(localStorage.getItem('accountList'))
-      this.accountListVisible = false
-      if (this.accountList && this.accountList.length) this.accountListVisible = true
+    showAccountList() {
+      this.accountList = JSON.parse(localStorage.getItem("accountList"));
+      this.accountListVisible = false;
+      if (this.accountList && this.accountList.length)
+        this.accountListVisible = true;
     },
 
     // 前往注册
     goRegister() {
-      console.log(123)
-      this.$router.push({ path: '/register' })
+      console.log(123);
+      this.$router.push({ path: "/register" });
     }
   }
-}
+};
 </script>
 
 <style lang="scss">

@@ -1,28 +1,28 @@
-import { request } from '../utils/request'
+import { request } from "../utils/request";
 
 // 用户登录
-export function loginRequest (data) {
+export function loginRequest(data) {
   return request({
-    url: '/login',
-    method: 'post',
+    url: "/login",
+    method: "post",
     data: data
-  })
+  });
 }
 
 // 用户注册
-export function registerRequest (data) {
+export function registerRequest(data) {
   return request({
-    url: '/register',
-    method: 'post',
+    url: "/register",
+    method: "post",
     data: data
-  })
+  });
 }
 
 // 注销登录
-export function logonRequest (data) {
+export function logonRequest(data) {
   return request({
-    url: '/logon',
-    method: 'post',
+    url: "/logon",
+    method: "post",
     data: data
-  })
+  });
 }

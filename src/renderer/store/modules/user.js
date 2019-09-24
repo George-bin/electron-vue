@@ -1,67 +1,63 @@
-import {
-  loginRequest,
-  registerRequest,
-  logonRequest
-} from "../../api/user";
+import { loginRequest, registerRequest, logonRequest } from "../../api/user";
 
 const user = {
   state: {
     // 用户名
-    username: ''
+    username: ""
   },
   mutations: {
     SET_USERNAME: function(state, data) {
-      state.username = data
+      state.username = data;
     }
   },
   actions: {
     // 用户登录
-    Login ({ commit }, data) {
+    Login({ commit }, data) {
       return new Promise((resolve, reject) => {
         loginRequest(data)
           .then(response => {
-            if (response.data.errcode === 0) {
-              commit('SET_USERNAME', data.username)
-              commit('INIT_LOGIN', response.data.data)
+            let { errcode } = response.data;
+            if (errcode === 0) {
+              commit("SET_USERNAME", data.username);
             }
-            resolve(response.data)
+            resolve(response.data);
           })
           .catch(err => {
-            reject(err)
-          })
-      })
+            reject(err);
+          });
+      });
     },
     // 用户注册
-    Register ({ commit }, data) {
+    Register({ commit }, data) {
       return new Promise((resolve, reject) => {
         registerRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              resolve(response.data)
-              return
+              resolve(response.data);
+              return;
             }
-            reject(response.data)
+            reject(response.data);
           })
           .catch(err => {
-            reject(err)
-          })
-      })
+            reject(err);
+          });
+      });
     },
     // 注销登录
-    Logon ({ commit }, data) {
+    Logon({ commit }, data) {
       return new Promise((resolve, reject) => {
         logonRequest(data)
           .then(response => {
-            commit('SET_NOTE_LIST', [])
-            commit('SET_ACTIVE_MODULE', '')
-            resolve(response.data)
+            commit("SET_NOTE_LIST", []);
+            commit("SET_ACTIVE_MODULE", "");
+            resolve(response.data);
           })
           .catch(err => {
-            reject(err)
-          })
-      })
+            reject(err);
+          });
+      });
     }
   }
-}
+};
 
 export default user;
