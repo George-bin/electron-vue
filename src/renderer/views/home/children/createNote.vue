@@ -13,11 +13,11 @@
         @blur="onBlur"
       />
       <select class="set-note-label" v-model="note.noteLabel">
-        <option value="note" selected>笔记</option>
-        <option value="jottings">随笔</option>
+        <option value="main-body" selected>正文</option>
+        <option value="draft">草稿</option>
       </select>
     </el-header>
-    <div class="">
+    <div class>
       <el-upload
         v-show="false"
         class="avatar-uploader"
@@ -27,8 +27,7 @@
         :on-success="handleUploadImgSuccess"
         :on-error="handleUploadImgError"
         :before-upload="handleBeforeUploadImg"
-      >
-      </el-upload>
+      ></el-upload>
       <el-row v-loading="uploadingImg">
         <quill-editor
           v-model="note.noteContent"
@@ -37,8 +36,7 @@
           @blur="onEditorBlur($event)"
           @focus="onEditorFocus($event)"
           @change="onEditorChange($event)"
-        >
-        </quill-editor>
+        ></quill-editor>
       </el-row>
     </div>
   </div>
@@ -53,30 +51,11 @@ export default {
       note: {
         noteName: "",
         noteContent: "",
-        noteLabel: "note"
+        noteLabel: "draft"
       },
       // 是否编辑编辑标题
       isEditNoteNameFlag: "",
-      editorOption: {
-        // placeholder: "",
-        theme: "snow", // or 'bubble'
-        modules: {
-          toolbar: {
-            // 工具栏
-            container: editorConfig,
-            handlers: {
-              image: function(value) {
-                if (value) {
-                  // 触发input框选择图片文件
-                  document.querySelector(".avatar-uploader input").click();
-                } else {
-                  this.quill.format("image", false);
-                }
-              }
-            }
-          }
-        }
-      },
+      editorOption: editorConfig,
       serverUrl: "",
       uploadingImg: ""
     };
@@ -187,11 +166,15 @@ export default {
         // 获取光标所在位置
         let length = quill.getSelection().index;
         // 插入图片  res.info为服务器返回的图片地址
-        console.log("图片地址:", `http://${location.hostname}${res.filePath}`);
+        // console.log("图片地址:", `${baseUrl}${res.filePath}`);
         quill.insertEmbed(
           length,
           "image",
-          `http://${location.hostname}${res.filePath}`
+          `http://${
+            process.env.NODE_ENV === "production"
+              ? "39.105.55.137"
+              : location.hostname
+          }${res.filePath}`
         );
         // 调整光标到最后
         quill.setSelection(length + 1);

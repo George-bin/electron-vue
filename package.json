@@ -21,7 +21,7 @@
   },
   "build": {
     "productName": "博客管理端",
-    "appId": "com.example.yourapp",
+    "appId": "com.example.yourapp2",
     "directories": {
       "output": "build"
     },
@@ -56,6 +56,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "element-ui": "^2.6.1",
+    "highlight.js": "^9.15.10",
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
     "vue": "^2.5.16",

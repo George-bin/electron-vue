@@ -100,6 +100,7 @@ export default {
   watch: {},
   mounted() {},
   methods: {
+    ...mapActions(["GetNoteById"]),
     ...mapMutations([
       "SET_PARENT_NODE",
       "SET_ACTIVE_NOTEBOOK",
@@ -142,27 +143,29 @@ export default {
       this.SET_ACTIVE_NOTEBOOK(noteBook);
 
       this.GetNoteList({
-        username: localStorage.getItem("username"),
         notebookCode: item.notebookCode
       })
         .then(data => {
-          if (data.length) {
-            this.SET_ACTIVE_NOTE(data[0]);
-            this.$router.push("/home/noteDetail");
+          let { noteList } = data;
+          if (noteList && noteList.length) {
+            this.GetNoteById(noteList[0]._id)
+              .then(() => {
+                this.$router.push("/home/noteDetail");
+              })
+              .catch(err => {
+                this.SET_ACTIVE_NOTE({});
+                this.$router.push("/home/noContent");
+                this.$message({
+                  type: "error",
+                  message: "获取笔记失败!"
+                });
+              });
           } else {
             this.SET_ACTIVE_NOTE({});
             this.$router.push("/home/noContent");
           }
         })
         .catch(err => {
-          if (err.errcode) {
-            this.$message({
-              message: err.message,
-              type: "error",
-              duration: 1500
-            });
-            return;
-          }
           this.$message({
             message: "网络错误!",
             type: "error",

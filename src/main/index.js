@@ -31,16 +31,19 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 794,
+    height: 712,
     useContentSize: true,
-    width: 1108,
-    minWidth: 1108,
-    minHeight: 794,
+    width: 1018,
+    minWidth: 1018,
+    minHeight: 700,
     frame: false,
+    resizable: true,
     webPreferences: { webSecurity: false } // 允许跨域访问
   });
   // vue.js devtools
-  // BrowserWindow.addDevToolsExtension('C:\\Users\\think\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\nhdogjmejiglipccpnnnanhbledajbpd\\4.1.5_0');
+  // BrowserWindow.addDevToolsExtension(
+  //   "C:\\Users\\%USERNAME%\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\nhdogjmejiglipccpnnnanhbledajbpd\\4.1.5_0"
+  // );
 
   // 加载页面（URL）
   mainWindow.loadURL(winURL);

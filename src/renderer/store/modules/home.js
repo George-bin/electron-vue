@@ -125,7 +125,7 @@ const home = {
     },
     // 添加笔记
     ADD_NOTE(state, data) {
-      state.noteList.push(data);
+      state.noteList.unshift(data);
     },
     // 删除笔记
     DELETE_NOTE(state, data) {
@@ -156,7 +156,8 @@ const home = {
       let index = state.noteList.findIndex(item => {
         return item._id === data._id;
       });
-      state.noteList.splice(index, 1, data);
+      state.noteList.splice(index, 1);
+      state.noteList.unshift(data);
     },
 
     // 永久性删除笔记
@@ -260,7 +261,7 @@ const home = {
               commit("ADD_NOTE", {
                 ...response.data.note,
                 createTime: moment(response.data.note.createTime).format(
-                  "YYYY/MM/DD"
+                  "YYYY-MM-DD HH:mm:ss"
                 ),
                 rightKeyMenu: false
               });
@@ -283,16 +284,18 @@ const home = {
       return new Promise((resolve, reject) => {
         getNoteListRequest(data)
           .then(response => {
-            if (response.data.errcode === 0) {
+            let { errcode, noteList } = response.data;
+            if (errcode === 0) {
               commit("SET_ACTIVE_MODULE", "tree");
-              response.data.noteList.forEach(item => {
-                item.createTime = moment(item.createTime).format("YYYY/MM/DD");
+              noteList.forEach(item => {
+                item.createTime = moment(item.createTime).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                );
                 item.rightKeyMenu = false;
               });
               commit("SET_NOTE_LIST", response.data.noteList);
-              return resolve(response.data.noteList);
             }
-            reject(response.data);
+            resolve(response.data);
           })
           .catch(err => {
             reject(err);
@@ -324,7 +327,7 @@ const home = {
               commit("UPDATE_NOTE", {
                 ...response.data.note,
                 createTime: moment(response.data.note.createTime).format(
-                  "YYYY/MM/DD"
+                  "YYYY-MM-DD HH:mm:ss"
                 )
               });
               commit(
@@ -333,7 +336,7 @@ const home = {
                   JSON.stringify({
                     ...response.data.note,
                     createTime: moment(response.data.note.createTime).format(
-                      "YYYY/MM/DD"
+                      "YYYY-MM-DD HH:mm:ss"
                     )
                   })
                 )
@@ -347,13 +350,20 @@ const home = {
       });
     },
     // 获取废纸篓中的数据
-    GetRecycleBinNoteList({ commit }, data) {
+    GetRecycleBinNoteList({ commit }) {
       return new Promise((resolve, reject) => {
-        getRecycleBinNoteListRequest(data)
+        getRecycleBinNoteListRequest()
           .then(response => {
-            if (response.data.errcode === 0) {
+            let { errcode, noteList } = response.data;
+            if (errcode === 0) {
               commit("SET_ACTIVE_MODULE", "recycleBin");
-              commit("SET_NOTE_LIST", response.data.noteList);
+              noteList.forEach(item => {
+                item.createTime = moment(item.createTime).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                );
+                item.rightKeyMenu = false;
+              });
+              commit("SET_NOTE_LIST", noteList);
               return resolve(response.data.noteList);
             }
             reject(response.data);

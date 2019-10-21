@@ -1,53 +1,52 @@
 <template>
   <div class="global-drag-window">
-    <div
-      style="flex: 1; display: flex; align-items: center; height: 30px; padding-left: 5px; font-size: 14px;"
-    >
-      <img
-        src="../../../../static/img/logo.png"
-        width="20"
-        height="20"
-        alt="logo"
-        style="margin-right: 5px"
-      />
-      <span>博客管理端</span>
-    </div>
-    <!--v-if="isLogin"-->
-    <div
-      class="global-top-btn set-top-btn setup-btn"
-      @click.stop="startOpenSetup"
-    >
-      <img
-        src="../../assets/images/top-setup.png"
-        width="20"
-        height="23"
-        title="设置"
-      />
-    </div>
-    <div class="global-top-btn" @click="windowMin">
-      <img
-        src="../../assets/images/top-min.png"
-        title="最小化"
-        width="25"
-        height="23"
-      />
-    </div>
-    <!--v-if="isLogin"-->
-    <div class="global-top-btn" @click="windowMax">
-      <img
-        src="../../assets/images/top-max.png"
-        title="最大化"
-        width="20"
-        height="21"
-      />
-    </div>
-    <div
-      class="global-top-btn-close"
-      @click="windowClose"
-      alt="关闭窗口"
-      title="关闭窗口"
-    >
-      &nbsp;
+    <div class="global-drag-window-package-el">
+      <div
+        style="flex: 1; display: flex; align-items: center; height: 30px; padding-left: 5px; font-size: 14px;"
+      >
+        <img
+          src="../../../../static/img/logo.png"
+          width="20"
+          height="20"
+          alt="logo"
+          style="margin-right: 5px"
+        />
+        <span>博客管理端</span>
+      </div>
+      <div
+        class="global-top-btn set-top-btn setup-btn"
+        @click.stop="startOpenSetup"
+      >
+        <img
+          src="../../assets/images/top-setup.png"
+          width="20"
+          height="23"
+          title="设置"
+        />
+      </div>
+      <div class="global-top-btn" @click="windowMin">
+        <img
+          src="../../assets/images/top-min.png"
+          title="最小化"
+          width="25"
+          height="23"
+        />
+      </div>
+      <!--v-if="isLogin"-->
+      <div class="global-top-btn" @click="windowMax">
+        <img
+          src="../../assets/images/top-max.png"
+          title="最大化"
+          width="20"
+          height="21"
+        />
+      </div>
+      <div
+        class="global-top-btn-close"
+        @click="windowClose"
+        alt="关闭窗口"
+        title="关闭窗口"
+      ></div>
     </div>
   </div>
 </template>
@@ -83,14 +82,18 @@ export default {
 .global-drag-window {
   position: fixed;
   top: 0;
-  display: flex;
-  align-items: center;
   width: 100%;
-  height: 30px;
-  z-index: 999;
   -webkit-app-region: drag;
-  background: white;
-  // opacity:0.5;
+  .global-drag-window-package-el {
+    display: flex;
+    align-items: center;
+    /*width: 100%;*/
+    height: 30px;
+    /*z-index: 999;*/
+    background: white;
+    // opacity:0.5;
+    /*-webkit-app-region: no-drag;*/
+  }
   .global-top-btn {
     display: flex;
     align-items: center;

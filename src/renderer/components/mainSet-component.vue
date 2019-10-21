@@ -2,9 +2,23 @@
   <div class="main-set-main-component">
     <!--设置选项-->
     <ul v-if="showSetUpList" class="setup-list">
-      <li class="setup-list-item" @click="handleLogon">退出登录</li>
-      <li class="setup-list-item">账户设置</li>
-      <li class="setup-list-item" @click.stop="handleSetNetwork">网络设置</li>
+      <li
+        class="setup-list-item"
+        v-if="this.$route.fullPath !== '/login'"
+        @click="handleLogon"
+      >
+        退出登录
+      </li>
+      <li class="setup-list-item" v-if="this.$route.fullPath !== '/login'">
+        账户设置
+      </li>
+      <li
+        class="setup-list-item"
+        @click.stop="handleSetNetwork"
+        v-if="this.$route.fullPath === '/login'"
+      >
+        网络设置
+      </li>
     </ul>
 
     <!--网络设置-->
@@ -97,9 +111,14 @@ export default {
 
     // 改变网络地址
     handleChangeNetworkAddress() {
-      console.log("改变网络地址!");
+      // console.log("改变网络地址!");
+      this.openNetworkSetDialog = false;
       localStorage.setItem("baseUrl", this.networkAddress);
       destoryAxios();
+      this.$message({
+        type: "success",
+        message: "网络地址已变更!"
+      });
     }
   }
 };

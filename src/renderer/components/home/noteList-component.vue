@@ -23,6 +23,7 @@
         @click="handleGoNoteDetail(item)"
         @click.right="handleShowRightKeyMenu($event, item)"
         :class="{ 'active-note-style': activeNote._id === item._id }"
+        :title="item.noteName"
       >
         <p class="note-title ellipsis">{{ item.noteName }}</p>
         <p class="note-footer">
@@ -37,6 +38,9 @@
           <template v-if="item.status === 0">
             <li class="right-key-menu-item" @click="handleDeleteNote(item)">
               删除笔记
+            </li>
+            <li class="right-key-menu-item" @click="handleClearNote(item)">
+              永久删除笔记
             </li>
           </template>
           <template v-else-if="item.status === 2">
@@ -83,7 +87,7 @@ export default {
     ...mapActions(["DeleteNote", "RestoreNote", "ClearNote", "GetNoteById"]),
     // 显示右键菜单
     handleShowRightKeyMenu(event, note) {
-      // console.log(event);
+      console.log(note);
       this.rightKeyMenuPosition.x = event.x + "px";
       this.rightKeyMenuPosition.y = event.y + "px";
       this.SET_NOTE_RIGHT_KEY_MENU(note._id);
@@ -232,6 +236,9 @@ export default {
         border: 0;
         background: none;
         outline: none;
+        &:focus {
+          border-color: #3385ff;
+        }
       }
       i {
         cursor: pointer;

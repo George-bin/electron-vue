@@ -118,7 +118,7 @@ export default {
   },
   created() {
     this.initData();
-    // console.log(this.$route);
+    console.log(this.$route);
   },
   mounted() {},
   methods: {
@@ -154,8 +154,9 @@ export default {
       this.GetRecycleBinNoteList({
         username: localStorage.getItem("username")
       }).then(data => {
-        if (data.length) {
-          this.SET_ACTIVE_NOTE(data[0]);
+        let { noteList } = data;
+        if (noteList && noteList.length) {
+          this.SET_ACTIVE_NOTE(noteList[0]);
           this.$router.push("/home/noteDetail");
         } else {
           this.$router.push("/home/noContent");

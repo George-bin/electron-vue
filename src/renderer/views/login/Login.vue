@@ -1,11 +1,11 @@
 <template>
   <div class="login-main-components">
-    <div class="register-btn">
-      <span @click="goRegister">注册</span>
-    </div>
+    <!--<div class="register-btn">-->
+    <!--<span @click="goRegister">注册</span>-->
+    <!--</div>-->
     <div class="content-section">
       <div class="title">
-        <h2>登录</h2>
+        <h2>Login</h2>
       </div>
       <el-form ref="loginForm" :model="form" :rules="rules" class="login-form">
         <el-form-item prop="username" @click.native="showAccountList">
@@ -47,10 +47,10 @@
           >
           </el-input>
         </el-form-item>
+        <el-form-item style="text-align: center">
+          <el-button :loading="loading" @click="login">登录</el-button>
+        </el-form-item>
       </el-form>
-      <div class="submit-section">
-        <el-button :loading="loading" @click="login">登录</el-button>
-      </div>
     </div>
   </div>
 </template>
@@ -237,29 +237,39 @@ export default {
     left: 50%;
     transform: translateX(-50%) translateY(-70%);
     width: 300px;
-    h2 {
-      font-size: 24px;
+    /*display: flex;*/
+    align-items: center;
+    .title {
       text-align: center;
-      color: #333333;
-      letter-spacing: 4px;
+      .logo {
+        width: 60px;
+        height: 70px;
+      }
+      h2 {
+        font-size: 24px;
+        text-align: center;
+        color: #333333;
+        letter-spacing: 4px;
+      }
     }
     .login-form {
-      margin-top: 40px;
+      margin-top: 30px;
       input {
         border-radius: 20px;
       }
     }
   }
-  .submit-section {
-    text-align: center;
-    .el-button {
-      width: 200px;
-      height: 34px;
-      padding: 0;
-      border: 0;
-      color: white;
-      background: #3385ff;
-      border-radius: 20px;
+  .el-form {
+    .el-form-item {
+      .el-button {
+        width: 200px;
+        height: 34px;
+        padding: 0;
+        border: 0;
+        color: white;
+        background: #30b0e4;
+        border-radius: 20px;
+      }
     }
   }
 }

@@ -82,11 +82,10 @@ export function updateNoteRequest(data) {
 }
 
 // 获取废纸篓数据
-export function getRecycleBinNoteListRequest(data) {
+export function getRecycleBinNoteListRequest() {
   return request({
     url: "/getRecycleBinNoteList",
-    method: "get",
-    params: data
+    method: "get"
   });
 }
 

@@ -54,26 +54,7 @@ export default {
     return {
       note: {},
       isEditNoteNameFlag: false,
-      editorOption: {
-        // placeholder: "",
-        theme: "snow", // or 'bubble'
-        modules: {
-          toolbar: {
-            // 工具栏
-            container: editorConfig,
-            handlers: {
-              image: function(value) {
-                if (value) {
-                  // 触发input框选择图片文件
-                  document.querySelector(".avatar-uploader input").click();
-                } else {
-                  this.quill.format("image", false);
-                }
-              }
-            }
-          }
-        }
-      },
+      editorOption: editorConfig,
       // 服务器地址
       serverUrl: "",
       // 图片上传中
@@ -176,8 +157,9 @@ export default {
       if (res.errcode === 0 && res.filePath) {
         // 获取光标所在位置
         let length = quill.getSelection().index;
+
         // 插入图片  res.info为服务器返回的图片地址
-        console.log("图片地址:", `http://${location.hostname}${res.filePath}`);
+        // console.log("图片地址:", `http://${baseUrl}${res.filePath}`);
         quill.insertEmbed(
           length,
           "image",

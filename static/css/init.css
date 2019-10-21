@@ -94,14 +94,29 @@ html {
 }
 
 pre {
+  max-height: 300px;
   padding: 10px;
+  font-size: 14px;
   background: #1c2327;
   border-radius: 5px;
+  overflow: auto !important;
 }
 
 .ql-snow .ql-editor pre.ql-syntax {
-  color: #f7f7f7;
-  background: #1c2327;
+  color: #333333;
+  background: #f7f7f7;
+  border: 1px solid #d2d2d2;
+}
+
+.ql-snow .ql-editor blockquote {
+  height: 30px;
+  line-height: 30px;
+  background: #f7f7f7;
+}
+
+pre,
+code {
+  font-family: Consolas;
 }
 
 /*禁止文字选中*/
