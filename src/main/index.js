@@ -15,10 +15,11 @@ if (process.env.NODE_ENV !== "development") {
 }
 
 let mainWindow;
-const winURL =
-  process.env.NODE_ENV === "development"
-    ? `http://localhost:9088`
-    : `file://${__dirname}/index.html`;
+const winURL = 'http://www.gengshaobin.top/blog-manage/'
+// const winURL =
+//   process.env.NODE_ENV === "development"
+//     ? `http://localhost:9088`
+//     : `file://${__dirname}/index.html`
 
 //用一个 Tray 来表示一个图标,这个图标处于正在运行的系统的通知区 ，通常被添加到一个 context menu 上.
 const Tray = electron.Tray;
@@ -36,7 +37,7 @@ function createWindow() {
     width: 1018,
     minWidth: 1018,
     minHeight: 700,
-    frame: false,
+    frame: true,
     resizable: true,
     webPreferences: { webSecurity: false } // 允许跨域访问
   });
@@ -57,58 +58,69 @@ function createWindow() {
     mainWindow = null;
   });
 
-  //系统托盘右键菜单
-  let trayMenuTemplate = [
-    {
-      //系统托盘图标目录
-      label: "退出",
-      click: function() {
-        app.quit();
+  const isMac = process.platform === 'darwin'
+  if (!isMac) {
+    //系统托盘右键菜单
+    let trayMenuTemplate = [
+      {
+        //系统托盘图标目录
+        label: "退出",
+        click: function() {
+          app.quit();
+        }
       }
-    }
-  ];
-  let iconPath = path.join(__static, "/img/logo.png");
-  appTray = new Tray(iconPath);
-  const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-  // 设置托盘悬浮提示
-  appTray.setToolTip("博客管理端");
-  // 设置托盘菜单
-  appTray.setContextMenu(contextMenu);
+    ];
+    let iconPath = path.join(__static, "/img/logo.png");
+    appTray = new Tray(iconPath);
+    const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    // 设置托盘悬浮提示
+    appTray.setToolTip("博客管理端");
+    // 设置托盘菜单
+    appTray.setContextMenu(contextMenu);
 
-  appTray.on("click", function() {
-    // 显示主程序
-    // mainWindow.show();
-    // 关闭托盘显示
-    // appTray.destroy();
-    if (mainWindow.isVisible()) {
-      console.log("窗口最小化了");
-      mainWindow.hide();
-      // 让窗口不在任务栏中显示
-      mainWindow.setSkipTaskbar(true);
-    } else {
-      mainWindow.show();
-      // 让窗口在任务栏中显示
-      mainWindow.setSkipTaskbar(false);
-    }
-  });
+    appTray.on("click", function() {
+      // 显示主程序
+      // mainWindow.show();
+      // 关闭托盘显示
+      // appTray.destroy();
+      if (mainWindow.isVisible()) {
+        console.log("窗口最小化了");
+        mainWindow.hide();
+        // 让窗口不在任务栏中显示
+        mainWindow.setSkipTaskbar(true);
+      } else {
+        mainWindow.show();
+        // 让窗口在任务栏中显示
+        mainWindow.setSkipTaskbar(false);
+      }
+    });
+  } else {
+    const template = [
+      {
+        label: '博客管理端',
+        submenu: [
+          {
+            label: '退出登陆',
+            role: 'close'
+          },
+          {
+            label: '网络设置',
+            click: function() {
+              // ipcMain.send
+            }
+          }
+        ]
+      }
+    ];
+    // 构建菜单
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+  }
 }
 
-const menu = new Menu();
-menu.append(
-  new MenuItem({
-    label: "Print",
-    accelerator: "CmdOrCtrl+P",
-    click: () => {
-      console.log("time to print stuff");
-    }
-  })
-);
-
 // 以下为需要监听处理的系统事件
-
 // 创建浏览器窗口时调用
 app.on("ready", createWindow);
-
 // 全部应用窗口关闭时
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

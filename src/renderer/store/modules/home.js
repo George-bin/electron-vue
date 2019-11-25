@@ -12,7 +12,7 @@ import {
   clearNoteRequest,
   getRecycleBinNoteNumRequest,
   getNoteByIdRequest
-} from "../../api/home";
+} from '../../api/home'
 import {
   recursionSetTreeNode,
   recoverSetTreeNode,
@@ -22,11 +22,14 @@ import {
   recursionInsertNode,
   recursionUpdateNoteNum,
   recursionUpdateNoteBook
-} from "../../utils/home";
-import moment from "moment";
+} from '../../utils/home'
+import moment from 'moment'
+import X2js from 'x2js'
+let x2js = new X2js()
 
 const home = {
   state: {
+    isMac: false,
     // 事项列表
     eventList: [],
     endEventList: [],
@@ -49,123 +52,126 @@ const home = {
     // 当前编辑笔记
     activeNote: {},
     // 当前显示模块
-    activeModule: ""
+    activeModule: ''
   },
   mutations: {
+    SET_ISMAC(state, data) {
+      state.isMac = data
+    },
     // 设置要更新的笔记本
     SET_UPDATE_NOTEBOOK(state, notebook) {
-      state.updateNotebook = JSON.parse(JSON.stringify(notebook));
+      state.updateNotebook = JSON.parse(JSON.stringify(notebook))
     },
     // 递归更新笔记
     UPDATE_NOTEBOOK(state, notebook) {
-      recursionUpdateNoteBook(state.notebookTree, notebook);
+      recursionUpdateNoteBook(state.notebookTree, notebook)
     },
     // 废纸篓笔记数量
     SET_RECYCLE_BIN_NOTENUM(state, data) {
-      state.recycleBinNoteNum = data;
+      state.recycleBinNoteNum = data
     },
     // 当前选中的笔记本
     SET_ACTIVE_NOTEBOOK(state, data) {
-      state.activeNotebook = data;
+      state.activeNotebook = data
     },
     // 当前编辑笔记
     SET_ACTIVE_NOTE(state, data) {
-      state.activeNote = JSON.parse(JSON.stringify(data));
+      state.activeNote = JSON.parse(JSON.stringify(data))
     },
     // 设置父级节点
     SET_PARENT_NODE(state, data) {
-      state.parentNode = JSON.parse(JSON.stringify(data));
+      state.parentNode = JSON.parse(JSON.stringify(data))
     },
     SET_NOTEBOOK_TREE(state, data) {
-      state.notebookTree = data;
-      recursionSetTreeNode(state.notebookTree);
+      state.notebookTree = data
+      recursionSetTreeNode(state.notebookTree)
       // console.log(state.notebookTree)
     },
     RECOVER_NOTEBOOK_TREE(state) {
-      recoverSetTreeNode(state.notebookTree);
+      recoverSetTreeNode(state.notebookTree)
     },
     // 设置显示右键菜单的节点
     SET_RIGHT_KEY_MENU_TREE(state, data) {
-      recursionSetRightKeyMenuNode(state.notebookTree, data);
+      recursionSetRightKeyMenuNode(state.notebookTree, data)
     },
     // 显示对应节点/设置选中节点
     SET_ACTIVE_NODE(state, data) {
-      recursionShowNode(state.notebookTree, data);
+      recursionShowNode(state.notebookTree, data)
     },
     // 删除笔记本
     DELETE_NOTEBOOK_TREE(state, _id) {
-      recursionDeleteNotebook(state.notebookTree, _id);
+      recursionDeleteNotebook(state.notebookTree, _id)
     },
     // 插入节点
     RESERT_NODE_TREE(state, node) {
-      recursionInsertNode(state.notebookTree, node);
+      recursionInsertNode(state.notebookTree, node)
     },
     // 更新笔记本中的笔记数量
     UPDATE_NOTEBOOK_NOTENUM(state, { notebookCode, type }) {
-      recursionUpdateNoteNum(state.notebookTree, notebookCode, type);
+      recursionUpdateNoteNum(state.notebookTree, notebookCode, type)
     },
     // 设置当前显示模块
     SET_ACTIVE_MODULE(state, moduleName) {
-      state.activeModule = moduleName;
+      state.activeModule = moduleName
     },
     // 设置笔记列表
     SET_NOTE_LIST(state, data) {
-      state.noteList = data;
+      state.noteList = data
       // state.activeModule = 'tree'
     },
     // 显示某笔记右键菜单
     SET_NOTE_RIGHT_KEY_MENU(state, _id) {
       state.noteList.forEach(item => {
         if (item._id === _id) {
-          item.rightKeyMenu = true;
+          item.rightKeyMenu = true
         } else {
-          item.rightKeyMenu = false;
+          item.rightKeyMenu = false
         }
-      });
+      })
     },
     // 添加笔记
     ADD_NOTE(state, data) {
-      state.noteList.unshift(data);
+      state.noteList.unshift(data)
     },
     // 删除笔记
     DELETE_NOTE(state, data) {
-      state.recycleBinNoteNum += 1;
+      state.recycleBinNoteNum += 1
       let index = state.noteList.findIndex(item => {
-        return item._id === data._id;
-      });
-      state.noteList.splice(index, 1);
+        return item._id === data._id
+      })
+      state.noteList.splice(index, 1)
       recursionUpdateNoteNum(
         state.notebookTree,
         data.notebookCode,
-        "deleteNote"
-      );
+        'deleteNote'
+      )
     },
 
     // 还原笔记
     RESTORE_NOTE(state, data) {
-      state.recycleBinNoteNum -= 1;
+      state.recycleBinNoteNum -= 1
       let index = state.noteList.findIndex(item => {
-        return item._id === data._id;
-      });
-      state.noteList.splice(index, 1);
-      recursionUpdateNoteNum(state.notebookTree, data.notebookCode, "addNote");
+        return item._id === data._id
+      })
+      state.noteList.splice(index, 1)
+      recursionUpdateNoteNum(state.notebookTree, data.notebookCode, 'addNote')
     },
 
     // 更新笔记
     UPDATE_NOTE(state, data) {
       let index = state.noteList.findIndex(item => {
-        return item._id === data._id;
-      });
-      state.noteList.splice(index, 1);
-      state.noteList.unshift(data);
+        return item._id === data._id
+      })
+      state.noteList.splice(index, 1)
+      state.noteList.unshift(data)
     },
 
     // 永久性删除笔记
     CLEAR_NOTE(state, data) {
       let index = state.noteList.findIndex(item => {
-        return item._id === data._id;
-      });
-      state.noteList.splice(index, 1);
+        return item._id === data._id
+      })
+      state.noteList.splice(index, 1)
     }
   },
   actions: {
@@ -175,30 +181,30 @@ const home = {
         getNotebookTreeRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("SET_NOTEBOOK_TREE", response.data.tree);
-              resolve();
-              return;
+              commit('SET_NOTEBOOK_TREE', response.data.tree)
+              resolve()
+              return
             }
-            reject(response.data);
+            reject(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 获取笔记本废纸篓笔记数量
     GetRecycleBinNoteNum({ commit }) {
       return new Promise((resolve, reject) => {
         getRecycleBinNoteNumRequest()
           .then(response => {
-            let { recycleBinNoteNum } = response.data;
-            commit("SET_RECYCLE_BIN_NOTENUM", recycleBinNoteNum);
-            resolve();
+            let { recycleBinNoteNum } = response.data
+            commit('SET_RECYCLE_BIN_NOTENUM', recycleBinNoteNum)
+            resolve()
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 创建笔记本
     CreateNotebook({ commit }, data) {
@@ -206,19 +212,19 @@ const home = {
         createNotebookRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("RESERT_NODE_TREE", {
+              commit('RESERT_NODE_TREE', {
                 ...response.data.notebook,
                 label: response.data.notebook.notebookName
-              });
-              resolve();
-              return;
+              })
+              resolve()
+              return
             }
-            reject(response.data);
+            reject(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 删除笔记本
     DeleteNotebook({ commit }, data) {
@@ -226,14 +232,14 @@ const home = {
         deleteNotebookRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("DELETE_NOTEBOOK_TREE", response.data._id);
+              commit('DELETE_NOTEBOOK_TREE', response.data._id)
             }
-            resolve(response.data);
+            resolve(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 更新笔记本
     UpdateNotebook({ commit }, data) {
@@ -241,16 +247,16 @@ const home = {
         updateNotebookRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("SET_UPDATE_NOTEBOOK", null);
-              commit("UPDATE_NOTEBOOK", response.data.data);
-              return resolve();
+              commit('SET_UPDATE_NOTEBOOK', null)
+              commit('UPDATE_NOTEBOOK', response.data.data)
+              return resolve()
             }
-            reject(response.data);
+            reject(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 创建笔记
     CreateNote({ commit }, data) {
@@ -258,65 +264,66 @@ const home = {
         createNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("ADD_NOTE", {
+              commit('ADD_NOTE', {
                 ...response.data.note,
                 createTime: moment(response.data.note.createTime).format(
-                  "YYYY-MM-DD HH:mm:ss"
+                  'YYYY-MM-DD HH:mm:ss'
                 ),
                 rightKeyMenu: false
-              });
-              commit("UPDATE_NOTEBOOK_NOTENUM", {
+              })
+              commit('UPDATE_NOTEBOOK_NOTENUM', {
                 notebookCode: response.data.note.notebookCode,
-                type: "addNote"
-              });
-              commit("SET_ACTIVE_NOTE", response.data.note);
-              return resolve();
+                type: 'addNote'
+              })
+              commit('SET_ACTIVE_NOTE', response.data.note)
+              return resolve()
             }
-            reject(response.data);
+            reject(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 获取笔记本笔记
     GetNoteList({ commit }, data) {
       return new Promise((resolve, reject) => {
         getNoteListRequest(data)
           .then(response => {
-            let { errcode, noteList } = response.data;
+            let { errcode, noteList } = response.data
             if (errcode === 0) {
-              commit("SET_ACTIVE_MODULE", "tree");
+              commit('SET_ACTIVE_MODULE', 'tree')
               noteList.forEach(item => {
                 item.createTime = moment(item.createTime).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                );
-                item.rightKeyMenu = false;
-              });
-              commit("SET_NOTE_LIST", response.data.noteList);
+                  'YYYY-MM-DD HH:mm:ss'
+                )
+                item.rightKeyMenu = false
+              })
+              commit('SET_NOTE_LIST', response.data.noteList)
             }
-            resolve(response.data);
+            resolve(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 获取笔记内容
     GetNoteById({ commit }, data) {
       return new Promise((resolve, reject) => {
         getNoteByIdRequest(data)
           .then(response => {
-            let { errcode, note } = response.data;
+            let { errcode, note } = response.data
             if (errcode === 0) {
-              commit("SET_ACTIVE_NOTE", note);
+              console.log('xml2js', x2js.xml2js(note.noteContent))
+              commit('SET_ACTIVE_NOTE', note)
             }
-            resolve(response.data);
+            resolve(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 更新笔记
     UpdateNote({ commit }, data) {
@@ -324,54 +331,54 @@ const home = {
         updateNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("UPDATE_NOTE", {
+              commit('UPDATE_NOTE', {
                 ...response.data.note,
                 createTime: moment(response.data.note.createTime).format(
-                  "YYYY-MM-DD HH:mm:ss"
+                  'YYYY-MM-DD HH:mm:ss'
                 )
-              });
+              })
               commit(
-                "SET_ACTIVE_NOTE",
+                'SET_ACTIVE_NOTE',
                 JSON.parse(
                   JSON.stringify({
                     ...response.data.note,
                     createTime: moment(response.data.note.createTime).format(
-                      "YYYY-MM-DD HH:mm:ss"
+                      'YYYY-MM-DD HH:mm:ss'
                     )
                   })
                 )
-              );
+              )
             }
-            resolve(response.data);
+            resolve(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 获取废纸篓中的数据
     GetRecycleBinNoteList({ commit }) {
       return new Promise((resolve, reject) => {
         getRecycleBinNoteListRequest()
           .then(response => {
-            let { errcode, noteList } = response.data;
+            let { errcode, noteList } = response.data
             if (errcode === 0) {
-              commit("SET_ACTIVE_MODULE", "recycleBin");
+              commit('SET_ACTIVE_MODULE', 'recycleBin')
               noteList.forEach(item => {
                 item.createTime = moment(item.createTime).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                );
-                item.rightKeyMenu = false;
-              });
-              commit("SET_NOTE_LIST", noteList);
-              return resolve(response.data.noteList);
+                  'YYYY-MM-DD HH:mm:ss'
+                )
+                item.rightKeyMenu = false
+              })
+              commit('SET_NOTE_LIST', noteList)
+              return resolve(response.data.noteList)
             }
-            reject(response.data);
+            reject(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 删除笔记(移入回收站)
     DeleteNote({ commit }, data) {
@@ -379,16 +386,16 @@ const home = {
         deleteNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("DELETE_NOTE", response.data.data);
-              resolve();
-              return;
+              commit('DELETE_NOTE', response.data.data)
+              resolve()
+              return
             }
-            reject(response.data);
+            reject(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 还原笔记(移出回收站)
     RestoreNote({ commit }, data) {
@@ -396,14 +403,14 @@ const home = {
         restoreNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("RESTORE_NOTE", data);
+              commit('RESTORE_NOTE', data)
             }
-            resolve(response.data);
+            resolve(response.data)
           })
           .catch(err => {
-            reject(err);
-          });
-      });
+            reject(err)
+          })
+      })
     },
     // 永久性删除笔记
     ClearNote({ dispatch, commit }, data) {
@@ -411,17 +418,17 @@ const home = {
         clearNoteRequest(data)
           .then(response => {
             if (response.data.errcode === 0) {
-              commit("CLEAR_NOTE", response.data);
-              dispatch("GetRecycleBinNoteNum");
+              commit('CLEAR_NOTE', response.data)
+              dispatch('GetRecycleBinNoteNum')
             }
-            resolve(response.data);
+            resolve(response.data)
           })
           .catch(err => {
-            reject();
-          });
-      });
+            reject()
+          })
+      })
     }
   }
-};
+}
 
-export default home;
+export default home

@@ -63,6 +63,7 @@ export default {
   components: {},
   computed: {
     ...mapState({
+      isMac: state => state.home.isMac,
       editEvent: state => state.home.editEvent,
       activeNotebook: state => state.home.activeNotebook
     })
@@ -82,12 +83,16 @@ export default {
   mounted() {
     this.serverUrl = localStorage.getItem("baseUrl") + "/api/blog/uploadfile";
     this.content = this.editEvent.eventData;
+    this.init()
   },
   methods: {
     ...mapMutations(["SET_ACTIVE_NOTE"]),
-
     ...mapActions(["CreateNote"]),
-
+    init() {
+      $('.ql-container').css({
+        height: isMac ? 'calc(100vh - 75px - 12px)' : 'calc(100vh - 75px - 42px)'
+      })
+    },
     onFocus() {
       this.isEditNoteNameFlag = true;
     },
@@ -240,7 +245,7 @@ export default {
   }
 
   .ql-container {
-    height: calc(100vh - 75px - 42px) !important;
+    // height: calc(100vh - 75px - 42px) !important;
     border: none !important;
     overflow: auto !important;
   }

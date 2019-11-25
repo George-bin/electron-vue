@@ -1,7 +1,18 @@
 <template>
-  <div id="wrapper" @click="recovalNormal">
-    <el-container class="event-list-box">
-      <el-aside class="aside-menu-section" style="width: 240px">
+  <div
+    id="wrapper"
+    @click="recovalNormal">
+    <el-container
+      :style="{
+        paddingTop: isMac ? 0 : '30px'
+      }"
+      class="event-list-box">
+      <el-aside
+        :style="{
+          height: isMac ? '100vh' : 'calc(100vh - 30px)'
+        }"
+        class="aside-menu-section"
+        style="width: 240px">
         <div class="create-note" @click="handleStartCreateNote">
           <i
             class="iconfont icon-jiahao"
@@ -31,7 +42,10 @@
       </el-aside>
 
       <!--右侧显示-->
-      <el-main>
+      <el-main
+        :style="{
+          borderTop: isMac ? 0 : '1px solid #cccccc'
+        }">
         <!--当前笔记本中的笔记-->
         <div class="left-section">
           <note-list></note-list>
@@ -95,6 +109,7 @@ export default {
   },
   computed: {
     ...mapState({
+      isMac: state => state.home.isMac,
       username: state => state.user.username,
       editEvent: state => state.home.editEvent,
       showLeftMenuFlag: state => state.home.showLeftMenuFlag,
@@ -196,9 +211,7 @@ export default {
   height: 100%;
   .event-list-box {
     height: 100%;
-    padding-top: 30px;
     .aside-menu-section {
-      height: calc(100vh - 30px);
       text-align: left;
       line-height: 30px;
       background: #333333;
@@ -262,7 +275,6 @@ export default {
     .el-main {
       display: flex;
       padding: 0;
-      border-top: 1px solid #cccccc;
       transition: margin-left 1s;
       .el-header {
         display: flex;

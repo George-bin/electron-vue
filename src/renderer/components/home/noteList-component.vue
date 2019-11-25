@@ -1,5 +1,9 @@
 <template>
-  <div class="note-list-main-component">
+  <div
+    :style="{
+      height: isMac ? '100vh' : 'calc(100vh - 31px)'
+    }"
+    class="note-list-main-component">
     <div class="search-section">
       <div class="search-content">
         <input
@@ -72,6 +76,7 @@ export default {
   },
   computed: {
     ...mapState({
+      isMac: state => state.home.isMac,
       noteList: state => state.home.noteList,
       activeNote: state => state.home.activeNote
     }),
@@ -221,7 +226,6 @@ export default {
 
 <style lang="scss">
 .note-list-main-component {
-  height: calc(100vh - 31px) !important;
   border-right: 1px solid #cccccc;
   .search-section {
     padding: 5px;

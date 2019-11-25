@@ -1,6 +1,7 @@
 <template>
   <div id="app" @click="handleCloseSet" ref="app">
     <window-frame
+      v-if="!isMac"
       :isLogin="showSetupBtnFlag"
       @openSetup="openSetup.call(this)"
     ></window-frame>
@@ -18,25 +19,26 @@
 </template>
 
 <script>
-import TipsTemplate from "@/components/tips-template";
-import LoadingTemplate from "@/components/loading-template";
-import windowFrame from "@/components/common/windowFrame-component.vue";
-import { mapState, mapMutations, mapActions } from "vuex";
+import TipsTemplate from '@/components/tips-template'
+import LoadingTemplate from '@/components/loading-template'
+import windowFrame from '@/components/common/windowFrame-component.vue'
+import { mapState, mapMutations, mapActions } from 'vuex'
 export default {
-  name: "admin-tools",
+  name: 'admin-tools',
   data() {
     return {
       showSetupBtnFlag: false
-    };
+    }
   },
   components: {
     TipsTemplate,
     LoadingTemplate,
     windowFrame,
-    mainSet: () => import("@/components/mainSet-component.vue")
+    mainSet: () => import('@/components/mainSet-component.vue')
   },
   computed: {
     ...mapState({
+      isMac: state => state.home.isMac,
       resState: state => state.tipsStore.resState, // 操作状态：success error normal
       resMessage: state => state.tipsStore.resMessage, // 操作状态服务器返回信息
       stateTemplateShow: state => state.tipsStore.stateTemplateShow, // 控制状态组件显示
@@ -46,27 +48,38 @@ export default {
   created() {},
   watch: {},
   mounted() {
+    this.init()
     this.$refs.app.ondrop = e => {
-      e.preventDefault();
-    };
+      e.preventDefault()
+    }
     this.$refs.app.ondragenter = e => {
-      e.preventDefault(); // 阻止拖入时的浏览器默认行为
-    };
+      e.preventDefault() // 阻止拖入时的浏览器默认行为
+    }
     this.$refs.app.ondragover = e => {
-      e.preventDefault(); // 阻止拖来拖去的浏览器默认行为
-    };
+      e.preventDefault() // 阻止拖来拖去的浏览器默认行为
+    }
   },
   methods: {
-    ...mapMutations([]),
-    ...mapActions(["Logon"]),
+    ...mapMutations([
+      'SET_ISMAC'
+    ]),
+    ...mapActions(['Logon']),
+    init() {
+      let UA = navigator.userAgent
+      if (UA.indexOf('Mac OS') > -1) {
+        this.SET_ISMAC(true)
+      } else {
+        this.SET_ISMAC(false)
+      }
+    },
     openSetup() {
-      this.$refs.mainSet.$emit("openNetwork");
+      this.$refs.mainSet.$emit('openNetwork')
     },
     handleCloseSet() {
-      this.$refs.mainSet.$emit("closeSet");
+      this.$refs.mainSet.$emit('closeSet')
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
