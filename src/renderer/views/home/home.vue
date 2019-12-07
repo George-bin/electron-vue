@@ -26,7 +26,11 @@
           ></i>
           <span>新建笔记</span>
         </div>
-        <div class="catalog-section">
+        <div
+          :style="{
+            height: isMac ? 'calc(100vh - 45px)' : 'calc(100vh - 75px)'
+          }"
+          class="catalog-section">
           <tree :folder="notebookTree"></tree>
           <div
             class="recycle-bin"
@@ -245,7 +249,6 @@ export default {
         cursor: pointer;
       }
       .catalog-section {
-        height: calc(100vh - 75px);
         overflow: auto;
       }
       .recycle-bin {

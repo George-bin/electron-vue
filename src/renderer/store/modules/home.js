@@ -24,8 +24,6 @@ import {
   recursionUpdateNoteBook
 } from '../../utils/home'
 import moment from 'moment'
-import X2js from 'x2js'
-let x2js = new X2js()
 
 const home = {
   state: {
@@ -146,7 +144,18 @@ const home = {
         'deleteNote'
       )
     },
-
+    // 直接删除笔记
+    DELETE_NOTE_SURE(state, data) {
+      let index = state.noteList.findIndex(item => {
+        return item._id === data._id
+      })
+      state.noteList.splice(index, 1)
+      recursionUpdateNoteNum(
+        state.notebookTree,
+        data.notebookCode,
+        'deleteNote'
+      )
+    },
     // 还原笔记
     RESTORE_NOTE(state, data) {
       state.recycleBinNoteNum -= 1
@@ -156,7 +165,6 @@ const home = {
       state.noteList.splice(index, 1)
       recursionUpdateNoteNum(state.notebookTree, data.notebookCode, 'addNote')
     },
-
     // 更新笔记
     UPDATE_NOTE(state, data) {
       let index = state.noteList.findIndex(item => {
@@ -165,7 +173,6 @@ const home = {
       state.noteList.splice(index, 1)
       state.noteList.unshift(data)
     },
-
     // 永久性删除笔记
     CLEAR_NOTE(state, data) {
       let index = state.noteList.findIndex(item => {
@@ -263,19 +270,23 @@ const home = {
       return new Promise((resolve, reject) => {
         createNoteRequest(data)
           .then(response => {
-            if (response.data.errcode === 0) {
+            let {errcode, note} = response.data
+            if (errcode === 0) {
+              note = JSON.parse(JSON.stringify(note))
+              let {createTime, notebookCode} = note
               commit('ADD_NOTE', {
-                ...response.data.note,
-                createTime: moment(response.data.note.createTime).format(
+                ...note,
+                createTime: moment(createTime).format(
                   'YYYY-MM-DD HH:mm:ss'
                 ),
                 rightKeyMenu: false
               })
               commit('UPDATE_NOTEBOOK_NOTENUM', {
-                notebookCode: response.data.note.notebookCode,
+                notebookCode: notebookCode,
                 type: 'addNote'
               })
-              commit('SET_ACTIVE_NOTE', response.data.note)
+              note.noteContent = note.noteContent.replace(/src="\/file\/uploads\/images\/blog/g, 'src="http://39.105.55.137/file/uploads/images/blog')
+              commit('SET_ACTIVE_NOTE', note)
               return resolve()
             }
             reject(response.data)
@@ -315,7 +326,9 @@ const home = {
           .then(response => {
             let { errcode, note } = response.data
             if (errcode === 0) {
-              console.log('xml2js', x2js.xml2js(note.noteContent))
+              note = JSON.parse(JSON.stringify(note))
+              let str =  note.noteContent.replace(/src="\/file\/uploads\/images\/blog/g, 'src="http://39.105.55.137/file/uploads/images/blog')
+              note.noteContent = str
               commit('SET_ACTIVE_NOTE', note)
             }
             resolve(response.data)
@@ -330,10 +343,14 @@ const home = {
       return new Promise((resolve, reject) => {
         updateNoteRequest(data)
           .then(response => {
+            let { note } = response.data
             if (response.data.errcode === 0) {
+              note = JSON.parse(JSON.stringify(note))
+              let { createTime } = note
+              note.noteContent =  note.noteContent.replace(/src="\/file\/uploads\/images\/blog/g, 'src="http://39.105.55.137/file/uploads/images/blog')
               commit('UPDATE_NOTE', {
-                ...response.data.note,
-                createTime: moment(response.data.note.createTime).format(
+                ...note,
+                createTime: moment(createTime).format(
                   'YYYY-MM-DD HH:mm:ss'
                 )
               })
@@ -341,8 +358,8 @@ const home = {
                 'SET_ACTIVE_NOTE',
                 JSON.parse(
                   JSON.stringify({
-                    ...response.data.note,
-                    createTime: moment(response.data.note.createTime).format(
+                    ...note,
+                    createTime: moment(createTime).format(
                       'YYYY-MM-DD HH:mm:ss'
                     )
                   })
@@ -419,7 +436,11 @@ const home = {
           .then(response => {
             if (response.data.errcode === 0) {
               commit('CLEAR_NOTE', response.data)
-              dispatch('GetRecycleBinNoteNum')
+              if (data.type === 'clear') {
+                dispatch('GetRecycleBinNoteNum')
+              } else {
+                commit('DELETE_NOTE_SURE', data.note)
+              }
             }
             resolve(response.data)
           })

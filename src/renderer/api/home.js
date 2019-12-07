@@ -29,10 +29,10 @@ export function createNotebookRequest(data) {
 // 创建笔记
 export function createNoteRequest(data) {
   return request({
-    url: "/createNote",
+    url: "/create/note",
     method: "post",
     data: data
-  });
+  })
 }
 
 // 删除笔记本
@@ -41,13 +41,13 @@ export function deleteNotebookRequest(data) {
     url: "/deleteNotebook",
     method: "post",
     data: data
-  });
+  })
 }
 
 // 更新笔记本
 export function updateNotebookRequest(data) {
   return request({
-    url: `/updateNotebook/${data._id}`,
+    url: `/update/notebook/${data._id}`,
     method: "put",
     data: data
   });
@@ -100,17 +100,17 @@ export function restoreNoteRequest(data) {
 
 // 永久性删除笔记
 export function clearNoteRequest(data) {
+  let { note, type } = data
   return request({
-    url: `/clearNote/${data._id}`,
-    method: "put",
-    data: data
+    url: `/clear/note/${note._id}/${type}`,
+    method: "delete"
   });
 }
 
-// 删除(移入回收站)
+// 删除笔记(移入回收站)
 export function deleteNoteRequest(data) {
   return request({
-    url: `/deleteNote/${data._id}`,
+    url: `/delete/note/${data._id}`,
     method: "put",
     data: data
   });

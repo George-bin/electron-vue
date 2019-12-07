@@ -1,6 +1,6 @@
 <template>
   <ul class="tree-main-component">
-    <li class="tree-item" v-for="item in folder">
+    <li v-for="(item, index) in folder" :key="index" class="tree-item">
       <div
         class="notebook-name"
         @click="handleSelectNode(item)"
@@ -48,7 +48,7 @@
         <li @click="startCreateNotebook(item)">
           在“{{ item.label }}”中创建笔记本
         </li>
-        <li v-if="item.nodeClass !== 1" @click="startUpdateNotebook(item)">
+        <li v-if="item.nodeClass !== 1" @click="handleClickStartUpdateNotebook(item)">
           重命名
         </li>
         <li v-if="item.nodeClass !== 1" @click="handleDeleteBotebook(item)">
@@ -64,7 +64,7 @@
         class="right-key-menu-list"
         :style="{ top: rightKeyMenuPosition.y, left: rightKeyMenuPosition.x }"
       >
-        <li v-if="item.nodeClass !== 1" @click="startUpdateNotebook(item)">
+        <li v-if="item.nodeClass !== 1" @click="handleClickStartUpdateNotebook(item)">
           重命名
         </li>
         <li @click="startCreateNote(item)">新建笔记</li>
@@ -211,7 +211,7 @@ export default {
     },
 
     // 准备更新笔记本
-    startUpdateNotebook(notebook) {
+    handleClickStartUpdateNotebook(notebook) {
       this.SET_UPDATE_NOTEBOOK(notebook);
     }
   }

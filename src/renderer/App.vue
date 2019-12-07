@@ -1,10 +1,5 @@
 <template>
   <div id="app" @click="handleCloseSet" ref="app">
-    <window-frame
-      v-if="!isMac"
-      :isLogin="showSetupBtnFlag"
-      @openSetup="openSetup.call(this)"
-    ></window-frame>
     <router-view></router-view>
 
     <!-- 数据请求客户提示 -->
@@ -13,8 +8,15 @@
     <!-- Loading组件 -->
     <!--<loading-template :loadingShow="loadingShow"></loading-template>-->
 
-    <!--设置选项-->
-    <main-set ref="mainSet"></main-set>
+    <!-- mac -->
+    <template v-if="isMac">
+      <network-set-component ref="networkSet"></network-set-component>
+    </template>
+    <!--window-->
+    <template v-else>
+      <window-frame :isLogin="showSetupBtnFlag" @openSetup="openSetup.call(this)"></window-frame>
+      <main-set v-if="!isMac" ref="mainSet"></main-set>
+    </template>
   </div>
 </template>
 
@@ -23,6 +25,7 @@ import TipsTemplate from '@/components/tips-template'
 import LoadingTemplate from '@/components/loading-template'
 import windowFrame from '@/components/common/windowFrame-component.vue'
 import { mapState, mapMutations, mapActions } from 'vuex'
+import { ipcRenderer } from 'electron'
 export default {
   name: 'admin-tools',
   data() {
@@ -34,7 +37,8 @@ export default {
     TipsTemplate,
     LoadingTemplate,
     windowFrame,
-    mainSet: () => import('@/components/mainSet-component.vue')
+    mainSet: () => import('@/components/mainSet-component.vue'),
+    NetworkSetComponent: () => import('@/components/common/NetworkSetComponent')
   },
   computed: {
     ...mapState({
@@ -49,6 +53,7 @@ export default {
   watch: {},
   mounted() {
     this.init()
+    this.handleInitIpcMainEvent()
     this.$refs.app.ondrop = e => {
       e.preventDefault()
     }
@@ -72,10 +77,51 @@ export default {
         this.SET_ISMAC(false)
       }
     },
+    // 初始化主进程事件(mac)
+    handleInitIpcMainEvent() {
+      // 退出登陆
+      ipcRenderer.on('logout', (event, arg) => {
+        this.handleLogon()
+      })
+      // 网络设置
+      ipcRenderer.on('network-set', (event, arg) => {
+        this.$refs.networkSet.$emit('setNetwork')
+      })
+    },
+    // 注销(mac)
+    handleLogon() {
+      this.$confirm("确定退出登录吗?", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          let data = {
+            username: localStorage.getItem("username")
+          };
+          this.Logon(data)
+            .then(data => {
+              if (data.errcode === 0) {
+                this.$message({
+                  type: "success",
+                  message: "注销成功!",
+                  duration: 1500
+                });
+                if (this.isMac) {
+                  ipcRenderer.send('logout')
+                }
+                this.$router.push("/login");
+              }
+            })
+            .catch(err => {
+              this.$router.push("/login");
+            });
+        })
+        .catch(() => {});
+    },
     openSetup() {
       this.$refs.mainSet.$emit('openNetwork')
     },
     handleCloseSet() {
+      if (this.isMac) return
       this.$refs.mainSet.$emit('closeSet')
     }
   }

@@ -3,7 +3,6 @@
     <ul v-if="eventList.length" class="event-list">
       <li
         v-for="item in filterEventList"
-        v-if="item.status !== 2"
         :key="item._id">
         <div class="item-content" @click="goEventDetail(item)">
           <strong class="event-name">{{item.eventName}}</strong>
@@ -11,19 +10,6 @@
         </div>
         <span class="edit-button" @click="endEvent(item)">完成</span>
         <span class="edit-button" @click="addRecycleBin(item)">丢弃</span>
-        <!--<template v-if="item.status === 0 || item.status === 3">-->
-          <!--<span class="edit-button" v-if="item.status === 0" @click="addNowEndEventList(item)">今日完成</span>-->
-          <!--<span class="edit-button" v-else-if="item.status === 3" @click="outInRecycleBin(item)">暂缓完成</span>-->
-          <!--<span class="edit-button" @click="endEvent(item)">完成</span>-->
-          <!--<span class="edit-button" @click="addRecycleBin(item)">丢弃</span>-->
-        <!--</template>-->
-        <!--<template v-else-if="item.state === 1">-->
-          <!--<span class="edit-button" @click="addToNoEndEvent(item)">尚未完成</span>-->
-        <!--</template>-->
-        <!--<template v-else>-->
-          <!--<span class="edit-button" @click="clearEvent(item)">销毁</span>-->
-          <!--<span class="edit-button" @click="outInRecycleBin(item)">恢复</span>-->
-        <!--</template>-->
       </li>
     </ul>
     <div v-else class="sweet-tip">
@@ -50,7 +36,7 @@
       }),
       filterEventList () {
         return this.eventList.filter(item => {
-          return item.eventName.indexOf(this.searchContent) > -1
+          return item.eventName.indexOf(this.searchContent) > -1 && item.status !== 2 
         })
       }
     },

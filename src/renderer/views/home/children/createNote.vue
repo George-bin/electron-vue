@@ -9,15 +9,15 @@
         }"
         v-model="note.noteName"
         type="text"
-        @focus="onFocus"
-        @blur="onBlur"
-      />
+        @focus="onNoteNameFocus"
+        @blur="onNoteNameBlur"/>
       <select class="set-note-label" v-model="note.noteLabel">
         <option value="main-body" selected>正文</option>
         <option value="draft">草稿</option>
       </select>
     </el-header>
     <div class>
+      <!-- 图片上传组件 start -->
       <el-upload
         v-show="false"
         class="avatar-uploader"
@@ -28,6 +28,7 @@
         :on-error="handleUploadImgError"
         :before-upload="handleBeforeUploadImg"
       ></el-upload>
+      <!-- 图片上传组件 end -->
       <el-row v-loading="uploadingImg">
         <quill-editor
           v-model="note.noteContent"
@@ -43,22 +44,22 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
-import editorConfig from "../../../assets/js/editorConfig";
+import { mapState, mapMutations, mapActions } from 'vuex'
+import editorConfig from '../../../assets/js/editorConfig'
 export default {
   data() {
     return {
       note: {
-        noteName: "",
-        noteContent: "",
-        noteLabel: "draft"
+        noteName: '',
+        noteContent: '',
+        noteLabel: 'draft'
       },
       // 是否编辑编辑标题
-      isEditNoteNameFlag: "",
+      isEditNoteNameFlag: '',
       editorOption: editorConfig,
-      serverUrl: "",
-      uploadingImg: ""
-    };
+      serverUrl: '',
+      uploadingImg: ''
+    }
   },
   components: {},
   computed: {
@@ -71,88 +72,88 @@ export default {
   watch: {
     editEvent: {
       handler: function(val, oldval) {
-        this.content = val.eventData;
+        this.content = val.eventData
       },
       deep: true
     }
   },
   created() {
-    // debugger
-    console.log(this.$route.params);
   },
   mounted() {
-    this.serverUrl = localStorage.getItem("baseUrl") + "/api/blog/uploadfile";
-    this.content = this.editEvent.eventData;
+    this.serverUrl = localStorage.getItem('baseUrl') + '/api/blog/uploadfile'
+    this.content = this.editEvent.eventData
     this.init()
   },
   methods: {
-    ...mapMutations(["SET_ACTIVE_NOTE"]),
-    ...mapActions(["CreateNote"]),
+    ...mapMutations(['SET_ACTIVE_NOTE']),
+    ...mapActions(['CreateNote']),
     init() {
       $('.ql-container').css({
-        height: isMac ? 'calc(100vh - 75px - 12px)' : 'calc(100vh - 75px - 42px)'
+        height: this.isMac ? 'calc(100vh - 75px - 12px)' : 'calc(100vh - 75px - 42px)'
       })
     },
-    onFocus() {
-      this.isEditNoteNameFlag = true;
+    onNoteNameFocus() {
+      this.isEditNoteNameFlag = true
     },
 
-    onBlur() {
-      this.isEditNoteNameFlag = false;
+    onNoteNameBlur() {
+      this.isEditNoteNameFlag = false
     },
 
     // 创建笔记
     handleCreateNote() {
+      this.note.noteContent = this.note.noteContent.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog')
+      let username = localStorage.getItem('username')
       this.CreateNote({
         noteName: this.note.noteName,
         noteContent: this.note.noteContent,
         noteLabel: this.note.noteLabel,
         notebookName: this.activeNotebook.notebookName,
-        username: localStorage.getItem("username"),
+        username: username,
         notebookCode: this.activeNotebook.notebookCode,
         status: 0,
-        flag: "note",
+        flag: 'note',
         noteNum: this.activeNotebook.noteNum
       })
         .then(data => {
           this.$message({
-            message: "笔记创建成功!",
-            type: "success",
+            message: '笔记创建成功!',
+            type: 'success',
             duration: 1500
-          });
-          this.$router.push("/home/noteDetail");
+          })
+          this.$router.push('/home/noteDetail')
         })
         .catch(err => {
           if (err.errcode) {
             this.$message({
               message: err.message,
-              type: "error",
+              type: 'error',
               duration: 1500
-            });
-            return;
+            })
+            return
           }
           this.$message({
-            message: "网络错误!",
-            type: "error",
+            message: '网络错误!',
+            type: 'error',
             duration: 1500
-          });
-        });
+          })
+        })
     },
 
     // 取消编辑
     cancelEditor() {
-      this.$confirm("确定取消编辑吗?", "提示", {
-        type: "warning"
+      this.$confirm('确定取消编辑吗?', '提示', {
+        type: 'warning'
       })
         .then(() => {
-          this.$router.back();
+          this.$router.back()
         })
-        .catch(() => {});
+        .catch(() => {})
     },
 
     // 失去焦点事件
     onEditorBlur(event) {
-      console.log(this.content);
+      console.log(this.content)
     },
 
     // 获得焦点事件
@@ -163,46 +164,46 @@ export default {
 
     // 图片上传成功
     handleUploadImgSuccess(res) {
-      this.uploadingImg = false;
+      this.uploadingImg = false
       // 获取富文本组件实例
-      let quill = this.$refs.myQuillEditor.quill;
+      let quill = this.$refs.myQuillEditor.quill
       // 如果上传成功
       if (res.errcode === 0 && res.filePath) {
         // 获取光标所在位置
-        let length = quill.getSelection().index;
+        let length = quill.getSelection().index
         // 插入图片  res.info为服务器返回的图片地址
-        // console.log("图片地址:", `${baseUrl}${res.filePath}`);
+        // console.log('图片地址:', `${baseUrl}${res.filePath}`)
         quill.insertEmbed(
           length,
-          "image",
+          'image',
           `http://${
-            process.env.NODE_ENV === "production"
-              ? "39.105.55.137"
+            process.env.NODE_ENV === 'production'
+              ? '39.105.55.137'
               : location.hostname
           }${res.filePath}`
-        );
+        )
         // 调整光标到最后
-        quill.setSelection(length + 1);
+        quill.setSelection(length + 1)
       } else {
-        this.$message.error("图片插入失败");
+        this.$message.error('图片插入失败')
       }
     },
 
     // 图片上传失败
     handleUploadImgError() {
-      this.uploadingImg = false;
+      this.uploadingImg = false
       this.$message({
-        type: "error",
-        message: "图片上传失败!"
-      });
+        type: 'error',
+        message: '图片上传失败!'
+      })
     },
 
     // 上传图片之前
     handleBeforeUploadImg() {
-      this.uploadingImg = true;
+      this.uploadingImg = true
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

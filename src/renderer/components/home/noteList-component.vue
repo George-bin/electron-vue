@@ -40,10 +40,10 @@
           :style="{ top: rightKeyMenuPosition.y, left: rightKeyMenuPosition.x }"
         >
           <template v-if="item.status === 0">
-            <li class="right-key-menu-item" @click="handleDeleteNote(item)">
+            <li class="right-key-menu-item" @click="handleClickDeleteNote(item)">
               删除笔记
             </li>
-            <li class="right-key-menu-item" @click="handleClearNote(item)">
+            <li class="right-key-menu-item" @click="handleClickClearNote(item, 'delete')">
               永久删除笔记
             </li>
           </template>
@@ -51,7 +51,7 @@
             <li class="right-key-menu-item" @click="handleRestoreNote(item)">
               还原笔记
             </li>
-            <li class="right-key-menu-item" @click="handleClearNote(item)">
+            <li class="right-key-menu-item" @click="handleClickClearNote(item, 'clear')">
               永久删除笔记
             </li>
           </template>
@@ -62,17 +62,17 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
+import { mapState, mapMutations, mapActions } from 'vuex'
 export default {
   data() {
     return {
-      searchContent: "",
+      searchContent: '',
       // 右键菜单的位置
       rightKeyMenuPosition: {
         x: 0,
         y: 0
       }
-    };
+    }
   },
   computed: {
     ...mapState({
@@ -82,46 +82,49 @@ export default {
     }),
     filterNoteList() {
       return this.noteList.filter(item => {
-        return item.noteName.indexOf(this.searchContent) > -1;
-      });
+        return item.noteName.indexOf(this.searchContent) > -1
+      })
     }
   },
   watch: {},
   methods: {
-    ...mapMutations(["SET_ACTIVE_NOTE", "SET_NOTE_RIGHT_KEY_MENU"]),
-    ...mapActions(["DeleteNote", "RestoreNote", "ClearNote", "GetNoteById"]),
+    ...mapMutations(['SET_ACTIVE_NOTE', 'SET_NOTE_RIGHT_KEY_MENU']),
+    ...mapActions([
+      'DeleteNote',
+      'RestoreNote',
+      'ClearNote',
+      'GetNoteById'
+    ]),
     // 显示右键菜单
     handleShowRightKeyMenu(event, note) {
-      console.log(note);
-      this.rightKeyMenuPosition.x = event.x + "px";
-      this.rightKeyMenuPosition.y = event.y + "px";
-      this.SET_NOTE_RIGHT_KEY_MENU(note._id);
-      this.SET_ACTIVE_NOTE(note);
+      console.log(note)
+      this.rightKeyMenuPosition.x = event.x + 'px'
+      this.rightKeyMenuPosition.y = event.y + 'px'
+      this.SET_NOTE_RIGHT_KEY_MENU(note._id)
+      this.SET_ACTIVE_NOTE(note)
     },
     // 清空搜索框
     clearSearchContent() {
-      this.searchContent = "";
+      this.searchContent = ''
     },
-
     // 查看笔记详情
     handleGoNoteDetail(note) {
-      this.SET_ACTIVE_NOTE({});
+      this.SET_ACTIVE_NOTE({})
       this.GetNoteById(note._id)
         .then(() => {
-          this.$router.push("/home/noteDetail");
+          this.$router.push('/home/noteDetail')
         })
         .catch(err => {
           this.$message({
-            type: "error",
-            message: "获取笔记失败!"
-          });
-        });
+            type: 'error',
+            message: '获取笔记失败!'
+          })
+        })
     },
-
     // 删除笔记
-    handleDeleteNote(note) {
-      this.$confirm("确定删除该笔记吗?", "提示", {
-        type: "warning"
+    handleClickDeleteNote(note) {
+      this.$confirm('确定删除该笔记吗?', '提示', {
+        type: 'warning'
       })
         .then(() => {
           this.DeleteNote({
@@ -130,34 +133,33 @@ export default {
           })
             .then(data => {
               this.$message({
-                message: "笔记已删除，可在废纸篓中查看!"
-              });
-              this.$router.push("/home/noContent");
+                message: '笔记已删除，可在废纸篓中查看!'
+              })
+              this.$router.push('/home/noContent')
             })
             .catch(err => {
               if (err.errcode) {
                 this.$message({
                   message: err.message,
-                  type: "error",
+                  type: 'error',
                   duration: 1500
-                });
-                return;
+                })
+                return
               }
               this.$message({
-                message: "网络错误!",
-                type: "error",
+                message: '网络错误!',
+                type: 'error',
                 duration: 1500
-              });
-            });
+              })
+            })
         })
-        .catch(() => {});
+        .catch(() => {})
     },
-
     // 还原笔记
     handleRestoreNote(note) {
-      this.SET_NOTE_RIGHT_KEY_MENU("");
-      this.$confirm("确定还原笔记吗？", "提示", {
-        type: "warning"
+      this.SET_NOTE_RIGHT_KEY_MENU('')
+      this.$confirm('确定还原笔记吗？', '提示', {
+        type: 'warning'
       })
         .then(data => {
           this.RestoreNote({
@@ -168,60 +170,59 @@ export default {
               if (data.errcode !== 0) {
                 this.$message({
                   message: data.message,
-                  type: "error",
+                  type: 'error',
                   duration: 1500
-                });
+                })
               }
-              this.$router.push("/home/noContent");
+              this.$router.push('/home/noContent')
             })
             .catch(err => {
               this.$message({
-                message: "网络错误!",
-                type: "error",
+                message: '网络错误!',
+                type: 'error',
                 duration: 1500
-              });
-            });
+              })
+            })
         })
         .catch(err => {
-          console.log("取消还原笔记!", err);
-        });
+          console.log('取消还原笔记!', err)
+        })
     },
-
     // 永久删除笔记
-    handleClearNote(note) {
-      this.SET_NOTE_RIGHT_KEY_MENU("");
-      this.$confirm("确定永久性删除该笔记吗?", "提示", {
-        type: "warning"
+    handleClickClearNote(note, type) {
+      this.SET_NOTE_RIGHT_KEY_MENU('')
+      this.$confirm('确定永久性删除该笔记吗?', '提示', {
+        type: 'warning'
       }).then(() => {
-        this.ClearNote(note)
+        this.ClearNote({note, type})
           .then(data => {
             if (data.errcode === 0) {
               this.$message({
-                type: "success",
-                message: "删除笔记成功!",
+                type: 'success',
+                message: '删除笔记成功!',
                 duration: 1500
-              });
-              this.$router.push("/home/noContent");
+              })
+              this.$router.push('/home/noContent')
             } else {
               this.$message({
-                type: "warning",
+                type: 'warning',
                 message: data.message,
                 duration: 1500
-              });
+              })
             }
           })
           .catch(err => {
             this.$message({
-              message: "网络错误!",
-              type: "error",
+              message: '网络错误!',
+              type: 'error',
               duration: 1500
-            });
-            console.log("永久删除笔记失败!", err);
-          });
-      });
+            })
+            console.log('永久删除笔记失败!', err)
+          })
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

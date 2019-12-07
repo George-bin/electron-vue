@@ -107,6 +107,7 @@ export default {
         /\<p\>\<br\>\<\/p\>\<pre/g,
         '\<pre'
       )
+      content = content.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog')
       this.UpdateNote({
         ...this.activeNote,
         noteLabel: this.note.noteLabel,
