@@ -2,12 +2,12 @@ import { loginRequest, registerRequest, logonRequest } from "../../api/user";
 
 const user = {
   state: {
-    // 用户名
-    username: ""
+    // 用户信息
+    userInfo: {}
   },
   mutations: {
-    SET_USERNAME: function(state, data) {
-      state.username = data;
+    SET_USER_INFO: function(state, data) {
+      state.userInfo = data;
     }
   },
   actions: {
@@ -15,12 +15,12 @@ const user = {
     Login({ commit }, data) {
       return new Promise((resolve, reject) => {
         loginRequest(data)
-          .then(response => {
-            let { errcode } = response.data;
+          .then(res => {
+            let { errcode, userInfo } = res.data;
             if (errcode === 0) {
-              commit("SET_USERNAME", data.username);
+              commit("SET_USER_INFO", userInfo);
             }
-            resolve(response.data);
+            resolve(res.data);
           })
           .catch(err => {
             reject(err);
@@ -44,9 +44,9 @@ const user = {
       });
     },
     // 注销登录
-    Logon({ commit }, data) {
+    Logon({ commit }) {
       return new Promise((resolve, reject) => {
-        logonRequest(data)
+        logonRequest()
           .then(response => {
             commit("SET_NOTE_LIST", []);
             commit("SET_ACTIVE_MODULE", "");

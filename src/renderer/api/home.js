@@ -3,24 +3,16 @@ import { request } from "../utils/request";
 // 获取笔记本结构树
 export function getNotebookTreeRequest(data) {
   return request({
-    url: `/getNotebookTree`,
+    url: `/notebook`,
     method: "get",
     params: data
-  });
-}
-
-// 获取笔记本废纸篓笔记数量
-export function getRecycleBinNoteNumRequest() {
-  return request({
-    url: "/getRecycleBinNoteNum",
-    method: "get"
   });
 }
 
 // 创建笔记本
 export function createNotebookRequest(data) {
   return request({
-    url: "/createNotebook",
+    url: "/notebook",
     method: "post",
     data: data
   });
@@ -29,53 +21,48 @@ export function createNotebookRequest(data) {
 // 创建笔记
 export function createNoteRequest(data) {
   return request({
-    url: "/create/note",
+    url: "/note",
     method: "post",
     data: data
   })
 }
 
 // 删除笔记本
-export function deleteNotebookRequest(data) {
+export function deleteNotebookRequest(id) {
   return request({
-    url: "/deleteNotebook",
-    method: "post",
-    data: data
+    url: `/notebook/${id}`,
+    method: "delete"
   })
 }
 
 // 更新笔记本
 export function updateNotebookRequest(data) {
   return request({
-    url: `/update/notebook/${data._id}`,
+    url: `/notebook`,
     method: "put",
     data: data
   });
 }
 
 // 获取笔记列表
-export function getNoteListRequest(data) {
+export function getNoteListRequest(id) {
   return request({
-    url: "/getNoteListByClassify",
-    method: "get",
-    params: data
+    url: `/notelist/${id}`,
+    method: "get"
   });
 }
 
 // 获取笔记内容
-export function getNoteByIdRequest(data) {
+export function getNoteByIdRequest(id) {
   return request({
-    url: `/getNoteById`,
-    params: {
-      _id: data
-    }
+    url: `/note/${id}`,
   });
 }
 
 // 更新笔记
 export function updateNoteRequest(data) {
   return request({
-    url: `/updateNote/${data._id}`,
+    url: `/note`,
     method: "put",
     data: data
   });
@@ -84,34 +71,31 @@ export function updateNoteRequest(data) {
 // 获取废纸篓数据
 export function getRecycleBinNoteListRequest() {
   return request({
-    url: "/getRecycleBinNoteList",
+    url: "/trash",
     method: "get"
   });
 }
 
 // 还原笔记
-export function restoreNoteRequest(data) {
+export function restoreNoteRequest(_id) {
   return request({
-    url: `/restoreNote/${data._id}`,
-    method: "put",
-    data: data
+    url: `/noteToNotebook/${_id}`,
+    method: "put"
   });
 }
 
 // 永久性删除笔记
-export function clearNoteRequest(data) {
-  let { note, type } = data
+export function clearNoteRequest(_id) {
   return request({
-    url: `/clear/note/${note._id}/${type}`,
+    url: `/note/${_id}`,
     method: "delete"
   });
 }
 
 // 删除笔记(移入回收站)
-export function deleteNoteRequest(data) {
+export function deleteNoteRequest(_id) {
   return request({
-    url: `/delete/note/${data._id}`,
-    method: "put",
-    data: data
+    url: `/noteToTrash/${_id}`,
+    method: "put"
   });
 }

@@ -1,22 +1,18 @@
 <template>
-  <div class="create-note-main-component" @keyup.ctrl.83="handleCreateNote">
-    <el-header class="title-section">
+  <div class="note-info-component" @keyup.ctrl.83="handleSaveNote">
+    <header class="title-section">
       <input
-        placeholder="标题"
+        placeholder="文章标题"
         class="note-title-input"
-        :style="{
-          border: isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'
-        }"
-        v-model="note.noteName"
+        v-model="note.title"
         type="text"
-        @focus="onNoteNameFocus"
-        @blur="onNoteNameBlur"/>
-      <select class="set-note-label" v-model="note.noteLabel">
-        <option value="main-body" selected>正文</option>
+        @keyup.enter="handleQuillFocus" />
+      <select class="set-note-label" v-model="note.label">
+        <option value="main" selected>正文</option>
         <option value="draft">草稿</option>
       </select>
-    </el-header>
-    <div class>
+    </header>
+    <div>
       <!-- 图片上传组件 start -->
       <el-upload
         v-show="false"
@@ -31,7 +27,7 @@
       <!-- 图片上传组件 end -->
       <el-row v-loading="uploadingImg">
         <quill-editor
-          v-model="note.noteContent"
+          v-model="note.content"
           ref="myQuillEditor"
           :options="editorOption"
           @blur="onEditorBlur($event)"
@@ -44,35 +40,46 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex'
-import editorConfig from '../../../assets/js/editorConfig'
+import { mapState, mapMutations, mapActions } from 'vuex';
+import editorConfig from '../../assets/js/editorConfig';
 export default {
+  components: {},
   data() {
     return {
       note: {
-        noteName: '',
-        noteContent: '',
-        noteLabel: 'draft'
+        title: '', // 笔记标题
+        content: '', // 笔记内容
+        status: 1, // 笔记状态 0：未完成 1：已完成 2：进入回收站
+        createTime: null, // 创建时间
+        updateTime: null, // 更新时间
+        label: 'draft', // 关联标签 draft：草稿 main：正文
+        account: '', // 关联账户
+        notebookId: '' // 笔记本id
       },
+      oldNote: null,
       // 是否编辑编辑标题
       isEditNoteNameFlag: '',
       editorOption: editorConfig,
       serverUrl: '',
-      uploadingImg: ''
+      uploadingImg: '',
+      // 当前光标位置
+      activeLocation: 0,
+      // 富文本对象
+      quill: null,
+      // 是否获得焦点
+      quillFocusFlag: false
     }
   },
-  components: {},
   computed: {
     ...mapState({
       isMac: state => state.home.isMac,
-      editEvent: state => state.home.editEvent,
-      activeNotebook: state => state.home.activeNotebook
+      activeNote: state => state.note.activeNote
     })
   },
   watch: {
-    editEvent: {
+    activeNote: {
       handler: function(val, oldval) {
-        this.content = val.eventData
+        this.note = JSON.parse(JSON.stringify(val))
       },
       deep: true
     }
@@ -80,84 +87,63 @@ export default {
   created() {
   },
   mounted() {
-    this.serverUrl = localStorage.getItem('baseUrl') + '/api/blog/uploadfile'
-    this.content = this.editEvent.eventData
-    this.init()
+    this.serverUrl = localStorage.getItem('baseUrl') + '/api/blog/uploadfile';
+    this.quill = this.$refs.myQuillEditor.quill;
+    this.init();
+    this.$nextTick(() => {
+      this.$on('updateSuccess', () => {
+        this.quill.setSelection(this.activeLocation)
+        this.uploadingImg = false;
+      })
+      this.$on('updateFail', () => {
+        this.quill.setSelection(this.activeLocation)
+        this.uploadingImg = false;
+      })
+    })
   },
   methods: {
-    ...mapMutations(['SET_ACTIVE_NOTE']),
-    ...mapActions(['CreateNote']),
+    ...mapMutations([]),
+    ...mapActions([]),
     init() {
       $('.ql-container').css({
-        height: this.isMac ? 'calc(100vh - 75px - 12px)' : 'calc(100vh - 75px - 42px)'
-      })
-    },
-    onNoteNameFocus() {
-      this.isEditNoteNameFlag = true
+        height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 75px - 42px)'
+      });
     },
 
-    onNoteNameBlur() {
-      this.isEditNoteNameFlag = false
+    // 主动获取焦点
+    handleQuillFocus() {
+      this.$refs.myQuillEditor.quill.focus();
     },
 
-    // 创建笔记
-    handleCreateNote() {
-      this.note.noteContent = this.note.noteContent.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog')
-      let username = localStorage.getItem('username')
-      this.CreateNote({
-        noteName: this.note.noteName,
-        noteContent: this.note.noteContent,
-        noteLabel: this.note.noteLabel,
-        notebookName: this.activeNotebook.notebookName,
-        username: username,
-        notebookCode: this.activeNotebook.notebookCode,
-        status: 0,
-        flag: 'note',
-        noteNum: this.activeNotebook.noteNum
-      })
-        .then(data => {
-          this.$message({
-            message: '笔记创建成功!',
-            type: 'success',
-            duration: 1500
-          })
-          this.$router.push('/home/noteDetail')
-        })
-        .catch(err => {
-          if (err.errcode) {
-            this.$message({
-              message: err.message,
-              type: 'error',
-              duration: 1500
-            })
-            return
-          }
-          this.$message({
-            message: '网络错误!',
-            type: 'error',
-            duration: 1500
-          })
-        })
+    // 保存笔记
+    handleSaveNote() {
+      let { path } = this.$route;
+      // 保存当前文档内容，避免操作失败
+      this.oldNote = JSON.parse(JSON.stringify(this.note));
+      if (this.quillFocusFlag) {
+        this.activeLocation = this.quill.getSelection().index;
+      }
+      if (path === '/home/createNote') {
+        this.$emit('createNote', this.note)
+      } else {
+        this.$emit('updateNote', this.note)
+      }
     },
 
-    // 取消编辑
-    cancelEditor() {
-      this.$confirm('确定取消编辑吗?', '提示', {
-        type: 'warning'
-      })
-        .then(() => {
-          this.$router.back()
-        })
-        .catch(() => {})
+    onUpdateSuccess() {
+
     },
 
     // 失去焦点事件
     onEditorBlur(event) {
-      console.log(this.content)
+      this.quillFocusFlag = false;
+      // console.log(this.content)
     },
 
     // 获得焦点事件
-    onEditorFocus() {},
+    onEditorFocus() {
+      this.quillFocusFlag = true;
+    },
 
     // 内容改变事件
     onEditorChange() {},
@@ -207,26 +193,24 @@ export default {
 </script>
 
 <style lang="scss">
-.create-note-main-component {
+.note-info-component {
   .title-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 45px !important;
+    height: 54px !important;
     padding: 0 5px;
     border-bottom: 1px solid #cccccc;
     text-align: right;
     background: #ffffff !important;
     .note-title-input {
       flex: 1;
-      height: 30px;
-      line-height: 30px;
+      height: 36px;
+      line-height: 36px;
       padding: 0 5px;
-      border: 1px solid #ffffff;
+      border: none;
+      border-bottom: 1px solid #f1f1f1;
       outline: none;
-    }
-    .note-title-input:hover {
-      border: 1px solid #cccccc !important;
     }
     .set-note-label {
       width: 60px;

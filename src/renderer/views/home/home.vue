@@ -11,37 +11,25 @@
         :style="{
           height: isMac ? '100vh' : 'calc(100vh - 30px)'
         }"
-        class="aside-menu-section"
-        style="width: 240px">
-        <div class="create-note" @click="handleStartCreateNote">
-          <i
-            class="iconfont icon-jiahao"
-            :style="{
-              background:
-                activeNotebook.nodeClass === 3 ||
-                activeNotebook.notebookCode === '-2'
-                  ? 'orange'
-                  : 'gray'
-            }"
-          ></i>
-          <span>新建笔记</span>
-        </div>
+        class="aside-menu-section">
+        <!-- 用户信息 -->
+        <user-info></user-info>
         <div
           :style="{
-            height: isMac ? 'calc(100vh - 45px)' : 'calc(100vh - 75px)'
+            height: isMac ? 'calc(100vh - 105px)' : 'calc(100vh - 75px)'
           }"
           class="catalog-section">
+          <!-- 结构树 -->
           <tree :folder="notebookTree"></tree>
-          <div
-            class="recycle-bin"
-            @click="getRecycleBinNoteList"
-            :style="{
-              background: activeModule === 'recycleBin' ? '#525252' : 'none'
-            }"
-          >
-            <i class="iconfont icon-huishouzhan"></i>
-            <span>废纸篓({{ recycleBinNoteNum }})</span>
-          </div>
+        </div>
+        <div
+          class="recycle-bin"
+          @click="getRecycleBinNoteList"
+          :style="{
+            background: activeModule === 'recycleBin' ? '#525252' : ''
+          }">
+          <img class="trash-icon" src="../../../../static/img/trash.png" alt="icon" />
+          <span>废纸篓</span>
         </div>
       </el-aside>
 
@@ -62,79 +50,54 @@
           <router-view></router-view>
         </div>
       </el-main>
-      <!--创建笔记本-->
-      <create-notebook-dialog
-        ref="createNotebookDialog"
-      ></create-notebook-dialog>
-      <!--重命名笔记本-->
-      <update-notebook-dialog
-        ref="updateNotebookDialog"
-      ></update-notebook-dialog>
     </el-container>
+    <!-- 文件夹右键菜单 -->
+    <notebook-right-menu
+      @showCreateNotebookDialog="onShowCreateNotebookDialog"
+      @showUpdateNotebookDialog="onShowUpdateNotebookDialog">
+    </notebook-right-menu>
+    <!-- 笔记右键菜单 -->
+    <note-right-menu></note-right-menu>
+    <!-- 创建笔记本 -->
+    <create-notebook-dialog ref="createNotebookDialog"></create-notebook-dialog>
+    <!--重命名笔记本-->
+    <update-notebook-dialog ref="updateNotebookDialog"></update-notebook-dialog>
   </div>
 </template>
 
 <script>
 import Aplayer from "vue-aplayer";
 import tree from "@/components/common/tree-component";
-import eventlistTemplate from "@/components/eventlist-template";
 import windowFrame from "@/components/common/windowFrame-component.vue";
-import createNotebookDialog from "@/components/home/createNotebook-dialog.vue";
-import updateNotebookDialog from "@/components/home/updateNotebook-dialog.vue";
 import noteList from "@/components/home/noteList-component.vue";
 import { mapState, mapMutations, mapActions } from "vuex";
 export default {
   name: "landing-page",
-  data() {
-    return {
-      eventData: "", // 添加事件名字
-      eventList: [], // 当前显示事件列表
-      allEventList: [], // 总的事件列表
-      activeClass: "no-end", // 当前选中分类
-      isPlayingFlag: false,
-      // 开始编辑事件名称
-      isEditEventNameFlag: false,
-      // 新的事件名称
-      newEventName: "",
-      defaultProps: {
-        children: "children",
-        label: "notebookName"
-      }
-    };
-  },
   components: {
     windowFrame,
-    eventlistTemplate,
     Aplayer,
     tree,
-    createNotebookDialog,
     noteList,
-    updateNotebookDialog
+    UserInfo: () => import('@/components/home/userInfo.vue'),
+    UpdateNotebookDialog: () => import('@/components/home/updateNotebook-dialog.vue'),
+    CreateNotebookDialog: () => import('@/components/home/createNotebook-dialog.vue'),
+    NotebookRightMenu: () => import('@/components/common/notebookRightMenu'),
+    NoteRightMenu: () => import('@/components/Note/noteRightMenu')
+  },
+  data() {
+    return {
+      isPlayingFlag: false
+    };
   },
   computed: {
     ...mapState({
       isMac: state => state.home.isMac,
-      username: state => state.user.username,
-      editEvent: state => state.home.editEvent,
-      showLeftMenuFlag: state => state.home.showLeftMenuFlag,
-      notebookTree: state => state.home.notebookTree,
-      parentNode: state => state.home.parentNode,
-      recycleBinNoteNum: state => state.home.recycleBinNoteNum,
+      notebookTree: state => state.notebook.notebookTree,
       activeModule: state => state.home.activeModule,
-      updateNotebook: state => state.home.updateNotebook,
-      activeNotebook: state => state.home.activeNotebook
+      activeNotebook: state => state.notebook.activeNotebook
     })
   },
-  watch: {
-    parentNode: function(val, oldVal) {
-      if (!val) return;
-      this.$refs.createNotebookDialog.$emit("showDialog");
-    },
-    updateNotebook: function(val, oldVal) {
-      if (!val) return;
-      this.$refs.updateNotebookDialog.$emit("showDialog", val);
-    }
-  },
+  watch: {},
   created() {
     this.initData();
     console.log(this.$route);
@@ -142,20 +105,26 @@ export default {
   mounted() {},
   methods: {
     ...mapMutations([
-      "RECOVER_NOTEBOOK_TREE",
-      "SET_NOTE_RIGHT_KEY_MENU",
+      'SET_RIGHT_MENU_POSITION',
+      "SET_NOTE_RIGHT_MENU_POSITION",
       "SET_ACTIVE_NOTE"
     ]),
     ...mapActions([
       "GetNotebookTree",
       "CreateNotebook",
       "GetRecycleBinNoteList",
-      "GetRecycleBinNoteNum"
     ]),
     // 初始化页面信息
     initData() {
       this.GetNotebookTree();
-      this.GetRecycleBinNoteNum();
+    },
+
+    onShowCreateNotebookDialog() {
+      this.$refs.createNotebookDialog.$emit('showDialog')
+    },
+
+    onShowUpdateNotebookDialog() {
+      this.$refs.updateNotebookDialog.$emit('showDialog')
     },
 
     goBack() {
@@ -164,37 +133,37 @@ export default {
 
     // 恢复默认行为
     recovalNormal() {
-      this.RECOVER_NOTEBOOK_TREE();
-      this.SET_NOTE_RIGHT_KEY_MENU("");
+      this.SET_NOTE_RIGHT_MENU_POSITION(null);
+      this.SET_RIGHT_MENU_POSITION(null);
     },
 
     // 获取废纸篓中的数据
     getRecycleBinNoteList() {
-      this.GetRecycleBinNoteList({
-        username: localStorage.getItem("username")
-      }).then(data => {
-        let { noteList } = data;
-        if (noteList && noteList.length) {
-          this.SET_ACTIVE_NOTE(noteList[0]);
-          this.$router.push("/home/noteDetail");
-        } else {
-          this.$router.push("/home/noContent");
-        }
-      });
-    },
-
-    // 开始新建笔记
-    handleStartCreateNote() {
-      if (
-        this.activeNotebook.nodeClass === 3 ||
-        this.activeNotebook.notebookCode === "-2"
-      ) {
-        this.$router.push({
-          name: "createNode",
-          params: { type: "createNote" }
+      this.GetRecycleBinNoteList()
+        .then(data => {
+          let { errcode, noteList } = data;
+          if (errcode === 0) {
+            if (noteList && noteList.length) {
+              this.SET_ACTIVE_NOTE(noteList[0]);
+              this.$router.push("/home/noteDetail");
+            } else {
+              this.$router.push("/home/noContent");
+            }
+          } else {
+            this.$message({
+              type: 'warning',
+              message
+            });
+          }
+        })
+        .catch(err => {
+          console.error('获取废纸篓中的数据失败:', err);
+          this.$message({
+            type: 'error',
+            message: '获取废纸篓中的数据失败!'
+          });
         });
-      }
-    }
+    },
 
     // 播放音乐
     // playMusic () {
@@ -216,49 +185,36 @@ export default {
   .event-list-box {
     height: 100%;
     .aside-menu-section {
+      width: 220px !important;
       text-align: left;
       line-height: 30px;
       background: #333333;
       color: white;
       overflow: hidden;
       transition: left 1s;
-      .create-note,
-      .create-note-book {
-        display: flex;
-        align-items: center;
-        height: 45px;
-        padding: 0 20px;
-        font-size: 16px;
-        color: #e6e6e6;
-        .icon-jiahao {
-          width: 28px;
-          height: 28px;
-          line-height: 28px;
-          font-size: 16px;
-          text-align: center;
-          color: white;
-          background: orange;
-          border-radius: 50%;
-        }
-        span {
-          margin-left: 10px;
-        }
-      }
-      .create-note:hover {
-        color: white;
-        cursor: pointer;
-      }
       .catalog-section {
         overflow: auto;
+        &::-webkit-scrollbar {
+          display:none
+        }
       }
       .recycle-bin {
-        height: 40px;
-        line-height: 40px;
+        display: flex;
+        align-items: center;
+        height: 50px;
         padding: 0 20px;
-      }
-      .recycle-bin:hover {
-        background: #525252 !important;
-        cursor: pointer;
+        background: #3c3c3c;
+        &:hover {
+          // background: #8e8e8e !important;
+          cursor: pointer;
+        }
+        .trash-icon {
+          width: 24px;
+          height: 24px;
+        }
+        span {
+          margin-left: 4px;
+        }
       }
       .el-menu {
         width: 100%;

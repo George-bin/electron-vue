@@ -16,6 +16,7 @@ import "highlight.js/styles/xcode.css";
 // 引入element-ui
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
+import "../../static/css/theme/index.css";
 Vue.use(ElementUI);
 
 // 引入全局函数
@@ -26,7 +27,12 @@ import "../../static/css/index.css";
 import $ from "jquery";
 
 Vue.use(VueQuillEditor);
-Vue.prototype.moment = require("moment");
+
+import moment from 'moment';
+Vue.prototype.$moment = moment;
+
+import md5 from 'js-md5';
+Vue.prototype.$md5 = md5;
 
 // 以web形式渲染，打包需注释
 // process.env.IS_WEB = 'web'

@@ -4,72 +4,28 @@
       <div
         class="notebook-name"
         @click="handleSelectNode(item)"
-        @click.right="showRightKeyMenu($event, item)"
+        @click.right="handleClickShowRightKeyMenu($event, item)"
         :style="{
-          'padding-left': item.nodeClass * 20 + 'px',
-
-          background:
-            item.isActive && activeModule === 'tree' ? '#525252' : '#333333'
-        }"
-        :class="[{ 'top-level-node': item.nodeClass === 1 }]"
-      >
+          'padding-left': item.grade * 20 + 'px',
+          'background': item.isActive && activeModule === 'tree' ? '#525252' : ''
+        }">
         <img
           v-if="item.children && item.children.length"
           src="../../../../static/img/sanjiaoxing.png"
-          style="width: 12px; height: 12px;"
+          :style="{'left': item.grade * 20 - 12 + 'px'}"
           :class="{ 'expand-node': item.show }"
-          alt="icon"
-        />
-        <i class="iconfont icon-bijiben"></i>
-        <span class="content ellipsis" :title="item.label">{{
-          item.label
-        }}</span>
-        <span class="note-num" v-if="item.nodeClass === 3"
-          >({{ item.noteNum }})</span
-        >
+          class="triangle-icon"
+          alt="icon" />
+        <img class="folder-icon" src="../../../../static/img/folder.png" alt="icon" />
+        <span class="content ellipsis" :title="item.name">{{item.name}}</span>
+        <span class="note-num" v-if="item.grade === 3">({{item.total ? item.total : 0}})</span>
         <i
-          v-if="item.nodeClass === 1"
-          class="iconfont icon-jiahao"
-          @click.stop="startCreateNotebook(item)"
-          title="创建笔记本"
-        ></i>
+          v-if="item.grade === 1"
+          class="el-icon-plus"
+          @click.stop="handleStartCreateNotebook(item)"
+          title="创建笔记本">
+        </i>
       </div>
-      <!--右键菜单 笔记本-->
-      <ul
-        v-if="
-          item.rightKeyMenu &&
-            item.nodeClass &&
-            item.nodeClass < 3 &&
-            item.notebookCode !== '-2'
-        "
-        class="right-key-menu-list"
-        :style="{ top: rightKeyMenuPosition.y, left: rightKeyMenuPosition.x }"
-      >
-        <li @click="startCreateNotebook(item)">
-          在“{{ item.label }}”中创建笔记本
-        </li>
-        <li v-if="item.nodeClass !== 1" @click="handleClickStartUpdateNotebook(item)">
-          重命名
-        </li>
-        <li v-if="item.nodeClass !== 1" @click="handleDeleteBotebook(item)">
-          删除
-        </li>
-      </ul>
-      <!--右键菜单 笔记-->
-      <ul
-        v-if="
-          item.rightKeyMenu &&
-            (item.nodeClass === 3 || item.notebookCode === '-2')
-        "
-        class="right-key-menu-list"
-        :style="{ top: rightKeyMenuPosition.y, left: rightKeyMenuPosition.x }"
-      >
-        <li v-if="item.nodeClass !== 1" @click="handleClickStartUpdateNotebook(item)">
-          重命名
-        </li>
-        <li @click="startCreateNote(item)">新建笔记</li>
-        <li @click="handleDeleteBotebook(item)">删除笔记本</li>
-      </ul>
       <tree v-if="item.children && item.show" :folder="item.children"></tree>
     </li>
   </ul>
@@ -82,12 +38,7 @@ export default {
   name: "tree",
   data() {
     return {
-      activeNode: "",
-      // 右键菜单的位置
-      rightKeyMenuPosition: {
-        x: 0,
-        y: 0
-      }
+      activeNode: ""
     };
   },
   components: {},
@@ -102,34 +53,25 @@ export default {
   methods: {
     ...mapActions(["GetNoteById"]),
     ...mapMutations([
-      "SET_PARENT_NODE",
       "SET_ACTIVE_NOTEBOOK",
-      "SET_RIGHT_KEY_MENU_TREE",
       "SET_ACTIVE_NODE",
-      "SET_UPDATE_NOTEBOOK",
-      "SET_ACTIVE_NOTE"
+      "SET_ACTIVE_NOTE",
+      'SET_RIGHT_MENU_POSITION'
     ]),
     ...mapActions(["DeleteNotebook", "GetNoteList"]),
 
     // 开始创建笔记本
-    startCreateNotebook(item) {
-      this.SET_PARENT_NODE(item);
-    },
-
-    // 开始创建笔记
-    startCreateNote(item) {
-      let activeNode = JSON.parse(JSON.stringify(item));
-      delete activeNode.children;
-      this.SET_ACTIVE_NOTEBOOK(activeNode);
-      this.$router.push({ name: "createNode", params: { type: "createNote" } });
+    handleStartCreateNotebook(item) {
     },
 
     // 显示右键菜单
-    showRightKeyMenu(event, item) {
-      this.rightKeyMenuPosition.x = event.x + "px";
-      this.rightKeyMenuPosition.y = event.y + "px";
+    handleClickShowRightKeyMenu(event, item) {
+      this.SET_ACTIVE_NOTEBOOK(item);
       this.$nextTick(() => {
-        this.SET_RIGHT_KEY_MENU_TREE(item);
+        this.SET_RIGHT_MENU_POSITION({
+          x: event.x + 'px',
+          y: event.y + 'px'
+        });
       });
     },
 
@@ -142,9 +84,7 @@ export default {
       delete noteBook.children;
       this.SET_ACTIVE_NOTEBOOK(noteBook);
 
-      this.GetNoteList({
-        notebookCode: item.notebookCode
-      })
+      this.GetNoteList(item._id)
         .then(data => {
           let { noteList } = data;
           if (noteList && noteList.length) {
@@ -180,39 +120,30 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.DeleteNotebook({
-            _id: item._id,
-            noteNum: this.activeNotebook.noteNum
-          })
+          this.DeleteNotebook(item._id)
             .then(data => {
-              if (data.errcode === 0) {
+              let { errcode, message } = data
+              if (errcode === 0) {
                 this.$message({
-                  message: "笔记本已删除!",
-                  type: "success",
-                  duration: 1500
+                  message: "删除了一个笔记本!",
+                  type: "success"
                 });
               } else {
                 this.$message({
-                  message: data.message,
-                  type: "error",
-                  duration: 1500
+                  message: message,
+                  type: "warning"
                 });
               }
             })
             .catch(err => {
+              console.error('删除笔记本失败:', err)
               this.$message({
-                message: "网络错误!",
-                type: "error",
-                duration: 1500
+                message: "删除笔记本失败!",
+                type: "error"
               });
             });
         })
         .catch(() => {});
-    },
-
-    // 准备更新笔记本
-    handleClickStartUpdateNotebook(notebook) {
-      this.SET_UPDATE_NOTEBOOK(notebook);
     }
   }
 };
@@ -222,16 +153,23 @@ export default {
 body {
   padding-top: 100px;
 }
-.expand-node {
-  transform: rotate(90deg);
-}
 .tree-main-component {
   .tree-item {
     .notebook-name {
+      position: relative;
       display: flex;
       align-items: center;
-      font-size: 12px;
+      height: 40px;
+      font-size: 14px;
       cursor: pointer;
+      .triangle-icon {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+      }
+      .expand-node {
+        transform: rotate(90deg);
+      }
       .content {
         flex: 1;
         margin-left: 5px;
@@ -239,24 +177,20 @@ body {
       .note-num {
         margin: 0 10px;
       }
-      .icon-jiahao {
-        margin: 0 20px;
-        font-size: 12px;
+      .el-icon-plus {
+        margin-right: 10px;
+        font-size: 16px;
       }
-      .icon-bijiben {
-        margin-left: 10px;
-        font-size: 20px;
+      .folder-icon {
+        width: 24px;
+        height: 24px;
       }
-    }
-    .top-level-node {
-      height: 40px;
-      font-size: 16px;
     }
     .active-node {
       background: #525252;
     }
     .notebook-name:hover {
-      background: #525252 !important;
+      background: #8e8e8e;
     }
     .right-key-menu-list {
       position: fixed;

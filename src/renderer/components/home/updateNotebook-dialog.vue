@@ -3,17 +3,23 @@
     <el-dialog
       :visible.sync="dialogVisible"
       :modal="false"
+      :close-on-click-modal="false"
       width="350px"
-      @close="onClose"
-    >
-      <h3 slot="title" class="el-dialog__headertitle">笔记本重命名</h3>
+      @close="onClose">
+      <h3 slot="title" class="el-dialog__headertitle">文件夹重命名</h3>
       <div class="el-dialog__content">
-        <p style="padding-top: 10px">笔记本名称:</p>
-        <input class="el-dialog__contentInp" v-model="notebook.notebookName" type="text" placeholder="请输入笔记本名称!" />
+        <p style="padding-top: 10px">文件夹名称:</p>
+        <input
+          v-model="notebook.name"
+          ref="nameInp"
+          class="el-dialog__contentInp"
+          type="text"
+          @keyup.enter="handleClickUpdateNotebook"
+          placeholder="请输入文件夹名称!" />
       </div>
       <div class="el-dialog__btngtoup">
-        <button @click="onClose">取消</button>
-        <button :disabled="!notebook.notebookName" @click="updateNotebook">确定</button>
+        <el-button @click="onClose">取消</el-button>
+        <el-button :loading="loading" :disabled="!notebook.name" @click="handleClickUpdateNotebook">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -24,42 +30,66 @@
   export default {
     data () {
       return {
+        loading: false,
         dialogVisible: false,
         notebook: {}
       }
     },
+    computed: {
+      ...mapState({
+        activeNotebook: state => state.notebook.activeNotebook
+      })
+    },
     mounted() {
       this.$nextTick(() => {
         this.$on('showDialog', (data) => {
-          this.dialogVisible = true
-          this.notebook = JSON.parse(JSON.stringify(data))
+          this.dialogVisible = true;
+          this.notebook = JSON.parse(JSON.stringify(this.activeNotebook));
+          this.$nextTick(() => {
+            this.$refs['nameInp'].focus();
+          });
         })
       })
     },
     methods: {
-      ...mapMutations([
-        'SET_UPDATE_NOTEBOOK'
-      ]),
+      ...mapMutations([]),
       ...mapActions([
         'UpdateNotebook'
       ]),
       onClose () {
-        this.dialogVisible = false
-        this.notebookName = ''
-        this.SET_UPDATE_NOTEBOOK(null)
+        this.dialogVisible = false;
+        this.notebookName = '';
       },
       // 更新笔记本
-      updateNotebook () {
+      handleClickUpdateNotebook () {
+        this.loading = true;
         this.UpdateNotebook({
           _id: this.notebook._id,
-          notebookName: this.notebook.notebookName
+          name: this.notebook.name
         })
           .then(data => {
-            this.dialogVisible = false
+            let { errcode, message } = data;
+            this.loading = false;
+            this.dialogVisible = false;
+            if (errcode === 0) {
+              this.$message({
+                type: 'success',
+                message: '更新了一个文件夹名称!'
+              });
+            } else {
+              this.$message({
+                type: 'warning',
+                message
+              });
+            }
           })
           .catch(err => {
-            console.log(err)
-            this.dialogVisible = false
+            console.error('更新文件夹名称失败:', err);
+            this.dialogVisible = false;
+            this.$message({
+              type: 'error',
+              message: '更新文件夹名称失败!'
+            });
           })
       }
     }
@@ -109,7 +139,8 @@
         }
         .el-dialog__contentInp:focus {
           height: 22px;
-          border: 1px solid #3388FF;
+          // border: 1px solid #3388FF;
+          border: 1px solid #0A419B;
         }
         .el-dialog__btngtoup {
           padding: 10px 0;
@@ -119,13 +150,17 @@
             height: 22px;
             padding: 0;
             font-size: 12px;
+            color: #333;
             background: #F3F3F3;
             border: 1px solid #A7A7A7;
             outline: none;
+            border-radius: 0;
+            &:hover {
+              // border: 1px solid #0A419B;
+              color: #333;
+              background: #fff;
+            }
           }
-          /*button:hover {*/
-          /*border: 1px solid #3388ff;*/
-          /*}*/
         }
       }
     }

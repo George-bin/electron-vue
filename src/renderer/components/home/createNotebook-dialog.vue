@@ -6,21 +6,21 @@
       width="350px"
       @close="onClose"
     >
-      <h3 slot="title" class="el-dialog__headertitle">新建笔记本</h3>
+      <h3 slot="title" class="el-dialog__headertitle">新建文件夹</h3>
       <div class="el-dialog__content">
-        <p style="padding-top: 10px">笔记本名称:</p>
+        <p style="padding-top: 10px">文件夹名称:</p>
         <input
           class="el-dialog__contentInp"
           id="noteBookNameInput"
           v-model="notebookName"
           ref="notebookNameInput"
           type="text"
-          @keyup.enter="createNotebook"
-          placeholder="请输入笔记本名称!" />
+          @keyup.enter="handleClickCreateNotebook"
+          placeholder="请输入文件夹名称!" />
       </div>
       <div class="el-dialog__btngtoup">
         <button @click="onClose">取消</button>
-        <button :disabled="!notebookName" @click="createNotebook">确定</button>
+        <button :disabled="!notebookName" @click="handleClickCreateNotebook">确定</button>
       </div>
     </el-dialog>
   </div>
@@ -37,7 +37,7 @@
     },
     computed: {
       ...mapState({
-        parentNode: state => state.home.parentNode
+        activeNotebook: state => state.notebook.activeNotebook
       })
     },
     mounted() {
@@ -51,47 +51,48 @@
       })
     },
     methods: {
-      ...mapMutations([
-        'SET_PARENT_NODE'
-      ]),
+      ...mapMutations([]),
       ...mapActions([
         'CreateNotebook'
       ]),
       onClose () {
         this.dialogVisible = false
         this.notebookName = ''
-        this.SET_PARENT_NODE(null)
       },
       // 创建笔记本
-      createNotebook () {
+      handleClickCreateNotebook () {
+        let account = localStorage.getItem('account')
         this.CreateNotebook({
-          notebookCode: Number(`${Date.now()}${Math.floor(Math.random() * 1000)}`),
-          notebookName: this.notebookName,
-          PARENT_CODE: this.parentNode.notebookCode,
-          noteNum: 0,
-          // createTime: Date.now(),
-          username: localStorage.getItem('username'),
-          flag: 'notebook',
-          nodeClass: this.parentNode.nodeClass + 1
+          name: this.notebookName, // 笔记本名称
+          account: account, // 所属用户
+          total: 0, // 笔记的数量
+          createTime: null, // 创建时间
+          updateTime: null, // 更新时间
+          PARENT_CODE: this.activeNotebook._id, // 父级节点的code
+          grade: this.activeNotebook.grade + 1 // 节点等级
         })
           .then(data => {
-            this.dialogVisible = false
+            this.dialogVisible = false;
+            let { errcode, message } = data;
+            if (errcode === 0) {
+              this.$message({
+                type: 'success',
+                message: '新建了一个笔记本!'
+              });
+            } else {
+              this.$message({
+                type: 'warning',
+                message
+              });
+            }
           })
           .catch(err => {
-            this.dialogVisible = false
-            if (err.errcode) {
-              this.$message({
-                message: err.message,
-                type: 'error',
-                duration: 1500
-              })
-              return
-            }
+            console.error('新建笔记本失败:', err);
+            this.dialogVisible = false;
             this.$message({
-              message: '网络错误',
-              type: 'error',
-              duration: 1500
-            })
+              message: '创建笔记本失败!',
+              type: 'error'
+            });
           })
       },
     }

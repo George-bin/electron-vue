@@ -49,7 +49,19 @@ export default {
       loadingShow: state => state.loadingStore.loadingShow // 加载动画显示/隐藏
     })
   },
-  created() {},
+  created() {
+    // 在页面加载时读取sessionStorage里的状态信息
+    if (sessionStorage.getItem('store')) {
+      console.log('获取store')
+      this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(sessionStorage.getItem('store'))))
+    }
+
+    // 在页面刷新时将vuex里的信息保存到sessionStorage里
+    window.addEventListener('beforeunload', () => {
+      console.log('缓存store')
+      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
+    })
+  },
   watch: {},
   mounted() {
     this.init()
@@ -94,10 +106,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          let data = {
-            username: localStorage.getItem("username")
-          };
-          this.Logon(data)
+          this.Logon()
             .then(data => {
               if (data.errcode === 0) {
                 this.$message({

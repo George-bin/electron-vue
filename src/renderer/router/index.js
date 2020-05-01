@@ -27,19 +27,9 @@ export default new Router({
       redirect: '/home/noContent',
       children: [
         {
-          path: 'eventList',
-          name: 'eventList',
-          component: require('@/views/home/children/eventList').default
-        },
-        {
           path: 'noteDetail',
           name: 'noteDetail',
           component: require('@/views/home/children/noteDetail').default
-        },
-        {
-          path: 'createNode',
-          name: 'createNode',
-          component: () => import('@/views/home/children/createNote')
         },
         {
           path: 'noContent',

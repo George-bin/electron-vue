@@ -1,24 +1,19 @@
 <template>
-  <div class="editor-content-main-component" @keyup.ctrl.83="handleUpdateNote">
-    <el-header class="title-section">
+  <div class="note-detail-component" @keyup.ctrl.83="handleUpdateNote">
+    <header class="title-section">
       <input
-        placeholder="标题"
+        placeholder="文章标题"
         class="note-title-input"
-        :disabled="activeModule === 'recycleBin'"
-        :style="{
-          border: isEditNoteNameFlag ? '1px solid #CCCCCC' : '1px solid #FFFFFF'
-        }"
-        v-model="note.noteName"
+        v-model="note.title"
         type="text"
-        @focus="onFocus"
-        @blur="onBlur"
-      />
-      <select class="set-note-label" v-model="note.noteLabel">
-        <option value="main-body" selected>正文</option>
+        @keyup.enter="handleQuillFocus" />
+      <select class="set-note-label" v-model="note.label">
+        <option value="main" selected>正文</option>
         <option value="draft">草稿</option>
       </select>
-    </el-header>
-    <div class="content-section">
+    </header>
+    <div>
+      <!-- 图片上传组件 start -->
       <el-upload
         v-show="false"
         class="avatar-uploader"
@@ -28,46 +23,57 @@
         :on-success="handleUploadImgSuccess"
         :on-error="handleUploadImgError"
         :before-upload="handleBeforeUploadImg"
-      >
-      </el-upload>
-      <el-row v-loading="uploadingImg || !activeNote._id">
+      ></el-upload>
+      <!-- 图片上传组件 end -->
+      <el-row v-loading="uploadingImg">
         <quill-editor
-          v-model="note.noteContent"
+          v-model="note.content"
           ref="myQuillEditor"
           :options="editorOption"
-          :disabled="activeModule === 'recycleBin'"
           @blur="onEditorBlur($event)"
           @focus="onEditorFocus($event)"
           @change="onEditorChange($event)"
-        >
-        </quill-editor>
+        ></quill-editor>
       </el-row>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex'
-import editorConfig from '../../../assets/js/editorConfig'
+import { mapState, mapMutations, mapActions } from 'vuex';
+import editorConfig from '../../../assets/js/editorConfig';
 export default {
+  components: {},
   data() {
     return {
-      note: {},
-      isEditNoteNameFlag: false,
+      note: {
+        title: '', // 笔记标题
+        content: '', // 笔记内容
+        status: 1, // 笔记状态 0：未完成 1：已完成 2：进入回收站
+        createTime: null, // 创建时间
+        updateTime: null, // 更新时间
+        label: 'draft', // 关联标签 draft：草稿 main：正文
+        account: '', // 关联账户
+        notebookId: '' // 笔记本id
+      },
+      oldNote: null,
+      // 是否编辑编辑标题
+      isEditNoteNameFlag: '',
       editorOption: editorConfig,
-      // 服务器地址
       serverUrl: '',
-      // 图片上传中
-      uploadingImg: false,
-      isDisabled: false
+      uploadingImg: '',
+      // 当前光标位置
+      activeLocation: 0,
+      // 富文本对象
+      quill: null,
+      // 是否获得焦点
+      quillFocusFlag: false
     }
   },
-  components: {},
   computed: {
     ...mapState({
       isMac: state => state.home.isMac,
-      activeNote: state => state.home.activeNote,
-      activeModule: state => state.home.activeModule
+      activeNote: state => state.note.activeNote
     })
   },
   watch: {
@@ -76,80 +82,99 @@ export default {
         this.note = JSON.parse(JSON.stringify(val))
       },
       deep: true
+    },
+    'note.content': function(val, oldval) {
+      if (!val || !oldval) return;
+      if (val.substring(val.length - 11, val.length) === '<p><br></p>' && val.length < oldval.length) {
+        let reg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i;
+        let str = oldval.substring(val.length - 11, oldval.length);
+        let result = str.match(reg);
+        if (result && result.length) {
+          console.log(result[1]);
+        }
+      }
     }
   },
+  created() {},
   mounted() {
-    this.serverUrl = localStorage.getItem('baseUrl') + '/api/blog/uploadfile'
-    this.note = JSON.parse(JSON.stringify(this.activeNote))
-    this.init()
+    this.serverUrl = localStorage.getItem('baseUrl') + '/api/blog/uploadfile';
+    this.init();
   },
   methods: {
     ...mapMutations([]),
-    ...mapActions(['UpdateNote']),
+    ...mapActions([
+      'UpdateNote'
+    ]),
     init() {
+      this.note = JSON.parse(JSON.stringify(this.activeNote));
       $('.ql-container').css({
-        height: this.isMac ? 'calc(100vh - 75px - 12px)' : 'calc(100vh - 75px - 42px)'
-      })
+        height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 75px - 42px)'
+      });
     },
-    onFocus() {
-      this.isEditNoteNameFlag = true
+
+    // 主动获取焦点
+    handleQuillFocus() {
+      this.$refs.myQuillEditor.quill.focus();
     },
-    onBlur() {
-      this.isEditNoteNameFlag = false
-    },
+
     // 更新笔记
     handleUpdateNote() {
-      let oldNote = JSON.parse(JSON.stringify(this.note))
-      let quill = this.$refs.myQuillEditor.quill
-      let length = quill.getSelection().index
-      this.uploadingImg = true
-      let content = this.note.noteContent.replace(
+      let note = JSON.parse(JSON.stringify(this.note));
+      let quill = this.$refs.myQuillEditor.quill;
+      let activeLocation = quill.getSelection().index;
+      let content = note.content.replace(
         /\<p\>\<br\>\<\/p\>\<pre/g,
         '\<pre'
       )
       content = content.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog')
       this.UpdateNote({
-        ...this.activeNote,
-        noteLabel: this.note.noteLabel,
-        noteContent: content,
-        noteName: this.note.noteName
+        ...note
       })
         .then(data => {
-          this.uploadingImg = false
-          // 将光标插入到原来位置
-          quill.setSelection(length)
           if (data.errcode === 0) {
             this.$message({
-              message: '保存成功!',
+              message: '更新了一个笔记!',
               type: 'success',
-              duration: 1500
-            })
+              duration: 1000
+            });
+          } else {
+            this.$message({
+              type: 'warning',
+              message
+            });
           }
         })
         .catch(err => {
-          this.note = oldNote
-          this.uploadingImg = false
-          // 将光标插入到原来位置
-          quill.setSelection(length)
+          console.error('更新笔记失败:', err);
           this.$message({
-            message: '网络错误!',
             type: 'error',
-            duration: 1500
-          })
-          // console.log('更新笔记失败!', err)
+            message: '更新笔记失败!'
+          });
         })
-      this.note = {}
+        .finally(() => {
+          quill.setSelection(activeLocation)
+          this.uploadingImg = false;
+        })
     },
+
+    onUpdateSuccess() {},
+
     // 失去焦点事件
     onEditorBlur(event) {
-      console.log('失去焦点!')
+      this.quillFocusFlag = false;
+      // console.log(this.content)
     },
+
     // 获得焦点事件
     onEditorFocus() {
-      console.log('获得焦点!')
+      this.quillFocusFlag = true;
     },
+
     // 内容改变事件
-    onEditorChange() {},
+    onEditorChange({html, editor, text}) {
+      // console.log(html)
+    },
+
     // 图片上传成功
     handleUploadImgSuccess(res) {
       this.uploadingImg = false
@@ -159,9 +184,8 @@ export default {
       if (res.errcode === 0 && res.filePath) {
         // 获取光标所在位置
         let length = quill.getSelection().index
-
         // 插入图片  res.info为服务器返回的图片地址
-        // console.log('图片地址:', `http://${baseUrl}${res.filePath}`)
+        // console.log('图片地址:', `${baseUrl}${res.filePath}`)
         quill.insertEmbed(
           length,
           'image',
@@ -177,6 +201,7 @@ export default {
         this.$message.error('图片插入失败')
       }
     },
+
     // 图片上传失败
     handleUploadImgError() {
       this.uploadingImg = false
@@ -185,6 +210,7 @@ export default {
         message: '图片上传失败!'
       })
     },
+
     // 上传图片之前
     handleBeforeUploadImg() {
       this.uploadingImg = true
@@ -194,27 +220,24 @@ export default {
 </script>
 
 <style lang="scss">
-.editor-content-main-component {
+.note-detail-component {
   .title-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 45px !important;
+    height: 54px !important;
     padding: 0 5px;
     border-bottom: 1px solid #cccccc;
     text-align: right;
     background: #ffffff !important;
     .note-title-input {
       flex: 1;
-      height: 30px;
-      line-height: 30px;
+      height: 36px;
+      line-height: 36px;
       padding: 0 5px;
-      border: 1px solid #ffffff;
-      background: none;
+      border: none;
+      border-bottom: 1px solid #f1f1f1;
       outline: none;
-    }
-    .note-title-input:hover {
-      border: 1px solid #cccccc !important;
     }
     .set-note-label {
       width: 60px;
@@ -228,11 +251,13 @@ export default {
     border-right: none !important;
     border-top: none !important;
   }
+
   .ql-formats {
     margin-right: 0px !important;
   }
+
   .ql-container {
-    // height: calc(100vh - 75px - 43px) !important;
+    // height: calc(100vh - 75px - 42px) !important;
     border: none !important;
     overflow: auto !important;
   }

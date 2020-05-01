@@ -5,7 +5,7 @@ import router from "../router";
 // 创建axios实例
 export let request = axios.create({
   // api的base_url
-  baseURL: `${baseUrl()}/api/blog-manage`,
+  baseURL: `${baseUrl()}/api/blog/manage`,
   // 请求超时时间
   timeout: 60000,
   // 允许携带cookie
@@ -16,7 +16,7 @@ export function destoryAxios() {
   request = null;
   request = axios.create({
     // api的base_url
-    baseURL: `${baseUrl()}/api/blog-manage`,
+    baseURL: `${baseUrl()}/api/blog/manage`,
     // 请求超时时间
     timeout: 60000,
     // 允许携带cookie
@@ -49,15 +49,17 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   response => {
     let { errcode } = response.data;
-    if (errcode === 991) {
-      Message({
-        type: "warning",
-        message: "登录态失效!"
-      });
-      router.push("/login");
-      return response;
-    }
-    return response;
+    switch (errcode) {
+      case 991:
+        Message({
+          type: "warning",
+          message: "登录态失效!"
+        });
+        router.push("/login");
+        return response;
+      default:
+        return response;
+    }    
   },
   error => {
     return Promise.reject(error);

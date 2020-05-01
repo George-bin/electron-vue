@@ -75,11 +75,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          let data = {
-            // username: this.username
-            username: localStorage.getItem("username")
-          };
-          this.Logon(data)
+          this.Logon()
             .then(data => {
               if (data.errcode === 0) {
                 this.$message({

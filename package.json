@@ -44,7 +44,7 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/icon.ico"
+      "icon": "build/icons/icon.icns"
     },
     "win": {
       "icon": "build/icons/icon.ico"
@@ -56,9 +56,10 @@
   "dependencies": {
     "axios": "^0.18.0",
     "chromedriver": "^78.0.1",
-    "element-ui": "^2.6.1",
+    "element-ui": "^2.13.0",
     "highlight.js": "^9.15.10",
     "jquery": "^3.4.1",
+    "js-md5": "^0.7.3",
     "moment": "^2.24.0",
     "vue": "^2.5.16",
     "vue-aplayer": "^1.6.1",

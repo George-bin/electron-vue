@@ -19,10 +19,9 @@ export function registerRequest(data) {
 }
 
 // 注销登录
-export function logonRequest(data) {
+export function logonRequest() {
   return request({
     url: "/logon",
-    method: "post",
-    data: data
+    method: "post"
   });
 }
