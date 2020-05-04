@@ -113,47 +113,42 @@ export default {
     handleClickRegister() {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
-          this.loading = true
-          let data = JSON.parse(JSON.stringify(this.formData))
-          data.password = this.$md5(data.password)
+          this.loading = true;
+          let data = JSON.parse(JSON.stringify(this.formData));
+          data.password = this.$md5(data.password);
           this.Register(data)
-            .then(data => {
-              this.loading = false
-              this.$message({
-                type: 'success',
-                message: '注册成功!',
-                duration: 1500
-              })
-              this.$router.push('/login')
-            })
-            .catch(err => {
-              console.log(err)
-              this.loading = false
-              if (err.errcode) {
+            .then(res => {
+              let { errcode, message } = res;
+              if (errcode === 0) {
                 this.$message({
-                  type: 'warning',
-                  message: err.message,
-                  duration: 1500
-                })
-                return
+                  type: 'success',
+                  message: '注册成功!'
+                });
+                this.$router.push('/login');
+                return;
               }
               this.$message({
-                type: 'error',
-                message: '网络错误!',
-                duration: 1500
+                type: 'warning',
+                message: message
               })
+            })
+            .catch(err => {
+              console.error('注册失败!', err);
+            })
+            .finally(() => {
+              this.loading = false;
             })
         } else {
           this.$message({
             type: 'warning',
             message: '请完善必要数据!'
-          })
+          });
         }
       })
     },
     // 取消注册
     cancelRegister() {
-      this.$router.push('/login')
+      this.$router.push('/login');
     }
   }
 }

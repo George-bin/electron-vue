@@ -124,39 +124,31 @@ export default {
       let data = JSON.parse(JSON.stringify(this.formData))
       data.password = this.$md5(data.password)
       this.Login(data)
-        .then(data => {
-          if (data.errcode === 0) {
-            setTimeout(() => {
-              this.loading = false
-              if (this.rememberMe) this.cacheAccount()
-              localStorage.setItem('account', this.formData.account)
-              this.$message({
-                type: 'success',
-                message: data.message,
-                duration: 1500
-              })
-              if (this.isMac) {
-                ipcRenderer.send('loginSuccess')
-              }
-              this.$router.push('/home')
-            }, 3000)
+        .then(res => {
+          let { errcode, message } = res;
+          if (errcode === 0) {
+            if (this.rememberMe) this.cacheAccount();
+            localStorage.setItem('account', this.formData.account);
+            this.$message({
+              type: 'success',
+              message: '登录成功!'
+            });
+            if (this.isMac) {
+              ipcRenderer.send('loginSuccess');
+            }
+            this.$router.push('/home');
           } else {
-            this.loading = false
             this.$message({
               type: 'warning',
-              message: '用户名或密码错误!',
-              duration: 1500
+              message
             })
           }
         })
         .catch(err => {
+          console.error('登录失败!', err)
+        })
+        .finally(() => {
           this.loading = false
-          console.log(err)
-          this.$message({
-            type: 'error',
-            message: '网络错误!',
-            duration: 1500
-          })
         })
     },
 

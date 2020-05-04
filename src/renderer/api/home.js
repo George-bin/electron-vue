@@ -68,6 +68,15 @@ export function updateNoteRequest(data) {
   });
 }
 
+// 更新笔记简介
+export function updateNoteIntroductionRequest(data) {
+  return request({
+    url: `/note/introduction`,
+    method: "put",
+    data: data
+  });
+}
+
 // 获取废纸篓数据
 export function getRecycleBinNoteListRequest() {
   return request({

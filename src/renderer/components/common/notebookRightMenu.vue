@@ -128,14 +128,17 @@ export default {
     handleClickCreateNote() {
       // this.$router.push('/home/createNote');
       this.CreateNote({
-        title: '无标题笔记', // 笔记标题
+        title: '', // 笔记标题
         content: '', // 笔记内容
         status: 1, // 笔记状态 0：未完成 1：已完成 2：进入回收站
         createTime: null, // 创建时间
         updateTime: null, // 更新时间
-        label: 'draft', // 关联标签 draft：草稿 main：正文
+        type: 'draft',
+        label: [], // 关联标签 draft：草稿 main：正文
         account: this.userInfo.account, // 关联账户
-        notebookId: this.activeNotebook._id // 笔记本id
+        notebookId: this.activeNotebook._id, // 笔记本id
+        introduction: '', // 简介
+        img: '' // 图片地址
       })
         .then(data => {
           let { errcode, message } = data

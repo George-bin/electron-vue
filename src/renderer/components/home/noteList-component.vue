@@ -4,6 +4,7 @@
       height: isMac ? '100vh' : 'calc(100vh - 31px)'
     }"
     class="note-list-main-component">
+    <!-- 搜索区域 -->
     <div class="search-section">
       <input
         class="search-input"
@@ -16,37 +17,51 @@
         @click="clearSearchContent">
       </i>
     </div>
+    <!-- 列表区域 -->
     <ul class="note-list">
       <li
         v-for="item in filterNoteList"
         :key="item._id"
-        class="note-list-item"
+        class="note-list__item"
         @click="handleGoNoteDetail(item)"
         @click.right="handleShowRightKeyMenu($event, item)"
         :class="{ 'active-note-style': activeNote._id === item._id }"
         :title="item.title">
-        <span
-          :style="{
-            background: item.label === 'draft' ? '#0a419b' : 'rgb(241,201,63)'
-          }"
-          class="icon">
-          <i v-if="item.label === 'draft'" class="iconfont icon-biji"></i>
-          <i v-else class="el-icon-tickets" style="margin-top: 2px"></i>
-        </span>
-        <div class="content">
-          <p class="note-title ellipsis">{{ item.title ? item.title : '无标题文档' }}</p>
-          <p class="note-footer">
-            <span class="note-createTime">{{ $moment(item.createTime).format('YYYY-MM-DD HH:mm:ss') }}</span>
-          </p>
+        <div class="note-list__item-content">
+          <div class="left-box">
+            <div class="title">
+              <span
+                :style="{
+                  background: item.type === 'draft' ? '#0a419b' : 'rgb(241,201,63)'
+                }"
+                class="icon">
+                <i v-if="item.type === 'draft'" class="iconfont icon-biji"></i>
+                <i v-else class="el-icon-tickets" style="margin-top: 2px"></i>
+              </span>
+              <p class="note-title ellipsis">{{ item.title ? item.title : '无标题文档' }}</p>
+            </div>
+            <p class="time">
+              <span class="note-createTime">{{ $moment(item.createTime).format('YYYY-MM-DD HH:mm') }}</span>
+              <button class="introduction-btn" @click.stop="handleClickUpdateIntroduction(item)">简介</button>
+            </p>
+          </div>
+          <div class="right-box">
+            <img class="cover-img" :src="item.img ? item.img : '../../../../static/img/normal-cover.jpeg'" alt="cover" />
+          </div>
         </div>
       </li>
     </ul>
+    <!-- 添加笔记简介 -->
+    <note-introduction ref="noteIntroduction"></note-introduction>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations, mapActions } from 'vuex'
 export default {
+  components: {
+    NoteIntroduction: () => import('@/components/Note/noteIntroduction.vue')
+  },
   data() {
     return {
       searchContent: ''
@@ -90,6 +105,7 @@ export default {
     },
     // 查看笔记详情
     handleGoNoteDetail(note) {
+      if (note._id === this.activeNote._id) return;
       this.SET_ACTIVE_NOTE({})
       this.GetNoteById(note._id)
         .then(data => {
@@ -110,6 +126,10 @@ export default {
             message: '获取笔记列表失败!'
           })
         })
+    },
+    // 更新简介
+    handleClickUpdateIntroduction(note) {
+      this.$refs.noteIntroduction.$emit('showDialog', note)
     }
   }
 }
@@ -145,42 +165,65 @@ export default {
     height: calc(100vh - 60px) !important;
     padding-bottom: 5px;
     overflow: auto;
-    .note-list-item {
-      display: flex;
-      height: 56px;
-      align-items: center;
-      padding: 0 10px;
+    .note-list__item {
       border-bottom: 1px solid #f1f1f1;
+      padding: 6px 10px;
       cursor: pointer;
       &:hover {
         background: rgba(37, 215, 255, 0.2);
       }
-      .icon {
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        margin-right: 10px;
-        text-align: center;
-        border-radius: 4px;
-        i {
-          font-size: 16px;
-          font-weight: bold;
-          color: #fff;
+      .note-list__item-content {
+        display: flex;
+        align-items: center;
+        .left-box {
+          flex: 1;
+          .title {
+            display: flex;
+            align-items: center;
+            .icon {
+              width: 18px;
+              height: 18px;
+              line-height: 18px;
+              margin-right: 5px;
+              text-align: center;
+              border-radius: 4px;
+              i {
+                font-size: 14px;
+                font-weight: bold;
+                color: #fff;
+              }
+            }
+            .note-title {
+              width: 140px;
+              color: #000000;
+              overflow: hidden;
+            }
+          }
+          .time {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: #0a419b;
+            font-size: 12px;
+            .introduction-btn {
+              margin-right: 10px;
+              font-size: 10px;
+              font-weight: bold;
+              color: #0a419b;
+              border: none;
+              background: none;
+              outline: none;
+              cursor: pointer;
+            }
+          }
         }
-      }
-      .content {
-        flex: 1;
-        .note-title {
-          width: 180px;
-          color: #000000;
-          overflow: hidden;
-        }
-        .note-footer {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 10px;
-          color: #0a419b;
-          font-size: 12px;
+        .right-box {
+          .cover-img {
+            width: 60px;
+            height: 44px;
+            overflow: hidden;
+          }
         }
       }
     }

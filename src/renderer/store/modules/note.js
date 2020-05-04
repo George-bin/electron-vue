@@ -6,7 +6,8 @@ import {
   deleteNoteRequest,
   updateNoteRequest,
   clearNoteRequest,
-  getNoteByIdRequest
+  getNoteByIdRequest,
+  updateNoteIntroductionRequest
 } from '../../api/home'
 import {
   recursionUpdateNoteNum
@@ -160,6 +161,22 @@ const note = {
               note.content =  note.content.replace(/src="\/file\/uploads\/images\/blog/g, 'src="http://39.105.55.137/file/uploads/images/blog');
               commit('UPDATE_NOTE', JSON.parse(JSON.stringify(note)));
               commit('SET_ACTIVE_NOTE', JSON.parse(JSON.stringify(note)));
+            }
+            resolve(res.data);
+          })
+          .catch(err => {
+            reject(err);
+          })
+      })
+    },
+    // 更新笔记
+    UpdateNoteIntroduction({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        updateNoteIntroductionRequest(data)
+          .then(res => {
+            let { errcode, note } = res.data;
+            if (errcode === 0) {
+              commit('UPDATE_NOTE', JSON.parse(JSON.stringify(note)));
             }
             resolve(res.data);
           })

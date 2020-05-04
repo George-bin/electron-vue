@@ -7,7 +7,7 @@
         v-model="note.title"
         type="text"
         @keyup.enter="handleQuillFocus" />
-      <select class="set-note-label" v-model="note.label">
+      <select class="set-note-label" v-model="note.type">
         <option value="main" selected>正文</option>
         <option value="draft">草稿</option>
       </select>
@@ -52,7 +52,8 @@ export default {
         status: 1, // 笔记状态 0：未完成 1：已完成 2：进入回收站
         createTime: null, // 创建时间
         updateTime: null, // 更新时间
-        label: 'draft', // 关联标签 draft：草稿 main：正文
+        type: 'draft', // 文章类型 draft：草稿 main：正文
+        label: [], // 关联标签
         account: '', // 关联账户
         notebookId: '' // 笔记本id
       },
@@ -61,6 +62,10 @@ export default {
       isEditNoteNameFlag: '',
       editorOption: editorConfig,
       serverUrl: '',
+      network: {
+        ip: '127.0.0.1',
+        port: 10023
+      },
       uploadingImg: '',
       // 当前光标位置
       activeLocation: 0,
@@ -83,21 +88,25 @@ export default {
       },
       deep: true
     },
-    'note.content': function(val, oldval) {
-      if (!val || !oldval) return;
-      if (val.substring(val.length - 11, val.length) === '<p><br></p>' && val.length < oldval.length) {
-        let reg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i;
-        let str = oldval.substring(val.length - 11, oldval.length);
-        let result = str.match(reg);
-        if (result && result.length) {
-          console.log(result[1]);
-        }
-      }
-    }
+    // 'note.content': function(val, oldval) {
+    //   if (!val || !oldval) return;
+    //   if (val.substring(val.length - 11, val.length) === '<p><br></p>' && val.length < oldval.length) {
+    //     let reg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i;
+    //     let str = oldval.substring(val.length - 11, oldval.length);
+    //     let result = str.match(reg);
+    //     if (result && result.length) {
+    //       console.log(result[1]);
+    //     }
+    //   }
+    // }
   },
   created() {},
   mounted() {
-    this.serverUrl = localStorage.getItem('baseUrl') + '/api/blog/uploadfile';
+    let network = localStorage.getItem('network');
+    if (network) {
+      this.network = JSON.parse(network);
+    }
+    this.serverUrl = `http://${this.network.ip}:${this.network.port}` + '/api/blog/uploadfile';
     this.init();
   },
   methods: {
@@ -122,11 +131,12 @@ export default {
       let note = JSON.parse(JSON.stringify(this.note));
       let quill = this.$refs.myQuillEditor.quill;
       let activeLocation = quill.getSelection().index;
-      let content = note.content.replace(
+      quill.setSelection(1);
+      note.content = note.content.replace(
         /\<p\>\<br\>\<\/p\>\<pre/g,
         '\<pre'
-      )
-      content = content.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog')
+      );
+      note.content = note.content.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog');
       this.UpdateNote({
         ...note
       })
@@ -177,7 +187,7 @@ export default {
 
     // 图片上传成功
     handleUploadImgSuccess(res) {
-      this.uploadingImg = false
+      this.uploadingImg = false;
       // 获取富文本组件实例
       let quill = this.$refs.myQuillEditor.quill
       // 如果上传成功
@@ -189,11 +199,7 @@ export default {
         quill.insertEmbed(
           length,
           'image',
-          `http://${
-            process.env.NODE_ENV === 'production'
-              ? '39.105.55.137'
-              : location.hostname
-          }${res.filePath}`
+          `http://${this.network.ip}${res.filePath}`
         )
         // 调整光标到最后
         quill.setSelection(length + 1)
@@ -242,7 +248,7 @@ export default {
     .set-note-label {
       width: 60px;
       height: 32px;
-      margin-left: 10px;
+      margin-left: 5px;
       outline: none;
     }
   }
@@ -260,6 +266,42 @@ export default {
     // height: calc(100vh - 75px - 42px) !important;
     border: none !important;
     overflow: auto !important;
+    h1, h2, h3, h4, h5, h6, h7 {
+      font-weight: bold;
+    }
+    p {
+      img {
+        display: block;
+        width: 400px;
+        margin-top: 5px;
+      }
+    }
+    .ql-editor ol {
+      margin-left: 28px;
+    }
+    .ql-editor ul {
+      margin-left: 14px;
+    }
+    .ql-editor ol, .ql-editor ul {
+      margin-top: 10px;
+      padding-left: 0;
+    }
+    .ql-editor ol li:not(.ql-direction-rtl),
+    .ql-editor ul li:not(.ql-direction-rtl) {
+      padding-left: 0;
+    }
+    .ql-editor ul > li::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      margin-left: 0;
+      background: gray;
+      border-radius: 50%;
+    }
+    .ql-editor ol > li + li,
+    .ql-editor ul > li + li {
+      margin-top: 6px;
+    }
   }
 }
 </style>

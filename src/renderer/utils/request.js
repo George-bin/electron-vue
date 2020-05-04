@@ -25,11 +25,12 @@ export function destoryAxios() {
 }
 
 function baseUrl() {
-  let baseUrl = localStorage.getItem("baseUrl");
-  if (baseUrl) {
-    return baseUrl;
+  let network = localStorage.getItem("network");
+  if (network) {
+    network = JSON.parse(network)
+    return `http://${network.ip}:${network.port}`;
   } else {
-    return "http://localhost:3000";
+    return "http://localhost:10023";
   }
 }
 
@@ -62,6 +63,11 @@ request.interceptors.response.use(
     }    
   },
   error => {
+    Message({
+      message: "服务错误!",
+      type: "error"
+    });
+    router.push("/login");
     return Promise.reject(error);
   }
 );

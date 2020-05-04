@@ -20,7 +20,10 @@
           }"
           class="catalog-section">
           <!-- 结构树 -->
-          <tree :folder="notebookTree"></tree>
+          <tree
+            :folder="notebookTree"
+            @showCreateNotebookDialog="onShowCreateNotebookDialog">
+          </tree>
         </div>
         <div
           class="recycle-bin"

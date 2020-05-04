@@ -19,6 +19,7 @@
         <img class="folder-icon" src="../../../../static/img/folder.png" alt="icon" />
         <span class="content ellipsis" :title="item.name">{{item.name}}</span>
         <span class="note-num" v-if="item.grade === 3">({{item.total ? item.total : 0}})</span>
+        <!-- 一级目录 -->
         <i
           v-if="item.grade === 1"
           class="el-icon-plus"
@@ -62,6 +63,8 @@ export default {
 
     // 开始创建笔记本
     handleStartCreateNotebook(item) {
+      this.SET_ACTIVE_NOTEBOOK(item);
+      this.$emit('showCreateNotebookDialog');
     },
 
     // 显示右键菜单
@@ -96,7 +99,7 @@ export default {
                 this.SET_ACTIVE_NOTE({});
                 this.$router.push("/home/noContent");
                 this.$message({
-                  type: "error",
+                  type: "warning",
                   message: "获取笔记失败!"
                 });
               });
@@ -106,11 +109,7 @@ export default {
           }
         })
         .catch(err => {
-          this.$message({
-            message: "网络错误!",
-            type: "error",
-            duration: 1500
-          });
+          console.error('获取笔记失败!', err)
         });
     },
 
