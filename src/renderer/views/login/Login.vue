@@ -6,7 +6,7 @@
           <div class="logo">
             <img src="../../../../static/img/logo.png" alt="logo" />
           </div>
-          <h1>博客管理端</h1>
+          <h1>Blog Manage</h1>
         </header>
         <div class="login-form">
           <div
@@ -44,14 +44,20 @@
             <input v-model="formData.password" placeholder="Password" type="password" autocomplete="off" />
           </div>
           <div class="login-form-item remember-checkbox">
-            <div class="left">
+            <div class="left-box">
               <input v-model="rememberMe" id="rememberMe" type="checkbox" />
               <label for="rememberMe">Remember me</label>
             </div>
             <span class="register" @click="handleClickGoRegister">注册</span>
           </div>
           <div class="login-form-item">
-            <el-button type="primary" :loading="loading" class="login-btn" @click.native="handleClickLogin">登录</el-button>
+            <el-button
+              type="primary"
+              :loading="loading"
+              class="login-btn"
+              @click.native="handleClickLogin">
+              登&nbsp;&nbsp;&nbsp;&nbsp;录
+            </el-button>
           </div>
         </div>
       </div>
@@ -235,7 +241,6 @@ export default {
       margin-top: 15px;
       padding: 10px 20px 20px;
       background: rgba(255, 255, 255, 0.3);
-      border-radius: 4px;
       header {
         text-align: center;
         .logo {
@@ -264,15 +269,14 @@ export default {
             width: 100%;
             height: 38px;
             padding: 0;
-            // border-radius: 20px;
+            border-radius: 0;
           }
         }
         .login-form-item + .login-form-item {
           margin-top: 10px;
         }
         .input__inner {
-          // border: 1px solid #a7a7a7;
-          border-radius: 4px;
+          border-radius: 0;
           background: rgba(255, 255, 255, 0.2);
           input {
             width: 220px;
@@ -299,12 +303,12 @@ export default {
           font-size: 12px;
           color: #f7f7f7;
           .left-box {
+            display: flex;
+            align-items: center;
             label {
               cursor: pointer;
               margin-left: 5px;
-            }
-            input {
-              margin-top: -3px;
+              margin-top: -2px;
             }
           }
           .register {

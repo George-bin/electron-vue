@@ -149,9 +149,6 @@ export default {
 </script>
 
 <style lang="scss">
-body {
-  padding-top: 100px;
-}
 .tree-main-component {
   .tree-item {
     .notebook-name {

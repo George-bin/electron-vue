@@ -8,7 +8,7 @@
       @close="onClose">
       <h3 slot="title" class="el-dialog__headertitle">网络设置</h3>
       <div class="el-dialog__content">
-        <el-form ref="form" :model="formData" :rules="rules" label-width="50px">
+        <el-form ref="form" :model="formData" :rules="rules" label-width="60px">
           <el-form-item label="IP" prop="ip">
             <el-input size="small" v-model="formData.ip" placeholder="请输入目标IP地址!"></el-input>
           </el-form-item>
@@ -120,7 +120,7 @@ export default {
       }
     }
     .el-dialog__body {
-      padding: 0 10px;
+      padding: 0;
       background: #F7F7F7;
       .el-dialog__content {
         padding: 20px 10px 0 10px;
@@ -129,7 +129,7 @@ export default {
         }
       }
       .el-dialog__footer {
-        padding: 10px 0;
+        padding: 10px;
         text-align: right;
         background: #fff;
         button {

@@ -7,10 +7,10 @@
         v-model="note.title"
         type="text"
         @keyup.enter="handleQuillFocus" />
-      <select class="set-note-label" v-model="note.type">
-        <option value="main" selected>正文</option>
-        <option value="draft">草稿</option>
-      </select>
+      <el-select class="set-note-label" v-model="note.type" placeholder="请选择">
+        <el-option label="正文" value="main" selected></el-option>
+        <el-option label="草稿" value="draft"></el-option>
+       </el-select>
     </header>
     <div>
       <!-- 图片上传组件 start -->
@@ -117,7 +117,7 @@ export default {
     init() {
       this.note = JSON.parse(JSON.stringify(this.activeNote));
       $('.ql-container').css({
-        height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 75px - 42px)'
+        height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 26px - 55px - 42px)'
       });
     },
 
@@ -246,10 +246,11 @@ export default {
       outline: none;
     }
     .set-note-label {
-      width: 60px;
-      height: 32px;
-      margin-left: 5px;
-      outline: none;
+      width: 80px;
+      margin-left: 10px;
+      .el-input__inner {
+        border-radius: 0;
+      }
     }
   }
   .ql-snow {

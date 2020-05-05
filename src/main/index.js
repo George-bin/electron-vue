@@ -1,6 +1,7 @@
 // electron所有的功能都是通过命名空间暴露出来的
 // app => electron.app负责管理electron应用的生命周期
 import { app, BrowserWindow, Menu, MenuItem, ipcMain, dialog } from "electron";
+import os from 'os';
 const electron = require("electron");
 const path = require("path");
 
@@ -36,7 +37,7 @@ function createWindow() {
     width: 1035,
     minWidth: 1025,
     minHeight: 700,
-    frame: true,
+    frame: os.type() === 'Darwin' ? true : false,
     resizable: true,
     webPreferences: { webSecurity: false } // 允许跨域访问
   });

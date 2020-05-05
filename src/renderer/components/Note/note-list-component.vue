@@ -1,7 +1,7 @@
 <template>
   <div
     :style="{
-      height: isMac ? '100vh' : 'calc(100vh - 31px)'
+      height: isMac ? '100vh' : 'calc(100vh - 27px)'
     }"
     class="note-list-main-component">
     <!-- 搜索区域 -->
@@ -18,8 +18,13 @@
       </i>
     </div>
     <!-- 列表区域 -->
-    <ul class="note-list">
-      <li
+    <div
+      v-if="filterNoteList.length"
+      :style="{
+        height: isMac ? 'calc(100vh - 60px)' : 'calc(100vh - 88px)'
+      }"
+      class="note-list">
+      <div
         v-for="item in filterNoteList"
         :key="item._id"
         class="note-list__item"
@@ -46,11 +51,13 @@
             </p>
           </div>
           <div class="right-box">
-            <img class="cover-img" :src="item.img ? item.img : '../../../../static/img/normal-cover.jpeg'" alt="cover" />
+            <img v-if="item.img" class="cover-img" :src="item.img" alt="cover" />
+            <img v-else class="cover-img" src="../../../../static/img/normal-cover.jpeg" alt="cover" />
           </div>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
+    <p v-else class="no-note-tip">暂无任何笔记!</p>
     <!-- 添加笔记简介 -->
     <note-introduction ref="noteIntroduction"></note-introduction>
   </div>
@@ -60,7 +67,7 @@
 import { mapState, mapMutations, mapActions } from 'vuex'
 export default {
   components: {
-    NoteIntroduction: () => import('@/components/Note/noteIntroduction.vue')
+    NoteIntroduction: () => import('@/components/note/note-introduction-dialog.vue')
   },
   data() {
     return {
@@ -162,7 +169,7 @@ export default {
     }
   }
   .note-list {
-    height: calc(100vh - 60px) !important;
+    // height: calc(100vh - 60px) !important;
     padding-bottom: 5px;
     overflow: auto;
     .note-list__item {
@@ -233,6 +240,12 @@ export default {
         background: #f1f1f1;
       }
     }
+  }
+  .no-note-tip {
+    margin-top: 20px;
+    font-size: 12px;
+    text-align: center;
+    color: gray;
   }
 }
 </style>

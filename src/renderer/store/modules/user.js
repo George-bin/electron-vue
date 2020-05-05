@@ -1,13 +1,17 @@
-import { loginRequest, registerRequest, logonRequest } from "../../api/user";
+import { loginRequest, registerRequest, logonRequest } from '../../api/user';
 
 const user = {
   state: {
     // 用户信息
-    userInfo: {}
+    userInfo: {},
+    isLogin: false
   },
   mutations: {
-    SET_USER_INFO: function(state, data) {
+    SET_USER_INFO (state, data) {
       state.userInfo = data;
+    },
+    SET_IS_Login (state, data) {
+      state.isLogin = data;
     }
   },
   actions: {
@@ -18,7 +22,8 @@ const user = {
           .then(res => {
             let { errcode, userInfo } = res.data;
             if (errcode === 0) {
-              commit("SET_USER_INFO", userInfo);
+              commit('SET_USER_INFO', userInfo);
+              commit('SET_IS_Login', true)
             }
             resolve(res.data);
           })
@@ -48,8 +53,9 @@ const user = {
       return new Promise((resolve, reject) => {
         logonRequest()
           .then(response => {
-            commit("SET_NOTE_LIST", []);
-            commit("SET_ACTIVE_MODULE", "");
+            commit('SET_NOTE_LIST', []);
+            commit('SET_ACTIVE_MODULE', '');
+            commit('SET_IS_Login', false)
             resolve(response.data);
           })
           .catch(err => {

@@ -1,8 +1,5 @@
 <template>
   <div class="register-component">
-    <div class="cancel-register">
-      <span @click="cancelRegister">取消</span>
-    </div>
     <!--输入框区域-->
     <div class="register-form-section">
       <div class="register-title">
@@ -15,7 +12,7 @@
         :rules="rules"
         :show-message="false"
         class="register-form"
-        label-width="50px">
+        label-width="60px">
         <el-form-item prop="account" label="账户">
           <el-input
             prefix-icon="el-icon-user-solid"
@@ -70,6 +67,7 @@
         </el-form-item>
         <el-form-item>
           <el-button :loading="loading" type="primary" @click.native="handleClickRegister" class="register-button">注册用户</el-button>
+          <el-button class="register-button" @click="cancelRegister">取消</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -78,8 +76,7 @@
 
 <script>
 import { validatorSpace } from '@/utils/script/validatorData'
-import windowFrame from '@/components/common/windowFrame-component.vue'
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   data () {
@@ -103,7 +100,11 @@ export default {
     }
   },
   components: {
-    windowFrame
+  },
+  computed: {
+    ...mapState({
+      isMac: state => state.home.isMac
+    })
   },
   methods: {
     ...mapActions([
@@ -157,13 +158,6 @@ export default {
 <style lang="scss">
   .register-component {
     height: 100%;
-    .cancel-register {
-      padding-right: 40px;
-      padding-top: 20px;
-      text-align: right;
-      color: #0A419B;
-      cursor: pointer;
-    }
     .register-form-section {
       position: fixed;
       top: 50%;

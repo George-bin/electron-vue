@@ -1,22 +1,19 @@
 <template>
   <div
     id="wrapper"
+    :style="{
+      paddingTop: isMac ? '0' : '26px'
+    }"
     @click="recovalNormal">
     <el-container
-      :style="{
-        paddingTop: isMac ? 0 : '30px'
-      }"
       class="event-list-box">
       <el-aside
-        :style="{
-          height: isMac ? '100vh' : 'calc(100vh - 30px)'
-        }"
         class="aside-menu-section">
         <!-- 用户信息 -->
         <user-info></user-info>
         <div
           :style="{
-            height: isMac ? 'calc(100vh - 105px)' : 'calc(100vh - 75px)'
+            height: isMac ? 'calc(100vh - 56px - 50px)' : 'calc(100vh - 26px - 56px - 50px)'
           }"
           class="catalog-section">
           <!-- 结构树 -->
@@ -38,16 +35,11 @@
 
       <!--右侧显示-->
       <el-main
-        :style="{
-          borderTop: isMac ? 0 : '1px solid #cccccc'
-        }">
+        :style="{borderTop: isMac ? 0 : '1px solid #cccccc'}">
         <!--当前笔记本中的笔记-->
         <div class="left-section">
           <note-list></note-list>
         </div>
-        <!--<i v-else class="iconfont icon-fanhui back-btn" title="返回" @click="goBack"></i>-->
-        <!--<i class="iconfont icon-bofang play-music-btn" :class="{ 'play-music-btn-remote': isPlayingFlag }" @click="playMusic" title="静心聆听"></i>-->
-        <!--<audio src="../../../../static/music/花粥-纸短情长.mp3" loop ref="audioElement"></audio>-->
         <div class="right-section">
           <!--子路由-->
           <router-view></router-view>
@@ -66,26 +58,21 @@
     <!--重命名笔记本-->
     <update-notebook-dialog ref="updateNotebookDialog"></update-notebook-dialog>
   </div>
+  <!-- https://github.com/electron-userland/electron-builder-binaries/releases/download/winCodeSign-2.4.0/winCodeSign-2.4.0.7z -->
 </template>
 
 <script>
-import Aplayer from "vue-aplayer";
-import tree from "@/components/common/tree-component";
-import windowFrame from "@/components/common/windowFrame-component.vue";
-import noteList from "@/components/home/noteList-component.vue";
 import { mapState, mapMutations, mapActions } from "vuex";
 export default {
-  name: "landing-page",
+  name: "Home",
   components: {
-    windowFrame,
-    Aplayer,
-    tree,
-    noteList,
-    UserInfo: () => import('@/components/home/userInfo.vue'),
-    UpdateNotebookDialog: () => import('@/components/home/updateNotebook-dialog.vue'),
-    CreateNotebookDialog: () => import('@/components/home/createNotebook-dialog.vue'),
-    NotebookRightMenu: () => import('@/components/common/notebookRightMenu'),
-    NoteRightMenu: () => import('@/components/Note/noteRightMenu')
+    tree: () => import('@/components/home/tree-component.vue'),
+    noteList: () => import('@/components/note/note-list-component.vue'),
+    UserInfo: () => import('@/components/home/user-info-component.vue'),
+    UpdateNotebookDialog: () => import('@/components/notebook/update-notebook-dialog.vue'),
+    CreateNotebookDialog: () => import('@/components/notebook/create-notebook-dialog.vue'),
+    NotebookRightMenu: () => import('@/components/notebook/notebook-right-menu-component.vue'),
+    NoteRightMenu: () => import('@/components/note/note-right-menu-component')
   },
   data() {
     return {
@@ -184,9 +171,7 @@ export default {
 
 <style lang="scss">
 #wrapper {
-  height: 100%;
   .event-list-box {
-    height: 100%;
     .aside-menu-section {
       width: 220px !important;
       text-align: left;
@@ -235,58 +220,8 @@ export default {
       }
     }
     .el-main {
-      display: flex;
       padding: 0;
-      transition: margin-left 1s;
-      .el-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 45px !important;
-        border-bottom: 1px solid #cccccc;
-        text-align: right;
-        background: #f7f7f7;
-        .edit-event-name {
-          width: 320px;
-          text-align: center;
-          cursor: pointer;
-        }
-        .back-btn {
-          font-size: 24px;
-          cursor: pointer;
-        }
-        .edit-event-name-input {
-          width: 300px;
-          height: 30px;
-          line-height: 30px;
-          padding: 0 10px;
-          border: none;
-          outline: none;
-          background: #dfdfdf;
-        }
-        strong {
-          margin-right: 10px;
-          color: orange;
-        }
-        span {
-          cursor: pointer;
-        }
-        .play-music-btn {
-          font-size: 24px;
-          cursor: pointer;
-        }
-        .play-music-btn-remote {
-          animation: rotate 3s linear infinite;
-        }
-        @keyframes remote {
-          from {
-            -webkit-transform: rotate(0deg);
-          }
-          to {
-            -webkit-transform: rotate(360deg);
-          }
-        }
-      }
+      display: flex;
       .right-section {
         flex: 1;
       }
