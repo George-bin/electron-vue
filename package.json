@@ -20,7 +20,7 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "博客管理端",
+    "productName": "BM",
     "appId": "com.example.yourapp2",
     "directories": {
       "output": "build"

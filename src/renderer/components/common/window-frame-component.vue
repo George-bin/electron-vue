@@ -1,6 +1,6 @@
 <template>
   <div class="global-drag-window">
-    <p class="app-name">Blog Manage</p>
+    <p class="app-name">BM</p>
     <div class="global-drag-window-box">
       <div class="global-top-btn global-top-btn-close" @click="windowClose" title="关闭">
         <i class="iconfont icon-htmal5icon21"></i>

@@ -101,7 +101,7 @@ function createWindow() {
     appTray = new Tray(iconPath);
     const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
     // 设置托盘悬浮提示
-    appTray.setToolTip("博客管理端");
+    appTray.setToolTip("BM");
     // 设置托盘菜单
     appTray.setContextMenu(contextMenu);
 
@@ -124,7 +124,7 @@ function createWindow() {
   } else {
     const template = [
       {
-        label: '博客管理端',
+        label: 'BM',
         submenu: [
           {
             label: '网络',
@@ -146,7 +146,7 @@ function createWindow() {
 ipcMain.on('loginSuccess', function() {
   const template = [
     {
-      label: '博客管理端',
+      label: 'BM',
       submenu: [
         {
           label: '注销',
@@ -175,7 +175,7 @@ ipcMain.on('loginSuccess', function() {
 ipcMain.on('logout', function() {
   const template = [
     {
-      label: '博客管理端',
+      label: 'BM',
       submenu: [
         {
           label: '网络',

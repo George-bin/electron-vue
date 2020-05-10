@@ -6,7 +6,7 @@
           <div class="logo">
             <img src="../../../../static/img/logo.png" alt="logo" />
           </div>
-          <h1>Blog Manage</h1>
+          <h1>BM</h1>
         </header>
         <div class="login-form">
           <div
