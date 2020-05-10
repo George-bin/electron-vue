@@ -68,9 +68,9 @@ export default {
           { required: true, message: '请输入简介内容!', trigger: 'blur' },
           { min: 10, max: 200, message: '长度在 10 到 200 个字符', trigger: 'blur' }
         ],
-        img: [
-          { required: true, message: '请上传封面图片!', trigger: 'blur' }
-        ],
+        // img: [
+        //   { required: true, message: '请上传封面图片!', trigger: 'blur' }
+        // ],
       }
     }
   },
