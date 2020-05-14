@@ -94,12 +94,12 @@ html {
 }
 
 pre {
-  max-height: 300px;
+  /* max-height: 300px; */
   padding: 10px;
   font-size: 14px;
   background: #1c2327;
   border-radius: 5px;
-  overflow: auto !important;
+  /* overflow: auto !important; */
 }
 
 .ql-snow .ql-editor pre.ql-syntax {
