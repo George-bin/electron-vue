@@ -7,7 +7,7 @@
         v-model="note.title"
         type="text"
         @keyup.enter="handleQuillFocus" />
-      <el-select class="set-note-label" v-model="note.type" placeholder="请选择">
+      <el-select class="set-note-label" size="small" v-model="note.type" placeholder="">
         <el-option label="正文" value="main" selected></el-option>
         <el-option label="草稿" value="draft"></el-option>
        </el-select>
@@ -248,9 +248,6 @@ export default {
     .set-note-label {
       width: 80px;
       margin-left: 10px;
-      .el-input__inner {
-        border-radius: 0;
-      }
     }
   }
   .ql-snow {
@@ -269,6 +266,16 @@ export default {
     overflow: auto !important;
     h1, h2, h3, h4, h5, h6, h7 {
       font-weight: bold;
+    }
+    pre {
+      white-space: pre-wrap;       /* css-3 */
+      white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+      white-space: -pre-wrap;      /* Opera 4-6 */
+      white-space: -o-pre-wrap;    /* Opera 7 */
+      word-wrap: break-word;       /* Internet Explorer 5.5+ */
+      overflow: auto;
+      word-break: break-all;
+      word-wrap: break-word;
     }
     p {
       img {

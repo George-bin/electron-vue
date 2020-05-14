@@ -104,16 +104,16 @@ pre {
 
 .ql-snow .ql-editor pre.ql-syntax {
   color: #333333;
-  background: #f7f7f7;
+  background: #e9ecef;
   /* border: 1px solid #d2d2d2; */
   border-radius: 0;
 }
 
-.ql-snow .ql-editor blockquote {
+/* .ql-snow .ql-editor blockquote {
   height: 30px;
   line-height: 30px;
   background: #f7f7f7;
-}
+} */
 
 pre,
 code {
