@@ -116,9 +116,19 @@ export default {
     ]),
     init() {
       this.note = JSON.parse(JSON.stringify(this.activeNote));
-      $('.ql-container').css({
-        height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 26px - 55px - 42px)'
-      });
+      qlContainerHeightComputed.call(this);
+      window.addEventListener('resize', qlContainerHeightComputed.bind(this));
+      function qlContainerHeightComputed() {
+        if (document.body.clientWidth >= 1149) {
+          $('.ql-container').css({
+            height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 26px - 55px - 42px)'
+          });
+        } else {
+          $('.ql-container').css({
+            height: this.isMac ? 'calc(100vh - 55px - 65px)' : 'calc(100vh - 26px - 55px - 66px)'
+          });
+        }
+      }
     },
 
     // 主动获取焦点
@@ -261,6 +271,7 @@ export default {
   }
 
   .ql-container {
+    position: static;
     // height: calc(100vh - 75px - 42px) !important;
     border: none !important;
     overflow: auto !important;
