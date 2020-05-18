@@ -57,7 +57,7 @@ request.interceptors.response.use(
           message: "登录态失效!"
         });
         router.push("/login");
-        return response;
+        return;
       default:
         return response;
     }    
