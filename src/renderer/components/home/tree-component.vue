@@ -1,6 +1,13 @@
 <template>
-  <ul class="tree-main-component">
-    <li v-for="(item, index) in folder" :key="index" class="tree-item">
+  <ul
+    class="tree-main-component">
+    <li
+      v-for="(item, index) in folder"
+      :key="index"
+      class="tree-item">
+      <!-- :style="{
+        height: item.show ? 40 * (item.children.length+1) + 'px' : 40 + 'px'
+      }" -->
       <div
         class="notebook-name"
         @click="handleSelectNode(item)"
@@ -27,7 +34,12 @@
           title="创建笔记本">
         </i>
       </div>
-      <tree v-if="item.children && item.show" :folder="item.children"></tree>
+      <!-- 子节点 -->
+      <tree
+        v-show="item.children && item.show"
+        :folder="item.children"
+        class="son-tree">
+      </tree>
     </li>
   </ul>
 </template>
@@ -50,7 +62,9 @@ export default {
     })
   },
   watch: {},
-  mounted() {},
+  mounted() {
+    console.log('folder', this.folder)
+  },
   methods: {
     ...mapActions(["GetNoteById"]),
     ...mapMutations([
@@ -162,6 +176,7 @@ export default {
         position: absolute;
         width: 8px;
         height: 8px;
+        transition: all 0.5s;
       }
       .expand-node {
         transform: rotate(90deg);

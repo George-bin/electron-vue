@@ -7,7 +7,12 @@
         v-model="note.title"
         type="text"
         @keyup.enter="handleQuillFocus" />
-      <el-select class="set-note-label" size="small" v-model="note.type" placeholder="">
+      <el-select
+        class="set-note-label"
+        size="small"
+        v-model="note.type"
+        @change="onNoteTypeChange"
+        placeholder="">
         <el-option label="正文" value="main" selected></el-option>
         <el-option label="草稿" value="draft"></el-option>
        </el-select>
@@ -112,14 +117,15 @@ export default {
   methods: {
     ...mapMutations([]),
     ...mapActions([
-      'UpdateNote'
+      'UpdateNote',
+      'UpdateNoteAttr'
     ]),
     init() {
       this.note = JSON.parse(JSON.stringify(this.activeNote));
       qlContainerHeightComputed.call(this);
       window.addEventListener('resize', qlContainerHeightComputed.bind(this));
       function qlContainerHeightComputed() {
-        if (document.body.clientWidth >= 1149) {
+        if (document.body.clientWidth >= 1149) { // 1257
           $('.ql-container').css({
             height: this.isMac ? 'calc(100vh - 55px - 41px)' : 'calc(100vh - 26px - 55px - 42px)'
           });
@@ -148,7 +154,9 @@ export default {
       );
       note.content = note.content.replace(/src="http:\/\/39.105.55.137\/file\/uploads\/images\/blog/g, 'src="/file/uploads/images/blog');
       this.UpdateNote({
-        ...note
+        _id: note._id,
+        content: note.content,
+        title: note.title
       })
         .then(data => {
           if (data.errcode === 0) {
@@ -160,7 +168,8 @@ export default {
           } else {
             this.$message({
               type: 'warning',
-              message
+              message,
+              duration: 1000
             });
           }
         })
@@ -168,7 +177,8 @@ export default {
           console.error('更新笔记失败:', err);
           this.$message({
             type: 'error',
-            message: '更新笔记失败!'
+            message: '更新笔记失败!',
+            duration: 1000
           });
         })
         .finally(() => {
@@ -230,6 +240,39 @@ export default {
     // 上传图片之前
     handleBeforeUploadImg() {
       this.uploadingImg = true
+    },
+
+    // 更新笔记类型
+    onNoteTypeChange(type) {
+      this.UpdateNoteAttr({
+        _id: this.activeNote._id,
+        type
+      })
+        .then(data => {
+          let { errcode, message } = data
+          if (errcode === 0) {
+            this.$message({
+              type: 'success',
+              message: `文章被设置为${type === 'main' ? '正文' : '草稿'}!`,
+              duration: 1000
+            })
+          } else {
+            this.note.type = this.activeNote.type
+            this.$message({
+              type: 'warning',
+              message,
+              duration: 1000
+            })
+          }
+        })
+        .catch(err => {
+          this.note.type = this.activeNote.type
+          console.error('更新笔记类型失败!')
+          this.$message({
+            type: 'error',
+            message: '更新笔记类型失败!'
+          })
+        })
     }
   }
 }
@@ -259,6 +302,9 @@ export default {
       width: 80px;
       margin-left: 10px;
     }
+  }
+  .ql-active {
+    color: #0a419b !important;
   }
   .ql-snow {
     border-left: none !important;

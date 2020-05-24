@@ -6,8 +6,7 @@ import {
   deleteNoteRequest,
   updateNoteRequest,
   clearNoteRequest,
-  getNoteByIdRequest,
-  updateNoteIntroductionRequest
+  getNoteByIdRequest
 } from '../../api/home'
 import {
   recursionUpdateNoteNum
@@ -169,10 +168,10 @@ const note = {
           })
       })
     },
-    // 更新笔记
-    UpdateNoteIntroduction({ commit }, data) {
+    // 更新笔记属性：type、img、introduction等
+    UpdateNoteAttr({ commit }, data) {
       return new Promise((resolve, reject) => {
-        updateNoteIntroductionRequest(data)
+        updateNoteRequest(data)
           .then(res => {
             let { errcode, note } = res.data;
             if (errcode === 0) {

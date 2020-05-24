@@ -92,7 +92,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'UpdateNoteIntroduction'
+      'UpdateNoteAttr'
     ]),
     init() {
       let network = localStorage.getItem('network');
@@ -128,13 +128,18 @@ export default {
     handleClickSubmit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          this.UpdateNoteIntroduction({
+          this.UpdateNoteAttr({
             ...this.formData
           })
             .then(data => {
-              this.dialogVisible = false;
               let { errcode, message } = data
               if (errcode === 0) {
+                this.$message({
+                  type: 'success',
+                  message: '成功!',
+                  duration: 1000
+                })
+                this.dialogVisible = false;
                 return;
               }
               this.$message({

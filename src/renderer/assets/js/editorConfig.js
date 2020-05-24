@@ -1,4 +1,8 @@
 import hljs from "highlight.js";
+import Quill from 'quill'  //引入编辑器
+var fonts = ['Microsoft-YaHei','SimSun', 'SimHei','KaiTi','Arial'];
+var Font = Quill.import('formats/font');
+Font.whitelist = fonts; //将字体加入到白名单
 
 export default {
   // placeholder: "",
@@ -15,7 +19,7 @@ export default {
         // [{ header: 1 }, { header: 2 }, { header: 4 }],
         // 字体
         // [{ font: [] }],
-        // [{ font: ['Microsoft-YaHei','SimSun', 'SimHei','KaiTi','Arial'] }],
+        // [{ font: fonts }],/
         // 几级标题
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
         [{ 'size': ['10px', '12px', '14px', false,'18px', '20px', '22px', '24px', '26px', '32px', '48px'] }],
